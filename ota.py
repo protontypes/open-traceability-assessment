@@ -360,8 +360,6 @@ def collect_evidence(args: argparse.Namespace) -> tuple[str, list[EvidenceItem]]
 SYSTEM_PROMPT = """You are an expert evaluator of open science, open-source software, environmental evidence chains, reproducibility, and scientific traceability.
 
 Assess the supplied project or report using the Open Traceability definition supplied by the user. You must score stages 1-6 from 0 to 100. Use only the supplied assessment definition and supplied evidence bundle. Do not invent facts. If evidence is absent, score conservatively and say what evidence is missing.
-Investigate related and linked projects across Git repositories, URLs, and other referenced documents within the URL starter for the assessment. 
-
 
 Scoring calibration:
 0-20: little or no public evidence for this dimension.
@@ -383,6 +381,9 @@ For every stage:
 - Provide a score derivation that explains why the score is not higher and not lower.
 - Include references from the evidence bundle. Each reference must have a URL and concrete finding.
 - If direct evidence is missing, include that absence in the derivation.
+
+Investigate related and linked projects across Git repositories, URLs, and other referenced documents within the URL starter for the assessment. 
+Create a full evidence chain from input data (1) to (5), then use this chain of evidence to create your assessment.
 """
 
 
