@@ -4,9 +4,11 @@ A Python command-line tool for running repeated **Open Traceability Assessments*
 
 The tool uses the OpenAI API to assess how externally inspectable the evidence chain behind a project or claim is. It can run the same assessment multiple times, capture score variation across runs, preserve references used for scoring, show derivations for each score, and produce both structured JSON and a Markdown report.
 
+⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. ⚠️
+
 ## Background
 
-Open Traceability asks a practical governance question:
+Rather than asking whether an environmental statement, insight, report or number is true or false, the Open Traceability Concept asks:
 
 > How open, linked, and externally inspectable is the evidence chain behind a sustainability or environmental claim?
 
@@ -231,10 +233,3 @@ This tool has important limitations:
 - [ecosyste.ms](https://ecosyste.ms/)
 - [OpenSustain.tech](https://opensustain.tech/)
 
-## License
-
-Choose a license that matches your intended reuse model. For open-source software, a recognized open-source license such as MIT, Apache-2.0, BSD-3-Clause, or GPL-3.0 is recommended. For documentation and assessment reports, a Creative Commons license may be appropriate.
-
-## Citation
-
-If you use this project in research, policy analysis, or public reporting, cite the Open Traceability Initiative and include the exact version of the assessment script, prompt, model, date of assessment, project URL, and evidence bundle used.
