@@ -6,7 +6,9 @@ The tool uses the OpenAI API and/or the Anthropic (Claude) API to assess how ext
 
 ⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. ⚠️
 
-![](opentraceability-evidence-chain.png)
+<p align="center">
+  <img src="opentraceability-evidence-chain.png" width="700"  />
+</p>
 
 ## Background
 
