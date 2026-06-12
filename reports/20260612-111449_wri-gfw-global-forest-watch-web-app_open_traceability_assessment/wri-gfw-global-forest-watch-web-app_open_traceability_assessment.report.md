@@ -1,4 +1,6 @@
-# Open Traceability Assessment Report
+# Open Traceability Assessment Report: wri/gfw Global Forest Watch web app
+
+- [ ] **Human reviewer:** I have validated all claims in this report against the references provided, and reviewed, edited, and approved its contents.
 
 - Project/report URL: https://github.com/wri/gfw
 - Assessment definition URL: https://raw.githubusercontent.com/protontypes/open-traceability/refs/heads/main/docs/definition.md

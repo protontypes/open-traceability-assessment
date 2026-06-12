@@ -360,6 +360,8 @@ def collect_evidence(args: argparse.Namespace) -> tuple[str, list[EvidenceItem]]
 SYSTEM_PROMPT = """You are an expert evaluator of open science, open-source software, environmental evidence chains, reproducibility, and scientific traceability.
 
 Assess the supplied project or report using the Open Traceability definition supplied by the user. You must score stages 1-6 from 0 to 100. Use only the supplied assessment definition and supplied evidence bundle. Do not invent facts. If evidence is absent, score conservatively and say what evidence is missing.
+Investigate related and linked projects across Git repositories, URLs, and other referenced documents within the URL starter for the assessment. 
+
 
 Scoring calibration:
 0-20: little or no public evidence for this dimension.
@@ -601,6 +603,24 @@ def model_to_dict(model_obj: BaseModel) -> dict:
     return model_obj.dict()
 
 
+# Human-review gate mirrored from the report's Markdown checkbox. `approved` starts
+# false; a human flips it to true after validating every claim against the references.
+HUMAN_REVIEW_INSTRUCTIONS = (
+    "Validate all claims in this report against the references provided, then review, "
+    "edit, and approve its contents. Set approved to true once done."
+)
+
+
+def build_runs_payload(runs: list[AssessmentRun]) -> dict:
+    return {
+        "human_review": {
+            "approved": False,
+            "instructions": HUMAN_REVIEW_INSTRUCTIONS,
+        },
+        "runs": [model_to_dict(r) for r in runs],
+    }
+
+
 def stage_by_number(run: AssessmentRun, stage_number: int) -> StageAssessment:
     matches = [stage for stage in run.stages if stage.stage == stage_number]
     if not matches:
@@ -748,8 +768,18 @@ def write_markdown_report(
     model_runs = models_with_runs(runs)
     evidence_urls = {normalize_url(item.url) for item in evidence_items}
 
+    project_name = next((run.project_name for run in runs if run.project_name), "")
+
     lines: list[str] = []
-    lines.append("# Open Traceability Assessment Report")
+    if project_name:
+        lines.append(f"# Open Traceability Assessment Report: {project_name}")
+    else:
+        lines.append("# Open Traceability Assessment Report")
+    lines.append("")
+    lines.append(
+        "- [ ] **Human reviewer:** I have validated all claims in this report against the "
+        "references provided, and reviewed, edited, and approved its contents."
+    )
     lines.append("")
     lines.append(f"- Project/report URL: {project_url}")
     lines.append(f"- Assessment definition URL: {definition_url}")
@@ -1060,7 +1090,7 @@ def main() -> None:
                 md_path = run_dir / f"{name_prefix}.report.md"
 
             json_path.write_text(
-                json.dumps([model_to_dict(r) for r in runs], indent=2, ensure_ascii=False),
+                json.dumps(build_runs_payload(runs), indent=2, ensure_ascii=False),
                 encoding="utf-8",
             )
             print(f"  Saved {len(runs)} run(s) so far to {json_path}")

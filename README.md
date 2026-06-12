@@ -196,6 +196,10 @@ With `--provider both`, `--runs` applies to each provider, so the example above 
 | `--output-dir` | `reports` | Base directory for the per-run output folder. |
 | `--out-prefix` | `open_traceability_assessment` | Filename prefix for the JSON and Markdown outputs. |
 
+## Token consumption and cost
+
+> ⚠️ **Warning:** this tool sends a large evidence bundle to the model on every run, so it consumes a significant number of tokens. A default assessment can cost up to around **$1**, depending on the model and plan you use.
+
 ## Outputs
 
 Each invocation writes its results into a dedicated folder named with a timestamp and the assessed project, under `--output-dir` (default `reports`). For example:
@@ -208,7 +212,7 @@ reports/20260612-101648_invest_open_traceability/
 
 Results are written incrementally — the JSON is saved after every successful run — so a transient failure on a later run does not discard the runs that already completed.
 
-The JSON output contains the full structured assessment data for every run, including:
+The JSON output is an object with a top-level `human_review` flag (`approved`, starting `false`, plus reviewer instructions) and a `runs` array. A human reviewer validates all claims against the references provided and sets `approved` to `true`. Each entry in `runs` contains the full structured assessment data for that run, including:
 
 - Run number.
 - Project name and URL.
@@ -223,6 +227,7 @@ The JSON output contains the full structured assessment data for every run, incl
 
 The Markdown report summarizes across runs rather than repeating each run verbatim, and contains:
 
+- A human-reviewer approval checkbox at the top, to be checked once all claims have been validated against the references provided.
 - The provider model(s) used, with the run numbers each produced.
 - A final single-paragraph summary.
 - A score table across runs, with average and standard deviation by dimension.

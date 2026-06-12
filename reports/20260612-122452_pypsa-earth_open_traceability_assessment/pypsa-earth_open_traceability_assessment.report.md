@@ -1,4 +1,6 @@
-# Open Traceability Assessment Report
+# Open Traceability Assessment Report: PyPSA-Earth
+
+- [ ] **Human reviewer:** I have validated all claims in this report against the references provided, and reviewed, edited, and approved its contents.
 
 - Project/report URL: https://github.com/pypsa-meets-earth/pypsa-earth
 - Assessment definition URL: https://raw.githubusercontent.com/protontypes/open-traceability/refs/heads/main/docs/definition.md
