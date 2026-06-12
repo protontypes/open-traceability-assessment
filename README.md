@@ -6,6 +6,8 @@ The tool uses the OpenAI API and/or the Anthropic (Claude) API to assess how ext
 
 ⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. ⚠️
 
+![](opentraceability-evidence-chain.png)
+
 ## Background
 
 Rather than asking whether an environmental statement, insight, report or number is true or false, the Open Traceability Concept asks:
@@ -18,7 +20,6 @@ The project responds to a common weakness in sustainability decision-making: cla
 
 Open Traceability therefore shifts attention from openness of isolated artifacts to the inspectability of the **claim-support chain**. A dataset, repository, report, or paper may be public, but it is only traceable when the links between inputs, methods, execution, review, and outputs are explicit enough for others to examine.
 
-![](opentraceability-evidence-chain.png)
 
 ## What this tool does
 
