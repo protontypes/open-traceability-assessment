@@ -1,0 +1,936 @@
+[
+  {
+    "run_number": 1,
+    "project_name": "PyPSA-Eur",
+    "project_url": "https://github.com/pypsa/pypsa-eur",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 72,
+        "score_derivation": "The project provides strong public evidence that its model dataset is built from identifiable external data sources, including OpenStreetMap, powerplantmatching, ENTSO-E Transparency Platform demand data, ERA5/SARAH-3 renewable time series via atlite, Eurostat, and JRC-IDEES. The bundled ENTSO-E/GridKit dataset documentation describes file contents, fields, processing caveats, and known inaccuracies, which supports external inspection of some primary/secondary input evidence. There is also evidence of a data-versioning layer with schema validation for dataset versions, sources, URLs, and tags. The score is not higher because the evidence bundle does not include the actual `data/versions.csv`, complete data-source licences, full primary-data provenance for every input, or quantified measurement errors/uncertainties for most datasets. It is not lower because the README and dataset documentation make many inputs identifiable and documented, and there is explicit testing around the dataset-version metadata structure.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence bundle shows substantial data-source documentation but omits key files such as the actual versions table and full data documentation.",
+        "references": [
+          {
+            "label": "README data sources",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "States that PyPSA-Eur is built from open data using a Snakemake workflow and lists sources including OpenStreetMap, powerplantmatching, ENTSO-E Transparency Platform, ERA5/SARAH-3 via atlite, Eurostat, and JRC-IDEES.",
+            "relevance": "Shows that major input datasets are publicly identified and connected to the model-building process."
+          },
+          {
+            "label": "ENTSO-E/GridKit dataset README",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/data/entsoegridkit/README.md",
+            "quote_or_finding": "Documents that the dataset was generated from a March 2022 ENTSO-E interactive-map extract processed by GridKit, lists CSV contents and fields, and warns about inaccuracies such as approximate coordinates and inferred transformers.",
+            "relevance": "Provides concrete input-data documentation, processing provenance, and quality caveats for a key grid dataset."
+          },
+          {
+            "label": "Data versions validation test",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/test/test_data_versions_layer.py",
+            "quote_or_finding": "Defines schema checks for `data/versions.csv`, including dataset, version, source, tags, added date, URL, archive URL requirements, and consistency of latest versions across sources.",
+            "relevance": "Shows an explicit mechanism for validating dataset-version metadata, though the actual version table is not included in the bundle."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 88,
+        "score_derivation": "The analytical software is publicly available in a version-controlled GitHub repository, is described as fully open source, and has a citation file specifying repository, version, and MIT licence. The repository includes explicit dependency/environment specification, tests, Docker development environment, and open-source tooling such as PyPSA, Snakemake, and atlite. The score is not higher because GitHub repository metadata reports `license: null`, and the bundle does not include a root LICENSE file or full confirmation that all infrastructure and dependent datasets are under compatible open licences. It is not lower because multiple supplied artifacts show inspectable code, tests, dependency declarations, SPDX headers, and machine-readable citation/licensing metadata.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The evidence bundle contains direct repository, citation, environment, Docker, and test files supporting this dimension.",
+        "references": [
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "Repository is public-facing as `PyPSA/pypsa-eur`, described as `A Sector-Coupled Open Optimisation Model of the European Energy System`, with default branch `master` and many energy-system topics; metadata license field is null.",
+            "relevance": "Confirms the public version-controlled software project and identifies a licensing metadata gap."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "Specifies title, repository URL, version `v2026.02.0`, licence `MIT`, and author ORCIDs.",
+            "relevance": "Provides machine-readable citation, version, authorship, repository, and licence information."
+          },
+          {
+            "label": "Environment file",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/envs/environment.yaml",
+            "quote_or_finding": "Lists conda channels and dependencies such as pypsa, snakemake-minimal, atlite, linopy, geopandas, pandas, xarray, and solver packages.",
+            "relevance": "Makes the software dependencies and computational stack inspectable."
+          },
+          {
+            "label": "Docker development environment",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/docker/dev-env/Dockerfile",
+            "quote_or_finding": "Defines a development container based on pixi, installs from `pixi.toml` and `pixi.lock`, and labels the image source as the GitHub repository.",
+            "relevance": "Shows infrastructure software for running the project environment outside a single local setup."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 78,
+        "score_derivation": "There is strong evidence of reproducible execution infrastructure: the README states the model is built from open data using Snakemake, dependencies are declared, a Docker/pixi environment is provided, unit and integration tests run through GitHub Actions, and CI uploads logs and results artifacts. The release workflow updates DAGs in documentation, and the image workflow tags development images by commit SHA. The score is not higher because the evidence bundle does not include the main Snakefile, example complete workflow commands, exact scenario configuration used for a specific reported environmental claim, durable run artifacts, or evidence that a particular publication result can be re-executed end-to-end by an external actor. It is not lower because the supplied workflows, tests, and environment files make much of the computational path inspectable and partially re-executable.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence clearly shows CI and environment automation, but the bundle omits central workflow and scenario files needed to judge full end-to-end reproducibility.",
+        "references": [
+          {
+            "label": "README workflow statement",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "States that the model is built from open data using a Snakemake workflow and is fully open source.",
+            "relevance": "Directly supports inspectability of the computational process from inputs to model dataset."
+          },
+          {
+            "label": "GitHub test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/test.yaml",
+            "quote_or_finding": "Runs unit tests and integration tests on pushes, pull requests, schedules, and manual dispatch; integration tests call `pixi run integration-tests` and upload logs, `.snakemake/log`, and results artifacts for 3 days.",
+            "relevance": "Shows automated execution checks and some public workflow artifacts, though short retention limits durable reproducibility evidence."
+          },
+          {
+            "label": "Environment specification",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/envs/environment.yaml",
+            "quote_or_finding": "Declares the conda environment name and extensive dependency list with version constraints.",
+            "relevance": "Supports recreation of the computational environment."
+          },
+          {
+            "label": "Image build workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/push-images.yaml",
+            "quote_or_finding": "Builds and pushes `ghcr.io/pypsa/eur-dev-env` images tagged with the GitHub commit SHA and `latest` on master.",
+            "relevance": "Provides evidence of commit-linked execution environments, improving re-executability."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 76,
+        "score_derivation": "The project has visible community and review channels: GitHub issues are active, contributing documentation invites bug reports, issues, pull requests, and Discord discussion, and the contribution policy states a four-eyes principle requiring review by a second person before incorporation. CI workflows add automated test, validation, CodeQL, SBOM, and vulnerability review layers. The score is not higher because the evidence bundle does not include actual issue or pull-request discussions, peer-review reports for linked papers, governance records, correction notices, or documented responses to specific scientific challenges. It is not lower because the public repository, issue tracker, contribution rules, and automated review workflows provide a substantial visible scrutiny infrastructure.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The review mechanisms are directly documented, but the bundle does not include concrete examples of review discussions or corrections.",
+        "references": [
+          {
+            "label": "Repository metadata issues",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "Repository metadata reports `open_issues_count: 256`.",
+            "relevance": "Indicates an active public issue-tracking channel for scrutiny and problem reporting."
+          },
+          {
+            "label": "Contributing guide",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/doc/contributing.md",
+            "quote_or_finding": "Invites contributions via issues and pull requests, points to `help wanted` issues, links a Discord server, and states that all code follows the four-eyes principle with review by a second person before incorporation.",
+            "relevance": "Direct evidence of public contribution, discussion, and review processes."
+          },
+          {
+            "label": "Validation workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/validate.yaml",
+            "quote_or_finding": "Runs a PyPSA validator on pull requests from the same repository and can create a validation report comment with specified result plots.",
+            "relevance": "Shows automated methodological or model-output validation integrated into review."
+          },
+          {
+            "label": "Security scan workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/security-scan.yaml",
+            "quote_or_finding": "Generates an SBOM and vulnerability scan, uploads SARIF, and fails fork PRs on new high-severity CVEs relative to master.",
+            "relevance": "Shows visible automated review of dependencies and security aspects of the software evidence chain."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 73,
+        "score_derivation": "The project communicates its claims and usage publicly through a README, ReadTheDocs homepage, citation metadata, Zenodo DOI badges, diagrams, warnings, linked limitations, and references to showcase papers. The README clearly describes the project as an open sector-coupled optimisation model of the European energy system and lists model scope, input sources, warnings, and limitations. The score is not higher because the evidence bundle does not include the ReadTheDocs pages, full publications, licence metadata for all reports/dashboards, version histories for dynamic outputs, or detailed claim-by-claim citations to exact supporting artifacts. It is not lower because the available README and citation file provide accessible, documented, citable public communication with explicit warnings and reuse information.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The bundle contains strong top-level communication artifacts but not the full documentation site or linked publications.",
+        "references": [
+          {
+            "label": "README communication and warnings",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "Describes model coverage, included sectors and networks, provides diagrams, links documentation, Zenodo DOIs, papers, issues, and states that PyPSA-Eur is under active development with limitations users should understand.",
+            "relevance": "Shows accessible public communication of scope, evidence sources, outputs, and caveats."
+          },
+          {
+            "label": "README SPDX licence header",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "Header includes `SPDX-License-Identifier: CC-BY-4.0`.",
+            "relevance": "Supports open licensing of the main communication artifact."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "Provides citation title, version `v2026.02.0`, repository, licence, and authors with ORCIDs.",
+            "relevance": "Makes the project citable and helps preserve publication context for reuse."
+          },
+          {
+            "label": "Repository homepage metadata",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "Repository metadata lists homepage `https://pypsa-eur.readthedocs.io/`.",
+            "relevance": "Shows the project maintains a public documentation endpoint, although the documentation contents are not included in the bundle."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 64,
+        "score_derivation": "There is moderate-to-strong linkage across the evidence chain: the README links the model claim to data sources, tools, documentation, issues, releases, Zenodo records, and papers; CITATION.cff records a specific version and repository; workflow files connect tests, release preparation, validation, Docker images, and security scans to commits; and the data-version schema indicates an intended structure for dataset provenance. The score is not higher because the bundle does not show an explicit, complete, versioned provenance manifest linking a specific environmental claim or publication result to exact dataset versions, code commit, configuration, Snakemake run, solver settings, logs, review records, and final output artifacts. It is not lower because many components are publicly linked and version-control/CI practices make important parts of the chain externally inspectable.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The project has many linkage mechanisms, but the evidence bundle lacks a concrete end-to-end claim-to-run provenance record.",
+        "references": [
+          {
+            "label": "README source and publication links",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "Links releases, documentation, test workflow, Zenodo DOIs, Discord, input datasets, limitations, issues, and showcase papers from the project overview.",
+            "relevance": "Provides top-level linkage among claims, data sources, software, documentation, community channels, and publications."
+          },
+          {
+            "label": "CITATION version linkage",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "Identifies repository `https://github.com/pypsa/pypsa-eur` and version `v2026.02.0`.",
+            "relevance": "Supports versioned linkage between citations/publications and the software artifact."
+          },
+          {
+            "label": "Release workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/release.yaml",
+            "quote_or_finding": "On version tags, validates/creates a release-preparation commit, runs `pixi run update-dags`, deletes and recreates the tag, and commits generated release changes.",
+            "relevance": "Shows release-time linkage between tagged versions and generated workflow documentation, though not a complete provenance record."
+          },
+          {
+            "label": "Data versions validation layer",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/test/test_data_versions_layer.py",
+            "quote_or_finding": "Validates `data/versions.csv` fields for dataset, version, source, tags, added date, note, and URL, including archive URL requirements and latest-version consistency.",
+            "relevance": "Indicates a structured mechanism for linking datasets to versions and URLs, but the actual manifest is absent from the evidence bundle."
+          },
+          {
+            "label": "Image SHA tagging workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/push-images.yaml",
+            "quote_or_finding": "Builds or retags development-environment images as `ghcr.io/pypsa/eur-dev-env:${{ github.sha }}`.",
+            "relevance": "Connects computational environments to exact code commits, strengthening linkage between code and execution context."
+          }
+        ]
+      }
+    ],
+    "total_score": 75,
+    "total_score_derivation": "Computed locally as round(mean([72, 88, 78, 76, 73, 64])) = 75.",
+    "single_paragraph_summary": "PyPSA-Eur shows a strong open-traceability profile for an open energy-system modelling project: the repository is public, citable, versioned, extensively tooled, and supported by documented data sources, dependency files, tests, CI workflows, containerized environments, contribution rules, issue tracking, and public documentation links. Its strongest areas are open-source methods/software and reproducible execution infrastructure. The main traceability gaps are not basic openness but end-to-end specificity: the evidence bundle does not include a complete provenance manifest tying a specific environmental claim or publication result to exact input dataset versions, code commit, model configuration, solver settings, workflow run, logs, review records, and output artifacts; it also lacks full input licences and quantified uncertainties for many data sources.",
+    "limitations": [
+      "The assessment uses only the supplied evidence bundle and does not inspect repository files or documentation pages not included in the bundle.",
+      "The bundle omits central files that would affect scoring, such as the main Snakefile, `pixi.toml`/`pixi.lock`, root LICENSE file, `data/versions.csv`, full configuration files, release artifacts, and ReadTheDocs content.",
+      "GitHub repository metadata reports `license: null`, while CITATION.cff and SPDX headers indicate MIT/CC licences; the assessment treats this as a licensing metadata inconsistency rather than resolving it externally.",
+      "No specific environmental claim or publication result was supplied, so Stage 6 linkage was assessed at the project-infrastructure level rather than for a concrete claim-to-evidence chain.",
+      "The evidence shows tests and CI workflows but not their current pass/fail status, durable logs, or the outputs of actual workflow runs beyond workflow definitions.",
+      "The bundle includes references to peer-reviewed papers and Zenodo DOIs but not the paper texts, peer-review records, or archived release contents."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 2,
+    "project_name": "PyPSA-Eur",
+    "project_url": "https://github.com/pypsa/pypsa-eur",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 76,
+        "score_derivation": "PyPSA-Eur provides strong public evidence that major input datasets are identifiable and documented: the README names the principal sources for grid, power plants, demand, weather/renewables, land eligibility, and energy balances, and states that the model is built from open data. The bundled ENTSO-E/GridKit dataset README gives concrete field-level documentation and important quality warnings, including known inaccuracies and derived fields. There is also evidence of a data-versioning layer with validation rules for dataset/version/source/tags/URLs. The score is not higher because the evidence bundle does not include the actual data/versions.csv contents, full licences for every upstream dataset, primary-data provenance for all secondary sources, quantified measurement errors/uncertainties for all inputs, or a complete externally verifiable chain from each secondary dataset back to primary measurements. It is not lower because the public repository clearly identifies major data sources, documents at least some embedded datasets in detail, and includes automated validation logic for data-version metadata.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence shows strong input-source documentation patterns, but the actual full data catalog and many upstream dataset details are not included in the bundle.",
+        "references": [
+          {
+            "label": "README input data overview",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "The README says the model is built from open data and lists sources including OpenStreetMap, powerplantmatching, ENTSO-E Transparency Platform, ERA5 and SARAH-3 via atlite, and Eurostat/JRC-IDEES energy balances.",
+            "relevance": "Supports identifiability and public documentation of major input datasets."
+          },
+          {
+            "label": "ENTSO-E/GridKit dataset documentation",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/data/entsoegridkit/README.md",
+            "quote_or_finding": "Documents the unofficial ENTSO-E dataset, its March 2022 map extract origin, CSV contents, field definitions, and cautions such as coordinates being topological rather than geographically exact and transformers being derived rather than present in the original dataset.",
+            "relevance": "Shows measurement/source documentation and explicit quality limitations for an important grid input."
+          },
+          {
+            "label": "Data version validation layer",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/test/test_data_versions_layer.py",
+            "quote_or_finding": "Defines validation for data/versions.csv with dataset, version, source, tags, added date, note, and URL fields; archive entries must have URLs and latest tags are checked for consistency.",
+            "relevance": "Indicates an explicit mechanism for versioning and validating dataset-source metadata."
+          },
+          {
+            "label": "README limitations warning",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "The README warns that PyPSA-Eur is under active development, has limitations, and that high-granularity assignment of loads/generators to nearest network nodes may be unrealistic in some cases.",
+            "relevance": "Shows public disclosure of data/model limitations relevant to input quality and transformations."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 88,
+        "score_derivation": "The analytical software and model-building logic are publicly available in a version-controlled GitHub repository, with clear open-source signals: the citation file names the repository, version v2026.02.0, and MIT licence; source/test files carry MIT SPDX identifiers; documentation carries CC-BY/CC0 identifiers; dependencies are specified in a conda environment file; and a Docker development environment is defined. The README states the model is fully open source and built with Snakemake for use with the open-source PyPSA framework. The score is not higher because the GitHub metadata in the evidence reports license as null, and the bundle does not include the top-level LICENSE file, full Snakemake rules, full dependency lockfile, or complete model-method documentation. It is not lower because the repository, licence metadata, dependency specification, container setup, and testable code evidence form a strong inspectable software basis.",
+        "uncertainty": "low",
+        "uncertainty_reason": "Multiple independent artifacts in the bundle directly document public code, licensing, dependencies, and software infrastructure.",
+        "references": [
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "The project is a public GitHub repository described as 'PyPSA-Eur: A Sector-Coupled Open Optimisation Model of the European Energy System' with active issue tracking and energy-system modelling topics.",
+            "relevance": "Establishes the public version-controlled software repository."
+          },
+          {
+            "label": "CITATION.cff licence and version",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "The citation file gives repository https://github.com/pypsa/pypsa-eur, version v2026.02.0, and license MIT.",
+            "relevance": "Supports explicit versioning, attribution, and open-source licensing."
+          },
+          {
+            "label": "README open-source workflow statement",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "The README states that the model is built from open data using a Snakemake workflow and is fully open source, designed for import into PyPSA.",
+            "relevance": "Documents the open methodological/software approach and modelling framework."
+          },
+          {
+            "label": "Conda environment",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/envs/environment.yaml",
+            "quote_or_finding": "Lists a named pypsa-eur environment with many pinned or bounded dependencies, including pypsa, snakemake-minimal, linopy, atlite, powerplantmatching, geospatial libraries, and solvers.",
+            "relevance": "Provides inspectable dependency information needed to understand and run the model."
+          },
+          {
+            "label": "Development Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/docker/dev-env/Dockerfile",
+            "quote_or_finding": "Defines a dev environment container based on ghcr.io/prefix-dev/pixi, copies pixi.toml and pixi.lock, installs the default pixi environment, and sets an entrypoint.",
+            "relevance": "Shows open infrastructure software for operating the development environment."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 82,
+        "score_derivation": "There is strong evidence for reproducible execution infrastructure: the README identifies a Snakemake workflow; dependency and container environments are supplied; GitHub Actions run unit tests, integration tests, lint checks, and Snakemake test workflows; artifacts such as logs and results are uploaded; release automation updates DAGs; and a validator workflow runs self-hosted validation and creates reports. This is substantially more than code availability and gives external users a path to inspect and re-run at least test and validation workflows. The score is not higher because the evidence bundle does not include a specific completed model run tying exact inputs, configuration, solver settings, random seeds if any, outputs, logs, and reported environmental claims together; nor does it include the full Snakefile/rules or archived workflow outputs beyond CI configuration. It is not lower because CI, environment files, Docker, tests, and Snakemake integration provide a robust reproducibility scaffold.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Execution tooling is well evidenced, but the bundle lacks a concrete end-to-end run record for a published result or scenario.",
+        "references": [
+          {
+            "label": "README Snakemake workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "The README states the model is built from open data using a Snakemake workflow.",
+            "relevance": "Identifies the workflow system connecting inputs and computations."
+          },
+          {
+            "label": "Test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/test.yaml",
+            "quote_or_finding": "GitHub Actions runs unit tests and integration tests on push, pull request, schedule, and manual dispatch; integration tests run Snakemake test workflows and upload logs, .snakemake/log, and results artifacts.",
+            "relevance": "Demonstrates automated execution checks and preservation of some execution artifacts."
+          },
+          {
+            "label": "Environment specification",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/envs/environment.yaml",
+            "quote_or_finding": "Specifies the pypsa-eur conda environment with Python, PyPSA, Snakemake, solvers, and geospatial/data dependencies.",
+            "relevance": "Supports reproducibility of the computational environment."
+          },
+          {
+            "label": "Development container",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/docker/dev-env/Dockerfile",
+            "quote_or_finding": "Builds a pixi-based development container from pixi.toml and pixi.lock and installs the default environment.",
+            "relevance": "Provides a reusable execution environment independent of a local manual setup."
+          },
+          {
+            "label": "Validator workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/validate.yaml",
+            "quote_or_finding": "For pull requests from the same repository, a pypsa-validator action runs self-hosted validation using envs/environment.yaml and config/test/config.validator.yaml, then can create a report with plots such as energy, costs, and balances graphs.",
+            "relevance": "Shows additional execution validation beyond ordinary unit tests."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 79,
+        "score_derivation": "The project has strong public community and review mechanisms. The repository metadata shows a substantial open issue tracker; the contributing guide invites bug reports, ideas, issues, pull requests, help-wanted work, and Discord discussion; and it explicitly says code contributions follow a four-eyes/two-person review principle. CI, CodeQL, security scans, lockfile update PRs, and validation workflows provide visible automated review and correction channels. The score is not higher because the evidence bundle does not include concrete examples of peer-review reports, issue discussions, pull-request review threads, governance decisions, correction notices, or affected-community engagement records. It is not lower because the public repository clearly provides mechanisms for critique, contribution, review, security checking, and validation.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The mechanisms for community review are explicit, but the bundle contains little direct evidence of actual review conversations or outcomes.",
+        "references": [
+          {
+            "label": "Repository issue count",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "Repository metadata reports open_issues_count of 256.",
+            "relevance": "Shows an active public issue-tracking channel for scrutiny and correction."
+          },
+          {
+            "label": "Contributing guide",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/doc/contributing.md",
+            "quote_or_finding": "The guide welcomes ideas, suggestions, bug reports, code contributions, issues, draft pull requests, and Discord discussion.",
+            "relevance": "Documents open channels for community input and error reporting."
+          },
+          {
+            "label": "Four-eyes review principle",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/doc/contributing.md",
+            "quote_or_finding": "The guide states that all code contributions follow the four-eyes principle, meaning suggested code is reviewed by a second person before incorporation.",
+            "relevance": "Supports visible review and quality-control expectations for changes."
+          },
+          {
+            "label": "CodeQL workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/codeql.yaml",
+            "quote_or_finding": "CodeQL analysis runs on pushes, pull requests, and a weekly schedule for Python.",
+            "relevance": "Shows automated code review/security analysis as part of scrutiny."
+          },
+          {
+            "label": "Security scan workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/security-scan.yaml",
+            "quote_or_finding": "Generates an SBOM on master and runs vulnerability scans, uploading SARIF and comparing fork PRs against a master baseline for high+ CVEs.",
+            "relevance": "Documents visible security and dependency review processes."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 83,
+        "score_derivation": "The project communicates its claims and outputs well through a public README, ReadTheDocs homepage, citation metadata, Zenodo DOI badges, release badges, diagrams, limitations warnings, and links to published papers and presentations demonstrating model capabilities. The README and documentation files carry open licence SPDX identifiers such as CC-BY-4.0, and CITATION.cff gives recommended citation metadata with author ORCIDs and version. The score is not higher because the evidence bundle does not include the full documentation pages, full publications, peer-review text, dashboard update-cycle/version-history documentation, or direct claim-by-claim citations to exact artifacts. It is not lower because the public communication artifacts are accessible, citation-ready, openly licensed in the shown files, and explicit about scope and limitations.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The README, citation file, and documentation/contributing files provide direct evidence of accessible communication and citation practices, though not the complete documentation set.",
+        "references": [
+          {
+            "label": "README public communication",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "The README describes PyPSA-Eur as an open sector-coupled optimisation model of the European energy system, explains included sectors and networks, shows model diagrams, and links to documentation, releases, Zenodo DOIs, Discord, limitations, and papers.",
+            "relevance": "Shows accessible public explanation of the model, scope, evidence base, and limitations."
+          },
+          {
+            "label": "README open documentation licence",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "The README begins with SPDX-License-Identifier: CC-BY-4.0.",
+            "relevance": "Supports open licensing of communication material in the repository."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "Provides citation title, repository, version v2026.02.0, MIT licence, authors, and ORCIDs.",
+            "relevance": "Enables formal citation and attribution of the project publication/software artifact."
+          },
+          {
+            "label": "Repository homepage metadata",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "Repository metadata lists homepage https://pypsa-eur.readthedocs.io/.",
+            "relevance": "Shows there is a public documentation site for explanatory materials."
+          },
+          {
+            "label": "Contributing documentation licence",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/doc/contributing.md",
+            "quote_or_finding": "The contributing page carries SPDX-License-Identifier: CC-BY-4.0 and explains how to build documentation with pixi and mkdocs.",
+            "relevance": "Supports open and maintainable documentation practices."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 68,
+        "score_derivation": "PyPSA-Eur has moderate-to-strong linkage across the evidence chain: the README links the high-level model claim to named input datasets and tools; CITATION.cff links the project to a repository, version, licence, and authors; data-version validation code implies dataset-version/source/URL linkage; CI workflows connect code changes to tests, Snakemake workflows, artifacts, release preparation, images, and validation; and Docker/environment files link execution to declared dependencies. However, the evidence bundle does not show a complete explicit chain from a particular environmental claim or published result to exact input dataset versions, code commit/tag, configuration file, workflow run ID, solver/environment, produced outputs, review records, and publication. The score is therefore below the highest range: the ingredients for linkage are present, but claim-specific, versioned, externally verifiable end-to-end provenance is not demonstrated in the supplied evidence. It is not lower because several artifacts already provide concrete cross-links among sources, code, versions, workflows, and publications.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The repository contains many linkage mechanisms, but the supplied evidence does not include a full claim-specific provenance record.",
+        "references": [
+          {
+            "label": "README links inputs, methods, publications",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "The README links the model description to named input sources, Snakemake, PyPSA, documentation, GitHub issues, Zenodo DOIs, and example papers.",
+            "relevance": "Provides high-level linkage between claim, inputs, methods, communication, and review channels."
+          },
+          {
+            "label": "CITATION version/repository linkage",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "CITATION.cff links the citable project title to repository https://github.com/pypsa/pypsa-eur and version v2026.02.0.",
+            "relevance": "Supports versioned linkage from citation/publication metadata to the code repository."
+          },
+          {
+            "label": "Data version schema checks",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/test/test_data_versions_layer.py",
+            "quote_or_finding": "The validation schema requires dataset, version, source, tags, added date, note, and URL fields, with consistency checks for latest versions across sources.",
+            "relevance": "Shows a mechanism for linking datasets to versions, source categories, and archive URLs."
+          },
+          {
+            "label": "Test workflow execution artifacts",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/test.yaml",
+            "quote_or_finding": "Integration tests run Snakemake test workflows and upload logs, .snakemake/log, and results artifacts.",
+            "relevance": "Links repository execution to workflow outputs and logs, though not to a specific published claim in the evidence bundle."
+          },
+          {
+            "label": "Release workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/release.yaml",
+            "quote_or_finding": "On version tags, the release workflow checks preparation, updates DAGs in documentation, removes/recreates the tag, and commits release-preparation changes.",
+            "relevance": "Connects releases/tags to generated documentation artifacts, supporting versioned linkage."
+          }
+        ]
+      }
+    ],
+    "total_score": 79,
+    "total_score_derivation": "Computed locally as round(mean([76, 88, 82, 79, 83, 68])) = 79.",
+    "single_paragraph_summary": "PyPSA-Eur shows a strong open-traceability foundation for an environmental energy-system modelling project: it is a public, version-controlled, openly licensed model repository with documented major input sources, a Snakemake-based workflow, dependency and container specifications, automated unit/integration tests, validation workflows, issue tracking, contribution rules, citation metadata, documentation, DOI links, and explicit limitations. Its strongest dimensions are open-source software, reproducible execution infrastructure, and public communication. The main gap is not openness of components but end-to-end claim-specific provenance: the supplied evidence does not demonstrate a complete externally verifiable chain from a particular published environmental claim or scenario result to exact input dataset versions, code commit, configuration, workflow run, solver environment, output files, review records, and publication artifact.",
+    "limitations": [
+      "The assessment uses only the supplied evidence bundle; it does not inspect files or web pages not included in the bundle, such as the full documentation site, full Snakefile/rules, actual data/versions.csv contents, release pages, Zenodo records, issue threads, pull-request reviews, or published papers.",
+      "The GitHub metadata reports license as null, while CITATION.cff and SPDX headers indicate MIT/Creative Commons licensing; without the top-level LICENSE file in the bundle, licensing completeness cannot be fully verified.",
+      "The evidence does not include a specific completed model run or scenario result, so execution and linkage scores are based on reproducibility infrastructure rather than verified reproduction of a particular reported claim.",
+      "Input-data assessment is limited because the bundle lists and partly documents major datasets but does not include full upstream provenance, licences, uncertainty estimates, quality-control results, or primary-measurement traceability for every source.",
+      "Community and review assessment is limited because mechanisms are documented, but concrete review discussions, correction histories, governance records, or peer-review reports are not included."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 3,
+    "project_name": "PyPSA-Eur",
+    "project_url": "https://github.com/pypsa/pypsa-eur",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 74,
+        "score_derivation": "PyPSA-Eur provides strong public evidence that its model dataset is built from identifiable external and mostly open input datasets: the README lists OpenStreetMap/Zenodo grid data, powerplantmatching, ENTSO-E Transparency Platform demand, ERA5 and SARAH-3 renewable time series via atlite, and Eurostat/JRC-IDEES energy balances. The bundled ENTSO-E GridKit README gives concrete field-level documentation and important quality caveats, which supports external inspection of data origin and limitations. There is also evidence of a data-version validation layer, indicating attention to dataset version metadata. The score is not higher because the evidence bundle does not include the actual data/versions.csv contents, complete input-data licences, complete primary-data provenance for all secondary datasets, or quantified uncertainty/error estimates across all inputs; several measurement uncertainties are described qualitatively rather than quantitatively.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence clearly documents major input sources and one dataset in detail, but the bundle omits several primary metadata files and full source-specific uncertainty/licensing records.",
+        "references": [
+          {
+            "label": "README input data sources",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "The README states the model is built from open data and lists sources including OpenStreetMap/Zenodo, powerplantmatching, ENTSO-E Transparency Platform, ERA5/SARAH-3 via atlite, and Eurostat/JRC-IDEES.",
+            "relevance": "Shows that major inputs are publicly identified and linked to source datasets/tools."
+          },
+          {
+            "label": "ENTSO-E GridKit dataset README",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/data/entsoegridkit/README.md",
+            "quote_or_finding": "Documents that the dataset was generated from a March 2022 ENTSO-E interactive map extract, processed by GridKit, and lists caveats such as coordinate inaccuracy, voltage ranges, derived transformers, and derived generator-bus connections.",
+            "relevance": "Provides concrete measurement/provenance documentation and quality limitations for a key grid input dataset."
+          },
+          {
+            "label": "Data versions validation test",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/test/test_data_versions_layer.py",
+            "quote_or_finding": "Defines a schema for data/versions.csv with dataset, version, source, tags, added date, note, and URL fields, and checks archive URLs and latest-version consistency.",
+            "relevance": "Evidence that the project maintains structured data-version metadata, although the actual versions table is not included in the evidence bundle."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 84,
+        "score_derivation": "The project has strong public evidence for open-source software and methods: it is a public GitHub repository, describes itself as fully open source, provides a citation file specifying MIT licensing for the software release, includes SPDX licence headers in test files, exposes dependencies through a conda environment file, and provides a Docker development environment. The repository also uses Snakemake and PyPSA, both named in the README/environment, indicating inspectable modelling infrastructure. The score is not higher because GitHub metadata reports no detected repository licence, the evidence bundle does not include the top-level LICENSE file or core model scripts/Snakefile themselves, and the dependency list includes Gurobi, which may create reproducibility/licensing friction even though open solvers are also listed.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "There is substantial evidence of open code, licensing, and dependencies, but the bundle lacks the full licence file and core workflow/code artifacts.",
+        "references": [
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "Public repository described as 'PyPSA-Eur: A Sector-Coupled Open Optimisation Model of the European Energy System' with energy-system modelling topics; GitHub metadata license field is null.",
+            "relevance": "Establishes public version-controlled software availability while also showing a licence-detection limitation."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "Citation metadata gives repository URL, version v2026.02.0, and license: MIT.",
+            "relevance": "Supports software attribution, versioning, and open-source licence evidence."
+          },
+          {
+            "label": "README open-source claim",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "States that the model is built from open data using a Snakemake workflow and is 'fully open source', designed for the open-source PyPSA framework.",
+            "relevance": "Shows that methods/software are intended to be inspectable and reusable."
+          },
+          {
+            "label": "Environment dependencies",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/envs/environment.yaml",
+            "quote_or_finding": "Lists a named pypsa-eur conda environment with dependencies including pypsa, linopy, snakemake-minimal, atlite, geopandas, pandas, GLPK, HiGHS, and Gurobi.",
+            "relevance": "Provides dependency transparency needed to understand and run the model/software."
+          },
+          {
+            "label": "Development Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/docker/dev-env/Dockerfile",
+            "quote_or_finding": "Builds a development environment from pixi files and labels the image source as the PyPSA-Eur GitHub repository.",
+            "relevance": "Shows infrastructure software for operating the development environment is publicly specified."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 76,
+        "score_derivation": "There is strong evidence for reproducible execution infrastructure: the README says the model is built with Snakemake, the environment file specifies dependencies, the Dockerfile defines a containerized development environment, the GitHub test workflow runs unit and integration tests including Snakemake test workflows, and configuration-schema tests check synchronization of generated defaults and schemas. CI also uploads logs and results artifacts for short retention. The score is not higher because the evidence bundle does not include the actual Snakefile, full run instructions, scenario configuration files, exact parameters for a published claim, persistent workflow-run artifacts, or a re-executable archived run connecting a specific input-data version to a reported environmental output.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Execution tooling is well evidenced, but the exact claim-to-run provenance needed for top reproducibility is not present in the bundle.",
+        "references": [
+          {
+            "label": "README Snakemake workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "States that PyPSA-Eur is built from open data using a Snakemake workflow.",
+            "relevance": "Identifies the workflow engine used to transform inputs into model outputs."
+          },
+          {
+            "label": "Environment file",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/envs/environment.yaml",
+            "quote_or_finding": "Defines the pypsa-eur conda environment and versions/ranges for many dependencies, including Snakemake and modelling/geospatial packages.",
+            "relevance": "Supports repeatability by specifying the computational environment."
+          },
+          {
+            "label": "Test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/test.yaml",
+            "quote_or_finding": "Runs unit tests and integration tests on GitHub Actions, including 'pixi run integration-tests' and uploading logs, .snakemake/log, and results artifacts with 3-day retention.",
+            "relevance": "Shows automated execution checks and partial workflow-output inspection."
+          },
+          {
+            "label": "Config schema synchronization tests",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/test/test_config_schema.py",
+            "quote_or_finding": "Tests that config/config.default.yaml and config/schema.default.json are in sync with a generated Pydantic schema.",
+            "relevance": "Supports reproducibility by validating configuration defaults and schemas."
+          },
+          {
+            "label": "Development Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/docker/dev-env/Dockerfile",
+            "quote_or_finding": "Creates a pixi-based environment in a container entrypoint for the project workspace.",
+            "relevance": "Provides an inspectable computational environment for external users."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 77,
+        "score_derivation": "The project has strong public mechanisms for community review: GitHub issues are open and numerous, the contributing guide invites bug reports, suggestions, issues, pull requests, and Discord discussion, and explicitly states that code changes follow a four-eyes/two-person review principle. CI workflows add automated review through tests, CodeQL, security scanning, lockfile-update PRs, and a validator bot that can create reports on pull requests. The score is not higher because the evidence bundle does not include concrete examples of issue discussions, pull-request review records, correction notices, governance decisions, or peer-review reports; therefore the existence of review channels is well evidenced but the depth and outcomes of review are only partially inspectable from the supplied materials.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Public review channels and policies are clear, but the supplied bundle lacks sampled review histories or correction records.",
+        "references": [
+          {
+            "label": "Repository issue count",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "Repository metadata reports 256 open issues.",
+            "relevance": "Shows an active public issue-tracking channel for scrutiny and problem reporting."
+          },
+          {
+            "label": "Contributing guide",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/doc/contributing.md",
+            "quote_or_finding": "Invites bug reports, suggestions, pull requests, help-wanted issue discussion, and Discord discussion; states all code contributions follow a four-eyes/two-person review principle.",
+            "relevance": "Provides explicit public contribution and review processes."
+          },
+          {
+            "label": "Test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/test.yaml",
+            "quote_or_finding": "Runs unit tests, integration tests, pylint checks, and Snakemake test workflows on pushes, pull requests, schedules, and manual dispatch.",
+            "relevance": "Automated public CI supports review and quality control around changes."
+          },
+          {
+            "label": "Validator workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/validate.yaml",
+            "quote_or_finding": "Runs pypsa-validator on pull requests from the repository and can create a report/comment with validation plots.",
+            "relevance": "Shows additional model-specific validation review infrastructure."
+          },
+          {
+            "label": "Security scan workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/security-scan.yaml",
+            "quote_or_finding": "Generates SBOMs and runs vulnerability scans on pixi.lock changes and schedules, uploading SARIF results.",
+            "relevance": "Shows systematic automated review of dependency/security risks."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 80,
+        "score_derivation": "PyPSA-Eur provides strong public-facing communication: the README clearly describes the model scope, sectors, input sources, limitations and warnings, documentation link, release badges, Zenodo DOIs, and example peer-reviewed papers. The citation file provides a formal citation with version, authors, repository, licence, and ORCIDs, and README/documentation files carry CC-BY-4.0 or CC0 SPDX notices. This is enough for strong publication traceability and reuse. The score is not higher because the README itself says documentation remains 'somewhat patchy', the evidence bundle does not include the full ReadTheDocs pages, release notes, Zenodo records, or the contents of cited papers, and no dynamic dashboard/update-cycle documentation is supplied.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The main communication artifacts are well evidenced, but several referenced publications and documentation pages are not included in the evidence bundle.",
+        "references": [
+          {
+            "label": "README overview and warnings",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "Provides model overview, source-data list, diagrams, links to documentation, Zenodo badges, papers, and warnings including active development, limitations, and patchy documentation.",
+            "relevance": "Main open communication artifact describing claims, evidence base, limitations, and routes for scrutiny."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "Gives formal citation metadata for 'PyPSA-Eur: An open sector-coupled optimisation model of the European energy system', repository, version v2026.02.0, MIT licence, and author ORCIDs.",
+            "relevance": "Supports attributable and versioned publication/citation of the project."
+          },
+          {
+            "label": "README SPDX and documentation badge",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "README includes SPDX-License-Identifier: CC-BY-4.0 and links to ReadTheDocs documentation and GitHub releases.",
+            "relevance": "Shows open licensing for explanatory material and public documentation/release channels."
+          },
+          {
+            "label": "Contributing documentation licence",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/doc/contributing.md",
+            "quote_or_finding": "Contributing guide has SPDX-License-Identifier: CC-BY-4.0.",
+            "relevance": "Indicates project documentation is openly licensed for reuse."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 69,
+        "score_derivation": "The project has meaningful but incomplete linkage across the evidence chain. The README links model claims to named input datasets, workflow technology, documentation, releases, Zenodo DOIs, limitations, issues, and papers. CITATION.cff provides a versioned software citation. The data-version validation layer suggests structured dataset-version/source/URL tracking, and workflows tag development container images by commit SHA and use release automation. These elements support traceability across data, code, execution, review, and publication. The score is not higher because the evidence bundle does not show an explicit, externally verifiable claim-level provenance record tying a specific environmental result to exact dataset versions, code commit/release, configuration, solver settings, workflow run ID, outputs, review records, and publication artifacts. The linkage is therefore strong at the project-artifact level but not yet excellent at the exact claim/run level.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Many linking mechanisms are present, but the supplied evidence lacks the exact end-to-end provenance record required for highest traceability.",
+        "references": [
+          {
+            "label": "README links across evidence chain",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "Links to releases, documentation, Zenodo DOIs, input data sources, GitHub issues, limitations, and example papers.",
+            "relevance": "Provides project-level linkage between claims, data sources, methods, publications, and review channels."
+          },
+          {
+            "label": "CITATION.cff versioned citation",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "Specifies repository https://github.com/pypsa/pypsa-eur and version v2026.02.0.",
+            "relevance": "Links software identity to a cited version."
+          },
+          {
+            "label": "Data versions schema",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/test/test_data_versions_layer.py",
+            "quote_or_finding": "Validates version records with dataset, version, source, tags, added date, note, and URL, including checks for latest consistency and archive URLs.",
+            "relevance": "Evidence of a mechanism for linking datasets to versions and URLs."
+          },
+          {
+            "label": "Container image tagging workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/push-images.yaml",
+            "quote_or_finding": "Builds or retags ghcr.io/pypsa/eur-dev-env images with the GitHub commit SHA and also pushes latest on master.",
+            "relevance": "Links computational environment images to code commits, improving execution traceability."
+          },
+          {
+            "label": "Release workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/release.yaml",
+            "quote_or_finding": "On version tags, checks release preparation, updates documentation DAGs, and re-tags prepared commits.",
+            "relevance": "Shows release automation connecting tagged versions with generated documentation artifacts."
+          }
+        ]
+      }
+    ],
+    "total_score": 77,
+    "total_score_derivation": "Computed locally as round(mean([74, 84, 76, 77, 80, 69])) = 77.",
+    "single_paragraph_summary": "PyPSA-Eur shows strong Open Traceability as a public, version-controlled, open energy-system optimisation model with named open input datasets, documented data caveats, open-source licensing evidence, dependency/environment specifications, Snakemake-based workflows, CI tests, validation/security automation, public issue and contribution processes, documentation, Zenodo DOI links, and formal citation metadata. Its main limitations for traceability are not the absence of openness, but incomplete evidence of exact end-to-end claim provenance: the supplied bundle does not include the core Snakefile/scripts, actual data/versions.csv, top-level licence file, full documentation, release records, or a persistent re-executable workflow run tying a specific published environmental claim to exact input versions, code commit, configuration, solver/environment, outputs, review records, and publication artifacts.",
+    "limitations": [
+      "The assessment uses only the supplied evidence bundle and does not inspect files or pages not included in that bundle.",
+      "The actual data/versions.csv file is referenced by tests but not supplied, so dataset-version coverage could not be verified directly.",
+      "The core Snakefile, scenario configuration files, model scripts, and run instructions are not included in the evidence bundle, limiting assessment of exact execution traceability.",
+      "The top-level LICENSE file is not supplied and GitHub metadata reports a null licence, despite MIT/CC SPDX and CITATION evidence.",
+      "The Zenodo records, ReadTheDocs documentation pages, GitHub releases, issue/PR discussions, and cited papers are linked but their contents are not included in the bundle.",
+      "No specific environmental claim or published numerical result was supplied, so Open Linkage was assessed at project level rather than claim-level provenance.",
+      "Quantified uncertainty/error metadata for all primary and secondary input datasets is not demonstrated in the supplied evidence."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 4,
+    "project_name": "PyPSA-Eur",
+    "project_url": "https://github.com/pypsa/pypsa-eur",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 74,
+        "score_derivation": "PyPSA-Eur provides strong public evidence that major model inputs are identifiable and based on open or externally accessible sources: the README lists the power grid model, power plant database, ENTSO-E demand, ERA5/SARAH-3 renewable time series via atlite, land eligibility analysis, and Eurostat/JRC-IDEES energy balances. The repository also includes dataset documentation for at least one input layer, entsoegridkit, with fields, provenance, processing caveats, and warnings about inaccuracies. There is evidence of a data-versioning layer through tests validating data/versions.csv, including source categories, archive URLs, tags such as latest/supported/deprecated, and consistency checks. The score is not higher because the evidence bundle does not include the actual data/versions.csv, complete source manifest, licences and access conditions for every input, quantified uncertainty/error estimates for all primary datasets, or full transformation documentation from primary to model-ready data. It is not lower because the supplied evidence clearly shows a systematic, documented open-data approach and explicit caveats for input quality.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The bundle contains strong high-level and selected detailed input-data evidence, but not the full data inventory or primary-data provenance records.",
+        "references": [
+          {
+            "label": "README input sources",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "States that the model is built from open data using a Snakemake workflow and lists major datasets including OpenStreetMap, powerplantmatching, ENTSO-E Transparency Platform, ERA5/SARAH-3 via atlite, and Eurostat/JRC-IDEES.",
+            "relevance": "Shows identifiable public input sources and the project’s open-data basis."
+          },
+          {
+            "label": "entsoegridkit dataset documentation",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/data/entsoegridkit/README.md",
+            "quote_or_finding": "Documents an unofficial ENTSO-E-derived GridKit dataset, its March 2022 map extract origin, CSV contents and fields, and cautions about coordinate inaccuracies, voltage ranges, derived transformers, and nearest-station generator connections.",
+            "relevance": "Provides concrete provenance, schema, and quality caveats for an input dataset."
+          },
+          {
+            "label": "Data versions validation test",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/test/test_data_versions_layer.py",
+            "quote_or_finding": "Defines validation for data/versions.csv with dataset, version, source, tags, added date, note, URL, required archive URLs, and consistency checks for latest versions.",
+            "relevance": "Shows that the project maintains and tests a structured data-versioning layer, although the actual CSV is not included in the evidence bundle."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 88,
+        "score_derivation": "The project has excellent public software traceability: it is hosted in a public GitHub repository, describes itself as fully open source, provides citation metadata identifying version v2026.02.0 and MIT licensing, includes SPDX licence headers in supplied source/test files, lists a full Conda environment with modelling and geospatial dependencies, and provides a Dockerfile for a development environment. The repository uses version control, release badges, dependency-management tooling, and open-source frameworks such as PyPSA, Snakemake, atlite, and powerplantmatching. The score is not higher because GitHub repository metadata reports no repository-level licence, the evidence bundle does not include the root LICENSE file or pixi.lock, and environment.yaml uses version ranges rather than a fully locked environment. It is not lower because the available evidence is explicit, reusable, and strongly supports inspection and operation of the model software.",
+        "uncertainty": "low",
+        "uncertainty_reason": "Multiple independent artifacts in the bundle directly document the public code, licensing statements, dependencies, and environment setup.",
+        "references": [
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "Public GitHub repository PyPSA/pypsa-eur with description “PyPSA-Eur: A Sector-Coupled Open Optimisation Model of the European Energy System,” default branch master, and active issue count.",
+            "relevance": "Establishes public version-controlled availability of the model/software."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "Identifies the project title, repository URL, version v2026.02.0, authors, and licence MIT.",
+            "relevance": "Provides citation, version, repository, authorship, and open-source licence evidence."
+          },
+          {
+            "label": "Environment file",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/envs/environment.yaml",
+            "quote_or_finding": "Lists Conda channels and dependencies including pypsa, snakemake-minimal, atlite, linopy, geopandas, rasterio, entsoe-py, powerplantmatching, solvers, and many geospatial/scientific packages.",
+            "relevance": "Documents the software dependencies needed to understand and run the model."
+          },
+          {
+            "label": "Development Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/docker/dev-env/Dockerfile",
+            "quote_or_finding": "Builds a development environment from a Pixi base image, copies pixi.toml and pixi.lock, installs the default environment, and labels the source repository.",
+            "relevance": "Shows reusable infrastructure software for operating the development environment."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 76,
+        "score_derivation": "The project has strong execution-traceability infrastructure: the README says the model is built from open data using a Snakemake workflow; the environment file documents dependencies; CI runs unit tests, integration tests, pylint checks, and Snakemake test workflows; validation workflows run self-hosted model validation and generate result comments; release workflows update documentation DAGs; and container-image workflows tag development environments by commit SHA. These artifacts make the computational pathway substantially inspectable and partly re-executable. The score is not higher because the evidence bundle does not include the Snakefile/rules, exact scenario configuration for a published environmental claim, full logs, result artifacts, solver settings, random seeds if any, or a specific run record linking inputs to outputs. It is not lower because there is clear evidence of automated tests, integration workflows, environment specification, and reproducibility-oriented workflow tooling.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence demonstrates substantial reproducibility infrastructure, but not a complete externally re-executable run for a specific reported claim.",
+        "references": [
+          {
+            "label": "README workflow statement",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "States that the model is built from open data using a Snakemake workflow and is fully open source.",
+            "relevance": "Identifies the workflow system connecting inputs to model construction."
+          },
+          {
+            "label": "Test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/test.yaml",
+            "quote_or_finding": "Runs unit tests, integration tests on multiple operating systems, source-change filtering, pylint checks, Snakemake test workflows, and uploads logs/results artifacts with three-day retention.",
+            "relevance": "Shows automated execution checks and partial preservation of run artifacts."
+          },
+          {
+            "label": "Validation workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/validate.yaml",
+            "quote_or_finding": "Runs pypsa-validator on pull requests with a specified environment file and Snakemake config, then creates a report comment with plots such as energy, costs, and balances.",
+            "relevance": "Shows model validation execution and reporting around proposed changes."
+          },
+          {
+            "label": "Push images workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/push-images.yaml",
+            "quote_or_finding": "Builds and pushes a development environment image to ghcr.io/pypsa/eur-dev-env tagged with the GitHub commit SHA, or retags an existing image for the current SHA.",
+            "relevance": "Supports re-execution by tying container environments to code revisions."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 77,
+        "score_derivation": "The project provides strong evidence of open community and review mechanisms: contributing documentation welcomes bug reports, ideas, issues, pull requests, help-wanted work, and Discord discussion; it explicitly says all code contributions follow a four-eyes/two-person review principle; repository metadata shows a large public issue tracker; and CI/security workflows support review through tests, CodeQL, SBOM generation, vulnerability scanning, and lockfile PRs. The score is not higher because the evidence bundle does not include actual issue discussions, pull-request review records, governance minutes, correction notices, or peer-review reports for the cited papers. It is not lower because open channels and review requirements are explicit and public, with automated review infrastructure visible.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The bundle documents review processes and channels well, but includes limited evidence of actual review histories or corrections.",
+        "references": [
+          {
+            "label": "Contributing guide",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/doc/contributing.md",
+            "quote_or_finding": "Welcomes ideas, bug reports, code contributions via pull requests, use of help-wanted issues, draft PRs, and Discord; states that all code contributions follow the four-eyes principle and are reviewed by a second person before incorporation.",
+            "relevance": "Directly documents public community channels and review policy."
+          },
+          {
+            "label": "Repository metadata issues",
+            "url": "https://github.com/pypsa/pypsa-eur",
+            "quote_or_finding": "Repository metadata reports 256 open issues.",
+            "relevance": "Indicates an active public issue tracker for critique, bug reports, and discussion."
+          },
+          {
+            "label": "CodeQL workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/codeql.yaml",
+            "quote_or_finding": "Runs CodeQL analysis on pushes, pull requests, and a weekly schedule for Python.",
+            "relevance": "Shows automated code review/security scrutiny as part of the public development process."
+          },
+          {
+            "label": "Security scan workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/security-scan.yaml",
+            "quote_or_finding": "Generates an SBOM on master, performs vulnerability scans, uploads SARIF, and checks fork PRs for new high-severity CVEs against a baseline.",
+            "relevance": "Shows visible automated dependency/security review processes."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 83,
+        "score_derivation": "PyPSA-Eur has strong publication and communication traceability. The README is openly accessible, clearly states the model’s purpose and scope, lists the evidence base and major data sources, includes warnings and limitations, links to documentation, release badges, Zenodo DOIs, and example peer-reviewed or scholarly outputs. CITATION.cff provides a citable project record with version, authors, repository, and licence. Documentation files in the bundle use CC-BY-4.0 SPDX headers, supporting reuse of explanatory material. The score is not higher because the bundle does not include the full documentation, complete dashboard/update-cycle documentation if any, full release notes, paper licences, or a complete mapping from each publication claim to exact artifacts. It is not lower because the main public communication artifacts are open, well labelled, citable, and explicitly point users to limitations and supporting resources.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The README, citation file, and documentation headers provide direct public evidence of accessible and reusable communication artifacts.",
+        "references": [
+          {
+            "label": "README overview and communications",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "Provides model overview, source list, diagrams, warnings, documentation link, release badge, Zenodo DOI badges, and links to papers and presentations showing model capabilities.",
+            "relevance": "Shows clear public communication of claims, scope, evidence base, documentation, and limitations."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "States how to cite the project, gives title, repository, version v2026.02.0, licence MIT, authors, and ORCIDs for many authors.",
+            "relevance": "Supports citable, versioned scholarly communication."
+          },
+          {
+            "label": "README SPDX and documentation badges",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "README includes SPDX-License-Identifier: CC-BY-4.0 and badges for documentation, releases, tests, Zenodo DOIs, Snakemake, Discord, and REUSE status.",
+            "relevance": "Shows open licensing and discoverability of communication, documentation, releases, and support channels."
+          },
+          {
+            "label": "Contributing documentation licence",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/doc/contributing.md",
+            "quote_or_finding": "Contributing guide carries SPDX-License-Identifier: CC-BY-4.0 and describes how to build and contribute documentation.",
+            "relevance": "Shows reusable public documentation and procedures for maintaining communication materials."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 64,
+        "score_derivation": "The project has moderate-to-strong linkage evidence across the chain: the README connects the model claim to named input datasets, Snakemake workflow construction, documentation, limitations, Zenodo records, releases, and papers; CITATION.cff identifies a specific version and repository; the data-versioning validation layer implies structured links among datasets, versions, sources, tags, dates, and URLs; and CI workflows connect code revisions to tests, validation, release preparation, and container images tagged by commit SHA. However, the evidence does not show an explicit, externally inspectable provenance graph from a specific environmental claim or publication result to exact data versions, code commit, model configuration, solver environment, workflow run logs, outputs, review records, and publication artifacts. The linkage is therefore substantially present at project-infrastructure level but incomplete at exact claim/run level. It is not lower because several artifacts deliberately support versioning and cross-referencing; it is not higher because exact end-to-end claim-level traceability is not demonstrated in the supplied bundle.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The bundle shows many linkage mechanisms but not a complete end-to-end evidence chain for a concrete claim.",
+        "references": [
+          {
+            "label": "README cross-links",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/README.md",
+            "quote_or_finding": "Links the model description to named datasets, Snakemake, documentation, limitations, GitHub issues, Zenodo DOIs, releases, and example papers.",
+            "relevance": "Provides project-level links among claims, inputs, methods, publications, and community channels."
+          },
+          {
+            "label": "CITATION version linkage",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/CITATION.cff",
+            "quote_or_finding": "Specifies repository https://github.com/pypsa/pypsa-eur and version v2026.02.0 for citation.",
+            "relevance": "Links citation/publication identity to a versioned software artifact."
+          },
+          {
+            "label": "Data versions schema test",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/test/test_data_versions_layer.py",
+            "quote_or_finding": "Validates data version records with dataset, version, source, tags, added date, note, and URL, including rules for archive URLs and latest-version consistency.",
+            "relevance": "Shows explicit infrastructure for linking model data layers to versioned source/archive records."
+          },
+          {
+            "label": "Container image SHA workflow",
+            "url": "https://raw.githubusercontent.com/pypsa/pypsa-eur/master/.github/workflows/push-images.yaml",
+            "quote_or_finding": "Builds or retags development container images with ghcr.io tags equal to the GitHub commit SHA.",
+            "relevance": "Links execution environments to exact code revisions, supporting verifiable chain construction."
+          }
+        ]
+      }
+    ],
+    "total_score": 77,
+    "total_score_derivation": "Computed locally as round(mean([74, 88, 76, 77, 83, 64])) = 77.",
+    "single_paragraph_summary": "PyPSA-Eur shows strong Open Traceability overall for an open European energy-system optimisation model: its public repository, open-source licensing statements, dependency/environment files, Snakemake-based workflow description, CI/integration tests, validation workflows, community contribution processes, documentation, citation metadata, Zenodo links, and explicit limitations make much of the evidence and method chain externally inspectable. The strongest dimensions are open-source software and public communication, while input data and reproducibility are also well supported by named data sources, versioning infrastructure, and automated workflows. The main traceability gap is exact end-to-end linkage for individual environmental claims or published results: the supplied evidence does not include a complete provenance record tying a specific claim to exact primary data versions, code commit, model configuration, solver settings, workflow logs, output files, review records, and final publication artifact.",
+    "limitations": [
+      "The evidence bundle does not include the root LICENSE file, pixi.lock, Snakefile, rules directory, full configuration files, full documentation pages, release notes, or the actual data/versions.csv.",
+      "Input-data assessment is limited because complete dataset licences, access conditions, source manifests, transformations, and quantified uncertainties for all primary inputs are not supplied.",
+      "Execution assessment is limited because no complete run record, logs, solver settings, scenario parameters, or output artifacts for a specific environmental claim are included.",
+      "Community/review assessment is limited because actual issue threads, pull-request reviews, governance records, correction notices, and paper peer-review materials are not included.",
+      "Publication assessment is limited because cited papers and Zenodo records are linked in the README but their full contents, licences, and exact artifact mappings are not included in the bundle.",
+      "Open Linkage is constrained by lack of a concrete claim-level provenance graph connecting exact datasets, code versions, configurations, workflow runs, reviews, and publications."
+    ],
+    "model_name": "gpt-5.5"
+  }
+]

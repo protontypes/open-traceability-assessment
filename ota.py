@@ -392,9 +392,19 @@ def build_user_prompt(
     definition_url: str,
     definition_text: str,
     evidence_bundle: str,
-) -> str:
-    return f"""
-Please perform Open Traceability Assessment run {run_number} of {runs}.
+) -> tuple[str, str]:
+    """Return ``(static_prefix, dynamic_suffix)`` for one assessment run.
+
+    The static prefix (definition + evidence bundle + output requirements) is
+    byte-identical across every run of a given assessment, so it forms a stable,
+    cacheable prompt prefix: OpenAI caches it automatically, and the Anthropic path
+    marks it with ``cache_control`` (see ``run_assessment_*``). Only the dynamic
+    suffix — the run number — changes per run, and it is placed last so it never
+    invalidates the cached prefix. Caching is a prefix match, so the run number must
+    not appear before the evidence bundle.
+    """
+    static_prefix = f"""
+Perform an Open Traceability Assessment of the project/report below.
 
 Definition source URL:
 {definition_url}
@@ -415,6 +425,10 @@ Output requirements:
 - Provide a single-paragraph summary.
 - Include limitations, especially where the evidence bundle is incomplete.
 """.strip()
+
+    dynamic_suffix = f"This is assessment run {run_number} of {runs}."
+
+    return static_prefix, dynamic_suffix
 
 
 # -----------------------------
@@ -457,13 +471,17 @@ def run_assessment_openai(
     *,
     model: str,
     reasoning_effort: str,
-    user_prompt: str,
+    static_prefix: str,
+    dynamic_suffix: str,
 ) -> AssessmentRun:
+    # The system prompt and static prefix are identical across every run, so OpenAI's
+    # automatic prefix caching reuses them; the per-run suffix is kept last so it
+    # never invalidates that cached prefix.
     kwargs = {
         "model": model,
         "input": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt},
+            {"role": "user", "content": f"{static_prefix}\n\n{dynamic_suffix}"},
         ],
         "text_format": AssessmentRun,
     }
@@ -479,13 +497,32 @@ def run_assessment_anthropic(
     *,
     model: str,
     reasoning_effort: str,
-    user_prompt: str,
+    static_prefix: str,
+    dynamic_suffix: str,
 ) -> AssessmentRun:
+    # Caching is a prefix match in render order tools -> system -> messages, so the
+    # cache_control breakpoint on the static prefix block caches the system prompt and
+    # the (large) evidence bundle together. Cache reads bill at ~0.1x, so every run
+    # after the first reuses that prefix for ~90% less input cost. The per-run suffix
+    # is a separate, uncached block placed after the breakpoint. The evidence bundle is
+    # well above Opus's 4096-token minimum cacheable prefix.
     kwargs = {
         "model": model,
         "max_tokens": 16000,
         "system": SYSTEM_PROMPT,
-        "messages": [{"role": "user", "content": user_prompt}],
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": static_prefix,
+                        "cache_control": {"type": "ephemeral"},
+                    },
+                    {"type": "text", "text": dynamic_suffix},
+                ],
+            }
+        ],
         "output_format": AssessmentRun,
     }
     # The Anthropic equivalent of OpenAI's reasoning effort is adaptive thinking
@@ -513,7 +550,7 @@ def run_assessment(
     evidence_bundle: str,
     include_total: bool,
 ) -> AssessmentRun:
-    user_prompt = build_user_prompt(
+    static_prefix, dynamic_suffix = build_user_prompt(
         run_number=run_number,
         runs=runs,
         project_url=project_url,
@@ -527,14 +564,16 @@ def run_assessment(
             anthropic_client,
             model=model,
             reasoning_effort=reasoning_effort,
-            user_prompt=user_prompt,
+            static_prefix=static_prefix,
+            dynamic_suffix=dynamic_suffix,
         )
     else:
         parsed = run_assessment_openai(
             openai_client,
             model=model,
             reasoning_effort=reasoning_effort,
-            user_prompt=user_prompt,
+            static_prefix=static_prefix,
+            dynamic_suffix=dynamic_suffix,
         )
 
     return finalize_run(

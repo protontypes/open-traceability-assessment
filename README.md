@@ -18,6 +18,8 @@ The project responds to a common weakness in sustainability decision-making: cla
 
 Open Traceability therefore shifts attention from openness of isolated artifacts to the inspectability of the **claim-support chain**. A dataset, repository, report, or paper may be public, but it is only traceable when the links between inputs, methods, execution, review, and outputs are explicit enough for others to examine.
 
+![](opentraceability-evidence-chain.png)
+
 ## What this tool does
 
 This repository provides a reusable assessment runner that:
