@@ -112,7 +112,7 @@ export GITHUB_TOKEN="your_github_token_here"
 Run the assessment against the default example repository:
 
 ```bash
-python open_traceability_assessment.py \
+python ota.py \
   --project-url https://github.com/natcap/invest \
   --runs 5 \
   --include-total \
@@ -122,7 +122,7 @@ python open_traceability_assessment.py \
 Run the assessment against another project, report, or web page:
 
 ```bash
-python open_traceability_assessment.py \
+python ota.py \
   --project-url https://example.org/report.pdf \
   --runs 3 \
   --include-total \
@@ -132,7 +132,7 @@ python open_traceability_assessment.py \
 Omit the overall total score while still scoring the six dimensions:
 
 ```bash
-python open_traceability_assessment.py \
+python ota.py \
   --project-url https://github.com/natcap/invest \
   --runs 5 \
   --no-include-total
@@ -141,7 +141,7 @@ python open_traceability_assessment.py \
 Use a different model:
 
 ```bash
-python open_traceability_assessment.py \
+python ota.py \
   --project-url https://github.com/natcap/invest \
   --runs 3 \
   --model gpt-5.5 \

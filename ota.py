@@ -32,7 +32,7 @@ import time
 from datetime import datetime
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 from urllib.parse import quote, urlparse
 
 import requests
@@ -70,7 +70,10 @@ class StageAssessment(BaseModel):
             "missing evidence, uncertainty, and why the exact score was selected."
         )
     )
-    uncertainty: str = Field(description="Low, medium, or high uncertainty plus one sentence explaining why.")
+    uncertainty: Literal["low", "medium", "high"] = Field(
+        description="Overall confidence in this stage's score given the available evidence."
+    )
+    uncertainty_reason: str = Field(description="One sentence explaining the uncertainty level.")
     references: list[EvidenceReference]
 
 
@@ -85,11 +88,11 @@ class AssessmentRun(BaseModel):
         default=None,
         ge=0,
         le=100,
-        description="Arithmetic mean of six stage scores, rounded to nearest integer, or null if totals are disabled.",
+        description="Leave null. Computed locally by the runner as the rounded mean of the stage scores.",
     )
     total_score_derivation: Optional[str] = Field(
         default=None,
-        description="Derivation of total score, or null if totals are disabled.",
+        description="Leave null. Filled in locally by the runner.",
     )
     single_paragraph_summary: str
     limitations: list[str]
@@ -383,15 +386,7 @@ def build_user_prompt(
     definition_url: str,
     definition_text: str,
     evidence_bundle: str,
-    include_total: bool,
 ) -> str:
-    total_instruction = (
-        "Also compute total_score as the arithmetic mean of the six stage scores, rounded to the nearest integer, "
-        "and explain the total_score_derivation."
-        if include_total
-        else "Set total_score and total_score_derivation to null. Do not include any overall numeric total."
-    )
-
     return f"""
 Please perform Open Traceability Assessment run {run_number} of {runs}.
 
@@ -410,7 +405,7 @@ Evidence bundle:
 Output requirements:
 - Score stages 1-6 independently from 0 to 100.
 - Treat this as an independent run; do not try to match imagined prior runs.
-- {total_instruction}
+- Leave total_score and total_score_derivation null; the runner computes the total locally.
 - Provide a single-paragraph summary.
 - Include limitations, especially where the evidence bundle is incomplete.
 """.strip()
@@ -440,7 +435,6 @@ def run_assessment(
         definition_url=definition_url,
         definition_text=definition_text,
         evidence_bundle=evidence_bundle,
-        include_total=include_total,
     )
 
     kwargs = {
@@ -504,11 +498,20 @@ def md_escape(value: object) -> str:
     return text.replace("|", "\\|").replace("\n", " ").strip()
 
 
-def consolidate_references(runs: list[AssessmentRun], stage_number: int) -> list[dict]:
+def normalize_url(url: str) -> str:
+    """Normalize a URL for comparison against the collected evidence URLs."""
+    return url.strip().rstrip("/")
+
+
+def consolidate_references(
+    runs: list[AssessmentRun], stage_number: int, evidence_urls: set[str]
+) -> list[dict]:
     """Collect every reference cited for a stage across all runs, deduplicated by URL.
 
     Returns one entry per unique URL with the runs that cited it, sorted by how many
-    runs cited it (consensus first), then by first appearance.
+    runs cited it (consensus first), then by first appearance. Each entry is marked
+    ``verified`` when its URL was part of the collected evidence bundle, so references
+    the model may have invented can be flagged in the report.
     """
     by_url: dict[str, dict] = {}
     order: list[str] = []
@@ -521,6 +524,7 @@ def consolidate_references(runs: list[AssessmentRun], stage_number: int) -> list
                     "label": ref.label,
                     "url": ref.url,
                     "finding": ref.quote_or_finding,
+                    "verified": normalize_url(ref.url) in evidence_urls,
                     "runs": [],
                 }
                 order.append(key)
@@ -529,6 +533,17 @@ def consolidate_references(runs: list[AssessmentRun], stage_number: int) -> list
     items = [by_url[key] for key in order]
     items.sort(key=lambda entry: len(entry["runs"]), reverse=True)
     return items
+
+
+def uncertainty_distribution(runs: list[AssessmentRun], stage_number: int) -> tuple[str, dict[str, int]]:
+    """Return the modal uncertainty level and the level counts for a stage across runs."""
+    counts = {"low": 0, "medium": 0, "high": 0}
+    for run in runs:
+        level = stage_by_number(run, stage_number).uncertainty
+        if level in counts:
+            counts[level] += 1
+    modal = max(counts, key=lambda level: counts[level])
+    return modal, counts
 
 
 def consolidate_limitations(runs: list[AssessmentRun]) -> list[str]:
@@ -576,13 +591,16 @@ def write_markdown_report(
     output_path: Path,
     project_url: str,
     definition_url: str,
+    model: str,
     include_total: bool,
+    evidence_urls: set[str],
 ) -> None:
     lines: list[str] = []
     lines.append("# Open Traceability Assessment Report")
     lines.append("")
     lines.append(f"- Project/report URL: {project_url}")
     lines.append(f"- Assessment definition URL: {definition_url}")
+    lines.append(f"- Model: {model}")
     lines.append(f"- Number of runs: {len(runs)}")
     lines.append("")
 
@@ -633,7 +651,9 @@ def write_markdown_report(
     lines.append("")
     lines.append(
         "References cited across all runs, deduplicated by URL. The runs that cited each "
-        "reference are noted in parentheses; references cited by more runs appear first."
+        "reference are noted in parentheses; references cited by more runs appear first. "
+        "References marked ⚠️ point to a URL that was not part of the collected evidence "
+        "bundle and could not be verified (the model may have introduced them)."
     )
     lines.append("")
 
@@ -642,14 +662,18 @@ def write_markdown_report(
         stages = [stage_by_number(run, stage_number) for run in runs]
         scores = [stage.score for stage in stages]
         avg = statistics.mean(scores)
+        modal_uncertainty, uncertainty_counts = uncertainty_distribution(runs, stage_number)
         lines.append(f"### Stage {stage_number}: {stages[0].stage_name}")
         lines.append("")
         lines.append(
-            f"Average score {avg:.1f} (range {min(scores)}–{max(scores)} across {run_count} runs)."
+            f"Average score {avg:.1f} (range {min(scores)}–{max(scores)} across {run_count} runs). "
+            f"Reported uncertainty: mostly {modal_uncertainty} "
+            f"(low {uncertainty_counts['low']}, medium {uncertainty_counts['medium']}, "
+            f"high {uncertainty_counts['high']})."
         )
         lines.append("")
 
-        references = consolidate_references(runs, stage_number)
+        references = consolidate_references(runs, stage_number, evidence_urls)
         if not references:
             lines.append("No references supplied across runs.")
             lines.append("")
@@ -660,8 +684,9 @@ def write_markdown_report(
             url = md_escape(ref["url"])
             finding = md_escape(ref["finding"])
             cited = ", ".join(str(n) for n in sorted(ref["runs"]))
+            marker = "" if ref["verified"] else " ⚠️"
             lines.append(
-                f"- [{label}]({url}): {finding} "
+                f"- [{label}]({url}){marker}: {finding} "
                 f"_(cited in {len(ref['runs'])}/{run_count} runs: {cited})_"
             )
         lines.append("")
@@ -730,54 +755,78 @@ def main() -> None:
     definition_text = fetch_url_text(args.definition_url, max_chars=args.max_definition_chars)
 
     print(f"Collecting evidence from: {args.project_url}")
-    evidence_bundle, _ = collect_evidence(args)
+    evidence_bundle, evidence_items = collect_evidence(args)
+    evidence_urls = {normalize_url(item.url) for item in evidence_items}
+
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
 
     client = OpenAI()
     runs: list[AssessmentRun] = []
+    failures: list[tuple[int, str]] = []
+    run_dir: Optional[Path] = None
+    json_path: Optional[Path] = None
+    md_path: Optional[Path] = None
 
     for run_number in range(1, args.runs + 1):
         print(f"Running assessment {run_number}/{args.runs}...")
-        run = run_assessment(
-            client,
-            model=args.model,
-            reasoning_effort=args.reasoning_effort,
-            run_number=run_number,
-            runs=args.runs,
-            project_url=args.project_url,
-            definition_url=args.definition_url,
-            definition_text=definition_text,
-            evidence_bundle=evidence_bundle,
-            include_total=args.include_total,
-        )
+        try:
+            run = run_assessment(
+                client,
+                model=args.model,
+                reasoning_effort=args.reasoning_effort,
+                run_number=run_number,
+                runs=args.runs,
+                project_url=args.project_url,
+                definition_url=args.definition_url,
+                definition_text=definition_text,
+                evidence_bundle=evidence_bundle,
+                include_total=args.include_total,
+            )
+        except Exception as exc:  # noqa: BLE001 - one failed run must not lose the others
+            print(f"  Run {run_number} failed: {exc}")
+            failures.append((run_number, str(exc)))
+            continue
+
         runs.append(run)
+
+        # Persist after every successful run so a later failure cannot discard prior work.
+        if run_dir is None:
+            name_prefix = f"{slugify(run.project_name)}_{args.out_prefix}"
+            run_dir = Path(args.output_dir) / f"{timestamp}_{name_prefix}"
+            run_dir.mkdir(parents=True, exist_ok=True)
+            json_path = run_dir / f"{name_prefix}.runs.json"
+            md_path = run_dir / f"{name_prefix}.report.md"
+
+        json_path.write_text(
+            json.dumps([model_to_dict(r) for r in runs], indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        print(f"  Saved {len(runs)} run(s) so far to {json_path}")
 
         if run_number < args.runs and args.sleep_seconds > 0:
             time.sleep(args.sleep_seconds)
 
-    project_slug = slugify(runs[0].project_name)
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    name_prefix = f"{project_slug}_{args.out_prefix}"
-    run_dir = Path(args.output_dir) / f"{timestamp}_{name_prefix}"
-    run_dir.mkdir(parents=True, exist_ok=True)
-
-    json_path = run_dir / f"{name_prefix}.runs.json"
-    md_path = run_dir / f"{name_prefix}.report.md"
-
-    json_path.write_text(
-        json.dumps([model_to_dict(run) for run in runs], indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
+    if not runs:
+        raise RuntimeError(
+            f"All {args.runs} assessment run(s) failed; no report generated. "
+            f"Last error: {failures[-1][1] if failures else 'unknown'}"
+        )
 
     write_markdown_report(
         runs,
         output_path=md_path,
         project_url=args.project_url,
         definition_url=args.definition_url,
+        model=args.model,
         include_total=args.include_total,
+        evidence_urls=evidence_urls,
     )
 
-    print(f"Wrote structured run data: {json_path}")
+    print(f"Wrote structured run data ({len(runs)} run(s)): {json_path}")
     print(f"Wrote Markdown report: {md_path}")
+    if failures:
+        failed_numbers = ", ".join(str(number) for number, _ in failures)
+        print(f"Note: {len(failures)} run(s) failed and were skipped: {failed_numbers}")
 
 
 if __name__ == "__main__":
