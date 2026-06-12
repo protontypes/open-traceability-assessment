@@ -37,8 +37,10 @@ from urllib.parse import quote, urlparse
 
 import requests
 from bs4 import BeautifulSoup
-from openai import OpenAI
 from pydantic import BaseModel, ConfigDict, Field
+
+# The provider SDKs (openai, anthropic) are imported lazily in build_clients() so
+# that running against a single provider does not require the other to be installed.
 
 
 DEFAULT_DEFINITION_URL = "https://raw.githubusercontent.com/protontypes/open-traceability/refs/heads/main/docs/definition.md"
@@ -96,6 +98,10 @@ class AssessmentRun(BaseModel):
     )
     single_paragraph_summary: str
     limitations: list[str]
+    model_name: Optional[str] = Field(
+        default=None,
+        description="Leave null. Set locally by the runner to the model that produced this run.",
+    )
 
 
 # -----------------------------
@@ -412,12 +418,91 @@ Output requirements:
 
 
 # -----------------------------
-# OpenAI call
+# Model calls
 # -----------------------------
 
-def run_assessment(
-    client: OpenAI,
+def finalize_run(
+    parsed: AssessmentRun,
     *,
+    run_number: int,
+    project_url: str,
+    model: str,
+    include_total: bool,
+) -> AssessmentRun:
+    """Apply run metadata, model attribution, and total-score behavior locally.
+
+    Shared across providers so the score/total semantics are identical no matter
+    which model produced the assessment.
+    """
+    parsed.run_number = run_number
+    parsed.project_url = project_url
+    parsed.model_name = model
+
+    if include_total:
+        stage_scores = [stage.score for stage in parsed.stages]
+        computed_total = round(statistics.mean(stage_scores))
+        parsed.total_score = computed_total
+        parsed.total_score_derivation = (
+            f"Computed locally as round(mean({stage_scores})) = {computed_total}."
+        )
+    else:
+        parsed.total_score = None
+        parsed.total_score_derivation = None
+
+    return parsed
+
+
+def run_assessment_openai(
+    client: "OpenAI",
+    *,
+    model: str,
+    reasoning_effort: str,
+    user_prompt: str,
+) -> AssessmentRun:
+    kwargs = {
+        "model": model,
+        "input": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt},
+        ],
+        "text_format": AssessmentRun,
+    }
+    if reasoning_effort != "none":
+        kwargs["reasoning"] = {"effort": reasoning_effort}
+
+    response = client.responses.parse(**kwargs)
+    return response.output_parsed
+
+
+def run_assessment_anthropic(
+    client,
+    *,
+    model: str,
+    reasoning_effort: str,
+    user_prompt: str,
+) -> AssessmentRun:
+    kwargs = {
+        "model": model,
+        "max_tokens": 16000,
+        "system": SYSTEM_PROMPT,
+        "messages": [{"role": "user", "content": user_prompt}],
+        "output_format": AssessmentRun,
+    }
+    # The Anthropic equivalent of OpenAI's reasoning effort is adaptive thinking
+    # combined with the effort parameter.
+    if reasoning_effort != "none":
+        kwargs["thinking"] = {"type": "adaptive"}
+        kwargs["output_config"] = {"effort": reasoning_effort}
+
+    response = client.messages.parse(**kwargs)
+    return response.parsed_output
+
+
+def run_assessment(
+    *,
+    provider: str,
+    openai_client,
+    anthropic_client,
     model: str,
     reasoning_effort: str,
     run_number: int,
@@ -437,37 +522,28 @@ def run_assessment(
         evidence_bundle=evidence_bundle,
     )
 
-    kwargs = {
-        "model": model,
-        "input": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt},
-        ],
-        "text_format": AssessmentRun,
-    }
-
-    if reasoning_effort != "none":
-        kwargs["reasoning"] = {"effort": reasoning_effort}
-
-    response = client.responses.parse(**kwargs)
-    parsed: AssessmentRun = response.output_parsed
-
-    # Enforce expected run metadata and total behavior locally.
-    parsed.run_number = run_number
-    parsed.project_url = project_url
-
-    if include_total:
-        stage_scores = [stage.score for stage in parsed.stages]
-        computed_total = round(statistics.mean(stage_scores))
-        parsed.total_score = computed_total
-        parsed.total_score_derivation = (
-            f"Computed locally as round(mean({stage_scores})) = {computed_total}."
+    if provider == "anthropic":
+        parsed = run_assessment_anthropic(
+            anthropic_client,
+            model=model,
+            reasoning_effort=reasoning_effort,
+            user_prompt=user_prompt,
         )
     else:
-        parsed.total_score = None
-        parsed.total_score_derivation = None
+        parsed = run_assessment_openai(
+            openai_client,
+            model=model,
+            reasoning_effort=reasoning_effort,
+            user_prompt=user_prompt,
+        )
 
-    return parsed
+    return finalize_run(
+        parsed,
+        run_number=run_number,
+        project_url=project_url,
+        model=model,
+        include_total=include_total,
+    )
 
 
 # -----------------------------
@@ -559,6 +635,34 @@ def consolidate_limitations(runs: list[AssessmentRun]) -> list[str]:
     return [seen[norm] for norm in order]
 
 
+def models_with_runs(runs: list[AssessmentRun]) -> list[tuple[str, list[int]]]:
+    """Return the distinct models used, in first-seen order, each with its run numbers."""
+    mapping: dict[str, list[int]] = {}
+    order: list[str] = []
+    for run in runs:
+        model = run.model_name or "unknown"
+        if model not in mapping:
+            mapping[model] = []
+            order.append(model)
+        mapping[model].append(run.run_number)
+    return [(model, mapping[model]) for model in order]
+
+
+def format_run_numbers(numbers: list[int]) -> str:
+    """Compress a list of run numbers into compact ranges, e.g. [1,2,3,5] -> '1–3, 5'."""
+    numbers = sorted(numbers)
+    ranges: list[tuple[int, int]] = []
+    start = prev = numbers[0]
+    for number in numbers[1:]:
+        if number == prev + 1:
+            prev = number
+        else:
+            ranges.append((start, prev))
+            start = prev = number
+    ranges.append((start, prev))
+    return ", ".join(str(a) if a == b else f"{a}–{b}" for a, b in ranges)
+
+
 def make_final_summary(runs: list[AssessmentRun], include_total: bool) -> str:
     stage_avgs = {}
     for stage_number in range(1, 7):
@@ -591,16 +695,23 @@ def write_markdown_report(
     output_path: Path,
     project_url: str,
     definition_url: str,
-    model: str,
     include_total: bool,
     evidence_urls: set[str],
 ) -> None:
+    model_runs = models_with_runs(runs)
+
     lines: list[str] = []
     lines.append("# Open Traceability Assessment Report")
     lines.append("")
     lines.append(f"- Project/report URL: {project_url}")
     lines.append(f"- Assessment definition URL: {definition_url}")
-    lines.append(f"- Model: {model}")
+    if len(model_runs) == 1:
+        lines.append(f"- Model: {model_runs[0][0]}")
+    else:
+        joined = "; ".join(
+            f"{model} (runs {format_run_numbers(numbers)})" for model, numbers in model_runs
+        )
+        lines.append(f"- Models: {joined}")
     lines.append(f"- Number of runs: {len(runs)}")
     lines.append("")
 
@@ -630,6 +741,25 @@ def write_markdown_report(
             f"{std:.1f}",
         ]
         lines.append("| " + " | ".join(md_escape(cell) for cell in row) + " |")
+
+    if len(model_runs) > 1:
+        lines.append("")
+        lines.append("## Average score by model")
+        lines.append("")
+        header = ["Stage", "Stage name"] + [model for model, _ in model_runs]
+        lines.append("| " + " | ".join(header) + " |")
+        lines.append("| " + " | ".join(["---"] * len(header)) + " |")
+        for stage_number in range(1, 7):
+            stage_name = stage_by_number(runs[0], stage_number).stage_name
+            row = [str(stage_number), stage_name]
+            for model, _ in model_runs:
+                model_scores = [
+                    stage_by_number(run, stage_number).score
+                    for run in runs
+                    if (run.model_name or "unknown") == model
+                ]
+                row.append(f"{statistics.mean(model_scores):.1f}" if model_scores else "—")
+            lines.append("| " + " | ".join(md_escape(cell) for cell in row) + " |")
 
     if include_total:
         totals = [run.total_score for run in runs if run.total_score is not None]
@@ -714,17 +844,27 @@ def write_markdown_report(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run an Open Traceability Assessment multiple times with the OpenAI API."
+        description="Run an Open Traceability Assessment multiple times with the OpenAI and/or Anthropic API."
     )
     parser.add_argument("--project-url", default=DEFAULT_PROJECT_URL)
     parser.add_argument("--definition-url", default=DEFAULT_DEFINITION_URL)
-    parser.add_argument("--runs", type=int, default=3)
-    parser.add_argument("--model", default="gpt-5.5")
+    parser.add_argument("--runs", type=int, default=3, help="Number of runs per selected provider.")
+    parser.add_argument(
+        "--provider",
+        choices=["openai", "anthropic", "both"],
+        default="openai",
+        help="Which model provider(s) to assess with. 'both' runs the full set of runs with each.",
+    )
+    parser.add_argument("--model", default="gpt-5.5", help="OpenAI model id.")
+    parser.add_argument("--anthropic-model", default="claude-opus-4-8", help="Anthropic (Claude) model id.")
     parser.add_argument(
         "--reasoning-effort",
         choices=["none", "low", "medium", "high", "xhigh"],
         default="medium",
-        help="Use 'none' for models that do not support reasoning parameters.",
+        help=(
+            "Reasoning effort. For OpenAI this maps to the reasoning parameter; for Anthropic it maps to "
+            "adaptive thinking plus the effort parameter. Use 'none' to disable."
+        ),
     )
     parser.add_argument(
         "--include-total",
@@ -742,14 +882,43 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def build_clients(provider: str) -> tuple[object, object]:
+    """Construct the API client(s) needed for the selected provider, importing lazily."""
+    openai_client = None
+    anthropic_client = None
+
+    if provider in ("openai", "both"):
+        if not os.getenv("OPENAI_API_KEY"):
+            raise RuntimeError("OPENAI_API_KEY is not set.")
+        from openai import OpenAI
+
+        openai_client = OpenAI()
+
+    if provider in ("anthropic", "both"):
+        if not os.getenv("ANTHROPIC_API_KEY"):
+            raise RuntimeError("ANTHROPIC_API_KEY is not set.")
+        import anthropic
+
+        anthropic_client = anthropic.Anthropic()
+
+    return openai_client, anthropic_client
+
+
 def main() -> None:
     args = parse_args()
 
     if args.runs < 1:
         raise ValueError("--runs must be at least 1")
 
-    if not os.getenv("OPENAI_API_KEY"):
-        raise RuntimeError("OPENAI_API_KEY is not set.")
+    # (provider, model) pairs to assess with, in order. 'both' runs each provider.
+    if args.provider == "openai":
+        provider_models = [("openai", args.model)]
+    elif args.provider == "anthropic":
+        provider_models = [("anthropic", args.anthropic_model)]
+    else:
+        provider_models = [("openai", args.model), ("anthropic", args.anthropic_model)]
+
+    openai_client, anthropic_client = build_clients(args.provider)
 
     print(f"Fetching Open Traceability definition from: {args.definition_url}")
     definition_text = fetch_url_text(args.definition_url, max_chars=args.max_definition_chars)
@@ -760,55 +929,60 @@ def main() -> None:
 
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
 
-    client = OpenAI()
+    total_runs = args.runs * len(provider_models)
     runs: list[AssessmentRun] = []
     failures: list[tuple[int, str]] = []
     run_dir: Optional[Path] = None
     json_path: Optional[Path] = None
     md_path: Optional[Path] = None
 
-    for run_number in range(1, args.runs + 1):
-        print(f"Running assessment {run_number}/{args.runs}...")
-        try:
-            run = run_assessment(
-                client,
-                model=args.model,
-                reasoning_effort=args.reasoning_effort,
-                run_number=run_number,
-                runs=args.runs,
-                project_url=args.project_url,
-                definition_url=args.definition_url,
-                definition_text=definition_text,
-                evidence_bundle=evidence_bundle,
-                include_total=args.include_total,
+    run_number = 0
+    for provider, model in provider_models:
+        for _ in range(args.runs):
+            run_number += 1
+            print(f"Running assessment {run_number}/{total_runs} ({provider}: {model})...")
+            try:
+                run = run_assessment(
+                    provider=provider,
+                    openai_client=openai_client,
+                    anthropic_client=anthropic_client,
+                    model=model,
+                    reasoning_effort=args.reasoning_effort,
+                    run_number=run_number,
+                    runs=total_runs,
+                    project_url=args.project_url,
+                    definition_url=args.definition_url,
+                    definition_text=definition_text,
+                    evidence_bundle=evidence_bundle,
+                    include_total=args.include_total,
+                )
+            except Exception as exc:  # noqa: BLE001 - one failed run must not lose the others
+                print(f"  Run {run_number} failed: {exc}")
+                failures.append((run_number, str(exc)))
+                continue
+
+            runs.append(run)
+
+            # Persist after every successful run so a later failure cannot discard prior work.
+            if run_dir is None:
+                name_prefix = f"{slugify(run.project_name)}_{args.out_prefix}"
+                run_dir = Path(args.output_dir) / f"{timestamp}_{name_prefix}"
+                run_dir.mkdir(parents=True, exist_ok=True)
+                json_path = run_dir / f"{name_prefix}.runs.json"
+                md_path = run_dir / f"{name_prefix}.report.md"
+
+            json_path.write_text(
+                json.dumps([model_to_dict(r) for r in runs], indent=2, ensure_ascii=False),
+                encoding="utf-8",
             )
-        except Exception as exc:  # noqa: BLE001 - one failed run must not lose the others
-            print(f"  Run {run_number} failed: {exc}")
-            failures.append((run_number, str(exc)))
-            continue
+            print(f"  Saved {len(runs)} run(s) so far to {json_path}")
 
-        runs.append(run)
-
-        # Persist after every successful run so a later failure cannot discard prior work.
-        if run_dir is None:
-            name_prefix = f"{slugify(run.project_name)}_{args.out_prefix}"
-            run_dir = Path(args.output_dir) / f"{timestamp}_{name_prefix}"
-            run_dir.mkdir(parents=True, exist_ok=True)
-            json_path = run_dir / f"{name_prefix}.runs.json"
-            md_path = run_dir / f"{name_prefix}.report.md"
-
-        json_path.write_text(
-            json.dumps([model_to_dict(r) for r in runs], indent=2, ensure_ascii=False),
-            encoding="utf-8",
-        )
-        print(f"  Saved {len(runs)} run(s) so far to {json_path}")
-
-        if run_number < args.runs and args.sleep_seconds > 0:
-            time.sleep(args.sleep_seconds)
+            if run_number < total_runs and args.sleep_seconds > 0:
+                time.sleep(args.sleep_seconds)
 
     if not runs:
         raise RuntimeError(
-            f"All {args.runs} assessment run(s) failed; no report generated. "
+            f"All {total_runs} assessment run(s) failed; no report generated. "
             f"Last error: {failures[-1][1] if failures else 'unknown'}"
         )
 
@@ -817,7 +991,6 @@ def main() -> None:
         output_path=md_path,
         project_url=args.project_url,
         definition_url=args.definition_url,
-        model=args.model,
         include_total=args.include_total,
         evidence_urls=evidence_urls,
     )

@@ -2,7 +2,7 @@
 
 A Python command-line tool for running repeated **Open Traceability Assessments** against an open-source project, open-science project, report, dashboard, or other public sustainability-related evidence artifact.
 
-The tool uses the OpenAI API to assess how externally inspectable the evidence chain behind a project or claim is. It can run the same assessment multiple times, capture score variation across runs, preserve references used for scoring, show derivations for each score, and produce both structured JSON and a Markdown report.
+The tool uses the OpenAI API and/or the Anthropic (Claude) API to assess how externally inspectable the evidence chain behind a project or claim is. It can run the same assessment multiple times, capture score variation across runs, preserve references used for scoring, show derivations for each score, and produce both structured JSON and a Markdown report. You can run against a single provider or against both at once to compare how different models score the same project.
 
 ⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. ⚠️
 
@@ -25,12 +25,14 @@ This repository provides a reusable assessment runner that:
 - Fetches an Open Traceability definition and project evidence.
 - Supports GitHub repositories, web pages, and PDF reports.
 - Runs the assessment multiple independent times.
+- Works with OpenAI models, Anthropic (Claude) models, or both providers in one run.
 - Scores six Open Traceability dimensions from 0 to 100.
 - Optionally computes an overall total score.
 - Captures score derivations for every stage and run.
-- Preserves references used by the model for each score.
+- Preserves references used by the model for each score and flags references that were not found in the collected evidence bundle.
+- Writes results incrementally and stores every run in its own timestamped, project-named folder.
 - Produces a structured JSON file for downstream analysis.
-- Produces a Markdown report with tables, references, limitations, and a single-paragraph summary.
+- Produces a Markdown report with tables, consolidated references, limitations, a per-model score comparison (when more than one model is used), and a single-paragraph summary.
 
 The tool is intended as an assessment assistant. It does not prove that a claim is true, unbiased, or scientifically valid. Instead, it helps identify whether the evidence, assumptions, methods, limitations, uncertainty, and possible errors behind a claim can be inspected by others.
 
@@ -87,19 +89,28 @@ Example `requirements.txt`:
 
 ```txt
 openai>=1.99.0
+anthropic>=0.69.0
 requests>=2.32.0
 beautifulsoup4>=4.12.0
 pydantic>=2.8.0
 pypdf>=4.3.0
 ```
 
-## OpenAI API key
+The provider SDKs are imported lazily, so you only need the one(s) you actually use: `openai` for `--provider openai`, `anthropic` for `--provider anthropic`, or both for `--provider both`.
 
-Create an API key in the OpenAI Platform, then expose it as an environment variable:
+## API keys
+
+Provide an API key for each provider you intend to use. Create the key in the relevant platform, then expose it as an environment variable:
 
 ```bash
-export OPENAI_API_KEY="your_api_key_here"
+# Required for --provider openai (and --provider both)
+export OPENAI_API_KEY="your_openai_api_key_here"
+
+# Required for --provider anthropic (and --provider both)
+export ANTHROPIC_API_KEY="your_anthropic_api_key_here"
 ```
+
+The runner only checks for the keys it needs: `OPENAI_API_KEY` for OpenAI runs, `ANTHROPIC_API_KEY` for Anthropic runs, and both when `--provider both` is selected.
 
 If you are assessing GitHub repositories and expect to fetch many files, you can also provide a GitHub token to reduce rate-limit issues:
 
@@ -138,7 +149,7 @@ python ota.py \
   --no-include-total
 ```
 
-Use a different model:
+Use a different OpenAI model:
 
 ```bash
 python ota.py \
@@ -148,35 +159,75 @@ python ota.py \
   --reasoning-effort medium
 ```
 
+Assess with Anthropic (Claude) instead of OpenAI:
+
+```bash
+python ota.py \
+  --project-url https://github.com/natcap/invest \
+  --runs 3 \
+  --provider anthropic \
+  --anthropic-model claude-opus-4-8
+```
+
+Assess with both providers at once and compare them in one report:
+
+```bash
+python ota.py \
+  --project-url https://github.com/natcap/invest \
+  --runs 3 \
+  --provider both \
+  --model gpt-5.5 \
+  --anthropic-model claude-opus-4-8
+```
+
+With `--provider both`, `--runs` applies to each provider, so the example above produces 6 runs in total (3 per model). The report then includes an "Average score by model" table comparing the two.
+
+### Model and reasoning options
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `--provider` | `openai` | Which provider(s) to assess with: `openai`, `anthropic`, or `both`. |
+| `--model` | `gpt-5.5` | OpenAI model id (used for `openai` and `both`). |
+| `--anthropic-model` | `claude-opus-4-8` | Anthropic (Claude) model id (used for `anthropic` and `both`). |
+| `--reasoning-effort` | `medium` | `none`, `low`, `medium`, `high`, or `xhigh`. For OpenAI this maps to the reasoning parameter; for Anthropic it maps to adaptive thinking plus the effort parameter. Use `none` to disable. |
+| `--runs` | `3` | Number of runs per selected provider. |
+| `--output-dir` | `reports` | Base directory for the per-run output folder. |
+| `--out-prefix` | `open_traceability_assessment` | Filename prefix for the JSON and Markdown outputs. |
+
 ## Outputs
 
-For an output prefix such as `invest_open_traceability`, the runner writes:
+Each invocation writes its results into a dedicated folder named with a timestamp and the assessed project, under `--output-dir` (default `reports`). For example:
 
 ```text
-invest_open_traceability.runs.json
-invest_open_traceability.report.md
+reports/20260612-101648_invest_open_traceability/
+├── invest_open_traceability.runs.json
+└── invest_open_traceability.report.md
 ```
+
+Results are written incrementally — the JSON is saved after every successful run — so a transient failure on a later run does not discard the runs that already completed.
 
 The JSON output contains the full structured assessment data for every run, including:
 
 - Run number.
 - Project name and URL.
+- The model that produced the run.
 - Six stage scores.
 - Score derivations.
 - Evidence references.
-- Uncertainty notes.
+- Uncertainty level (low/medium/high) and a one-line reason.
 - Optional total score.
 - Per-run summary paragraph.
 - Limitations.
 
-The Markdown report contains:
+The Markdown report summarizes across runs rather than repeating each run verbatim, and contains:
 
+- The provider model(s) used, with the run numbers each produced.
 - A final single-paragraph summary.
-- A score table across runs.
-- Average and standard deviation by dimension.
-- Optional total score table.
-- References and derivations by stage.
-- Per-run limitations.
+- A score table across runs, with average and standard deviation by dimension.
+- An "Average score by model" comparison table (only when more than one model is used).
+- An optional total score table.
+- Consolidated references by stage, deduplicated across runs, with the modal reported uncertainty and a ⚠️ marker on any reference whose URL was not part of the collected evidence bundle.
+- Consolidated, deduplicated limitations across runs.
 
 ## Scoring guidance
 
@@ -227,7 +278,7 @@ This tool has important limitations:
 ## Related resources
 
 - [Open Traceability Initiative](https://www.open-traceability-initiative.org/)
-- [Open Traceability Definition](https://hackmd.io/BctWeQSETuKNZehHwFnTsw)
+- [Open Traceability Definition](https://raw.githubusercontent.com/protontypes/open-traceability/refs/heads/main/docs/definition.md)
 - [Technical Foundation: Open Traceability for Sustainability Claims](https://hackmd.io/FQrXd1sbSbyXeSp7vqQSHQ)
 - [OpenAlex](https://openalex.org/)
 - [ecosyste.ms](https://ecosyste.ms/)
