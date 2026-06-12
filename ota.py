@@ -1,0 +1,784 @@
+#!/usr/bin/env python3
+"""
+Run an Open Traceability Assessment multiple times against an open project,
+open-science project, or report URL, then produce JSON and Markdown reports.
+
+Example:
+  export OPENAI_API_KEY="sk-..."
+  pip install openai requests beautifulsoup4 pydantic pypdf
+
+  python open_traceability_assessment.py \
+    --project-url https://github.com/natcap/invest \
+    --runs 5 \
+    --include-total \
+    --out-prefix invest_open_traceability
+
+  python open_traceability_assessment.py \
+    --project-url https://example.org/report.pdf \
+    --runs 3 \
+    --no-include-total
+"""
+
+from __future__ import annotations
+
+import argparse
+import io
+import json
+import os
+import re
+import statistics
+import textwrap
+import time
+from datetime import datetime
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
+from urllib.parse import quote, urlparse
+
+import requests
+from bs4 import BeautifulSoup
+from openai import OpenAI
+from pydantic import BaseModel, ConfigDict, Field
+
+
+DEFAULT_DEFINITION_URL = "https://raw.githubusercontent.com/protontypes/open-traceability/refs/heads/main/docs/definition.md"
+DEFAULT_PROJECT_URL = "https://github.com/natcap/invest"
+
+
+# -----------------------------
+# Structured output schema
+# -----------------------------
+
+class EvidenceReference(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    label: str = Field(description="Short human-readable label for the referenced artifact.")
+    url: str = Field(description="URL of the artifact, page, repository file, issue tracker, paper, docs page, etc.")
+    quote_or_finding: str = Field(description="Brief quote, paraphrase, or concrete observed finding.")
+    relevance: str = Field(description="Why this reference supports the score.")
+
+
+class StageAssessment(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    stage: int = Field(ge=1, le=6)
+    stage_name: str
+    score: int = Field(ge=0, le=100)
+    score_derivation: str = Field(
+        description=(
+            "Explain how the score was derived from evidence. Mention positive evidence, "
+            "missing evidence, uncertainty, and why the exact score was selected."
+        )
+    )
+    uncertainty: str = Field(description="Low, medium, or high uncertainty plus one sentence explaining why.")
+    references: list[EvidenceReference]
+
+
+class AssessmentRun(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    run_number: int
+    project_name: str
+    project_url: str
+    stages: list[StageAssessment]
+    total_score: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=100,
+        description="Arithmetic mean of six stage scores, rounded to nearest integer, or null if totals are disabled.",
+    )
+    total_score_derivation: Optional[str] = Field(
+        default=None,
+        description="Derivation of total score, or null if totals are disabled.",
+    )
+    single_paragraph_summary: str
+    limitations: list[str]
+
+
+# -----------------------------
+# Evidence collection
+# -----------------------------
+
+@dataclass
+class EvidenceItem:
+    label: str
+    url: str
+    text: str
+
+
+def compact_text(text: str, max_chars: int) -> str:
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 200].rstrip() + "\n\n...[truncated]..."
+
+
+def http_get(url: str, timeout: int = 30) -> requests.Response:
+    headers = {
+        "User-Agent": "open-traceability-assessor/1.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml,text/plain,application/pdf,*/*",
+    }
+    response = requests.get(url, headers=headers, timeout=timeout)
+    response.raise_for_status()
+    return response
+
+
+def candidate_text_urls(url: str) -> list[str]:
+    """Try HackMD's markdown download endpoint first when applicable."""
+    urls = []
+    parsed = urlparse(url)
+    if "hackmd.io" in parsed.netloc and not parsed.path.endswith("/download"):
+        urls.append(url.rstrip("/") + "/download")
+    urls.append(url)
+    return urls
+
+
+def extract_text_from_response(response: requests.Response, source_url: str) -> str:
+    content_type = response.headers.get("content-type", "").lower()
+    raw = response.content
+
+    if "application/pdf" in content_type or source_url.lower().endswith(".pdf"):
+        try:
+            from pypdf import PdfReader
+        except ImportError as exc:
+            raise RuntimeError("PDF input requires: pip install pypdf") from exc
+
+        reader = PdfReader(io.BytesIO(raw))
+        pages = []
+        for i, page in enumerate(reader.pages):
+            try:
+                pages.append(f"\n\n--- PDF page {i + 1} ---\n{page.extract_text() or ''}")
+            except Exception:
+                pages.append(f"\n\n--- PDF page {i + 1} ---\n[Could not extract text]")
+        return "\n".join(pages)
+
+    text = raw.decode(response.encoding or "utf-8", errors="replace")
+
+    if "html" in content_type or "<html" in text[:1000].lower():
+        soup = BeautifulSoup(text, "html.parser")
+        for tag in soup(["script", "style", "noscript", "svg"]):
+            tag.decompose()
+        return soup.get_text("\n")
+
+    return text
+
+
+def fetch_url_text(url: str, max_chars: int = 50_000) -> str:
+    last_error: Optional[Exception] = None
+    for candidate in candidate_text_urls(url):
+        try:
+            response = http_get(candidate)
+            text = extract_text_from_response(response, candidate)
+            if text.strip():
+                return compact_text(text, max_chars)
+        except Exception as exc:
+            last_error = exc
+    raise RuntimeError(f"Could not fetch text from {url}: {last_error}")
+
+
+def parse_github_repo(url: str) -> Optional[tuple[str, str]]:
+    parsed = urlparse(url)
+    if parsed.netloc.lower() not in {"github.com", "www.github.com"}:
+        return None
+    parts = [p for p in parsed.path.split("/") if p]
+    if len(parts) < 2:
+        return None
+    owner = parts[0]
+    repo = parts[1].removesuffix(".git")
+    return owner, repo
+
+
+def github_headers() -> dict[str, str]:
+    headers = {
+        "User-Agent": "open-traceability-assessor/1.0",
+        "Accept": "application/vnd.github+json",
+    }
+    token = os.getenv("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
+def github_api_get(url: str) -> dict:
+    response = requests.get(url, headers=github_headers(), timeout=30)
+    response.raise_for_status()
+    return response.json()
+
+
+def github_raw_url(owner: str, repo: str, branch: str, path: str) -> str:
+    return f"https://raw.githubusercontent.com/{owner}/{repo}/{quote(branch, safe='')}/{quote(path)}"
+
+
+IMPORTANT_FILE_PATTERNS = [
+    r"(^|/)readme(\..*)?$",
+    r"(^|/)license(\..*)?$",
+    r"(^|/)citation(\.cff|\.md|\.txt)?$",
+    r"(^|/)code[-_]?of[-_]?conduct(\..*)?$",
+    r"(^|/)contributing(\..*)?$",
+    r"(^|/)governance(\..*)?$",
+    r"(^|/)security(\..*)?$",
+    r"(^|/)authors(\..*)?$",
+    r"(^|/)changelog(\..*)?$",
+    r"(^|/)environment\.ya?ml$",
+    r"(^|/)requirements.*\.txt$",
+    r"(^|/)pyproject\.toml$",
+    r"(^|/)setup\.(py|cfg)$",
+    r"(^|/)dockerfile$",
+    r"(^|/)docker-compose\.ya?ml$",
+    r"(^|/)\.github/workflows/.*\.ya?ml$",
+    r"(^|/)docs/.*\.(md|rst|txt)$",
+    r"(^|/)documentation/.*\.(md|rst|txt)$",
+    r"(^|/)examples?/.*\.(md|rst|py|ipynb)$",
+    r"(^|/)tests?/.*\.(md|rst|py)$",
+]
+
+
+def important_path(path: str) -> bool:
+    lower = path.lower()
+    return any(re.search(pattern, lower) for pattern in IMPORTANT_FILE_PATTERNS)
+
+
+def collect_github_evidence(
+    project_url: str,
+    max_files: int,
+    max_file_chars: int,
+    max_total_chars: int,
+) -> tuple[str, list[EvidenceItem]]:
+    owner_repo = parse_github_repo(project_url)
+    if owner_repo is None:
+        raise ValueError("Not a GitHub repository URL")
+
+    owner, repo = owner_repo
+    api_root = f"https://api.github.com/repos/{owner}/{repo}"
+
+    repo_meta = github_api_get(api_root)
+    default_branch = repo_meta.get("default_branch", "main")
+
+    items: list[EvidenceItem] = [
+        EvidenceItem(
+            label="GitHub repository metadata",
+            url=project_url,
+            text=json.dumps(
+                {
+                    "full_name": repo_meta.get("full_name"),
+                    "description": repo_meta.get("description"),
+                    "homepage": repo_meta.get("homepage"),
+                    "license": repo_meta.get("license", {}).get("spdx_id")
+                    if repo_meta.get("license")
+                    else None,
+                    "default_branch": default_branch,
+                    "created_at": repo_meta.get("created_at"),
+                    "updated_at": repo_meta.get("updated_at"),
+                    "open_issues_count": repo_meta.get("open_issues_count"),
+                    "topics": repo_meta.get("topics", []),
+                },
+                indent=2,
+            ),
+        )
+    ]
+
+    tree_url = f"{api_root}/git/trees/{quote(default_branch, safe='')}?recursive=1"
+    tree = github_api_get(tree_url).get("tree", [])
+
+    paths = [
+        entry["path"]
+        for entry in tree
+        if entry.get("type") == "blob" and important_path(entry.get("path", ""))
+    ]
+
+    # Prefer top-level governance/documentation files before deep examples/tests.
+    paths = sorted(paths, key=lambda p: (p.count("/"), p.lower()))[:max_files]
+
+    total_chars = sum(len(item.text) for item in items)
+
+    for path in paths:
+        if total_chars >= max_total_chars:
+            break
+
+        raw_url = github_raw_url(owner, repo, default_branch, path)
+        try:
+            response = http_get(raw_url)
+            text = extract_text_from_response(response, raw_url)
+            text = compact_text(text, max_file_chars)
+        except Exception as exc:
+            text = f"[Could not fetch file: {exc}]"
+
+        remaining = max_total_chars - total_chars
+        if remaining <= 0:
+            break
+        text = compact_text(text, min(max_file_chars, remaining))
+
+        items.append(EvidenceItem(label=path, url=raw_url, text=text))
+        total_chars += len(text)
+
+    bundle_lines = [
+        f"PROJECT URL: {project_url}",
+        f"GITHUB REPOSITORY: {owner}/{repo}",
+        f"DEFAULT BRANCH: {default_branch}",
+        "",
+        "Collected evidence artifacts:",
+    ]
+
+    for i, item in enumerate(items, start=1):
+        bundle_lines.append(f"\n\n### Evidence {i}: {item.label}\nURL: {item.url}\n{item.text}")
+
+    return "\n".join(bundle_lines), items
+
+
+def collect_generic_evidence(project_url: str, max_chars: int) -> tuple[str, list[EvidenceItem]]:
+    text = fetch_url_text(project_url, max_chars=max_chars)
+    item = EvidenceItem(label="Input URL text extraction", url=project_url, text=text)
+    bundle = f"PROJECT OR REPORT URL: {project_url}\n\n### Evidence 1: {item.label}\nURL: {item.url}\n{text}"
+    return bundle, [item]
+
+
+def collect_evidence(args: argparse.Namespace) -> tuple[str, list[EvidenceItem]]:
+    if parse_github_repo(args.project_url):
+        return collect_github_evidence(
+            project_url=args.project_url,
+            max_files=args.max_evidence_files,
+            max_file_chars=args.max_file_chars,
+            max_total_chars=args.max_evidence_chars,
+        )
+
+    return collect_generic_evidence(args.project_url, max_chars=args.max_evidence_chars)
+
+
+# -----------------------------
+# Prompting
+# -----------------------------
+
+SYSTEM_PROMPT = """You are an expert evaluator of open science, open-source software, environmental evidence chains, reproducibility, and scientific traceability.
+
+Assess the supplied project or report using the Open Traceability definition supplied by the user. You must score stages 1-6 from 0 to 100. Use only the supplied assessment definition and supplied evidence bundle. Do not invent facts. If evidence is absent, score conservatively and say what evidence is missing.
+
+Scoring calibration:
+0-20: little or no public evidence for this dimension.
+21-40: partial, fragmentary, or hard-to-verify evidence.
+41-60: moderate evidence, but important gaps remain.
+61-80: strong public evidence with some limitations.
+81-100: excellent, explicit, versioned, reusable, externally verifiable evidence chain.
+
+The six stages are:
+1. Open Input Data and Measurement Evidence.
+2. Open-Source Models, Methods, and Software.
+3. Open Execution and Reproducibility.
+4. Open Community and Review.
+5. Open Publications and Communication.
+6. Open Verifiability.
+
+For every stage:
+- Give an integer score from 0 to 100.
+- Provide a score derivation that explains why the score is not higher and not lower.
+- Include references from the evidence bundle. Each reference must have a URL and concrete finding.
+- If direct evidence is missing, include that absence in the derivation.
+"""
+
+
+def build_user_prompt(
+    *,
+    run_number: int,
+    runs: int,
+    project_url: str,
+    definition_url: str,
+    definition_text: str,
+    evidence_bundle: str,
+    include_total: bool,
+) -> str:
+    total_instruction = (
+        "Also compute total_score as the arithmetic mean of the six stage scores, rounded to the nearest integer, "
+        "and explain the total_score_derivation."
+        if include_total
+        else "Set total_score and total_score_derivation to null. Do not include any overall numeric total."
+    )
+
+    return f"""
+Please perform Open Traceability Assessment run {run_number} of {runs}.
+
+Definition source URL:
+{definition_url}
+
+Open Traceability definition text:
+{definition_text}
+
+Project/report URL:
+{project_url}
+
+Evidence bundle:
+{evidence_bundle}
+
+Output requirements:
+- Score stages 1-6 independently from 0 to 100.
+- Treat this as an independent run; do not try to match imagined prior runs.
+- {total_instruction}
+- Provide a single-paragraph summary.
+- Include limitations, especially where the evidence bundle is incomplete.
+""".strip()
+
+
+# -----------------------------
+# OpenAI call
+# -----------------------------
+
+def run_assessment(
+    client: OpenAI,
+    *,
+    model: str,
+    reasoning_effort: str,
+    run_number: int,
+    runs: int,
+    project_url: str,
+    definition_url: str,
+    definition_text: str,
+    evidence_bundle: str,
+    include_total: bool,
+) -> AssessmentRun:
+    user_prompt = build_user_prompt(
+        run_number=run_number,
+        runs=runs,
+        project_url=project_url,
+        definition_url=definition_url,
+        definition_text=definition_text,
+        evidence_bundle=evidence_bundle,
+        include_total=include_total,
+    )
+
+    kwargs = {
+        "model": model,
+        "input": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt},
+        ],
+        "text_format": AssessmentRun,
+    }
+
+    if reasoning_effort != "none":
+        kwargs["reasoning"] = {"effort": reasoning_effort}
+
+    response = client.responses.parse(**kwargs)
+    parsed: AssessmentRun = response.output_parsed
+
+    # Enforce expected run metadata and total behavior locally.
+    parsed.run_number = run_number
+    parsed.project_url = project_url
+
+    if include_total:
+        stage_scores = [stage.score for stage in parsed.stages]
+        computed_total = round(statistics.mean(stage_scores))
+        parsed.total_score = computed_total
+        parsed.total_score_derivation = (
+            f"Computed locally as round(mean({stage_scores})) = {computed_total}."
+        )
+    else:
+        parsed.total_score = None
+        parsed.total_score_derivation = None
+
+    return parsed
+
+
+# -----------------------------
+# Reporting
+# -----------------------------
+
+def slugify(value: str, fallback: str = "project") -> str:
+    """Turn an arbitrary string into a lowercase, filesystem-safe slug."""
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", value).strip("-").lower()
+    return slug or fallback
+
+
+def model_to_dict(model_obj: BaseModel) -> dict:
+    if hasattr(model_obj, "model_dump"):
+        return model_obj.model_dump()
+    return model_obj.dict()
+
+
+def stage_by_number(run: AssessmentRun, stage_number: int) -> StageAssessment:
+    matches = [stage for stage in run.stages if stage.stage == stage_number]
+    if not matches:
+        raise ValueError(f"Run {run.run_number} missing stage {stage_number}")
+    return matches[0]
+
+
+def md_escape(value: object) -> str:
+    text = str(value)
+    return text.replace("|", "\\|").replace("\n", " ").strip()
+
+
+def consolidate_references(runs: list[AssessmentRun], stage_number: int) -> list[dict]:
+    """Collect every reference cited for a stage across all runs, deduplicated by URL.
+
+    Returns one entry per unique URL with the runs that cited it, sorted by how many
+    runs cited it (consensus first), then by first appearance.
+    """
+    by_url: dict[str, dict] = {}
+    order: list[str] = []
+    for run in runs:
+        stage = stage_by_number(run, stage_number)
+        for ref in stage.references:
+            key = ref.url.strip() or ref.label.strip()
+            if key not in by_url:
+                by_url[key] = {
+                    "label": ref.label,
+                    "url": ref.url,
+                    "finding": ref.quote_or_finding,
+                    "runs": [],
+                }
+                order.append(key)
+            if run.run_number not in by_url[key]["runs"]:
+                by_url[key]["runs"].append(run.run_number)
+    items = [by_url[key] for key in order]
+    items.sort(key=lambda entry: len(entry["runs"]), reverse=True)
+    return items
+
+
+def consolidate_limitations(runs: list[AssessmentRun]) -> list[str]:
+    """Collect limitations across all runs, deduplicated by normalized text."""
+    seen: dict[str, str] = {}
+    order: list[str] = []
+    for run in runs:
+        for limitation in run.limitations:
+            norm = re.sub(r"\s+", " ", limitation).strip().lower()
+            if norm and norm not in seen:
+                seen[norm] = limitation.strip()
+                order.append(norm)
+    return [seen[norm] for norm in order]
+
+
+def make_final_summary(runs: list[AssessmentRun], include_total: bool) -> str:
+    stage_avgs = {}
+    for stage_number in range(1, 7):
+        scores = [stage_by_number(run, stage_number).score for run in runs]
+        name = stage_by_number(runs[0], stage_number).stage_name
+        stage_avgs[stage_number] = (name, statistics.mean(scores))
+
+    strongest = max(stage_avgs.items(), key=lambda item: item[1][1])
+    weakest = min(stage_avgs.items(), key=lambda item: item[1][1])
+
+    total_text = ""
+    if include_total:
+        totals = [run.total_score for run in runs if run.total_score is not None]
+        if totals:
+            total_text = f" The average total score across runs is {statistics.mean(totals):.1f}."
+
+    return (
+        f"Across {len(runs)} independent assessment runs, the project appears strongest on "
+        f"{strongest[1][0]} with an average score of {strongest[1][1]:.1f}, and weakest on "
+        f"{weakest[1][0]} with an average score of {weakest[1][1]:.1f}.{total_text} "
+        f"The scores should be interpreted as evidence-bundle-based traceability estimates rather than scientific validation: "
+        f"high scores indicate externally inspectable artifacts and linkages, while lower scores indicate missing, implicit, "
+        f"or insufficiently versioned evidence in the collected material."
+    )
+
+
+def write_markdown_report(
+    runs: list[AssessmentRun],
+    *,
+    output_path: Path,
+    project_url: str,
+    definition_url: str,
+    include_total: bool,
+) -> None:
+    lines: list[str] = []
+    lines.append("# Open Traceability Assessment Report")
+    lines.append("")
+    lines.append(f"- Project/report URL: {project_url}")
+    lines.append(f"- Assessment definition URL: {definition_url}")
+    lines.append(f"- Number of runs: {len(runs)}")
+    lines.append("")
+
+    lines.append("## Final single-paragraph summary")
+    lines.append("")
+    lines.append(make_final_summary(runs, include_total=include_total))
+    lines.append("")
+
+    lines.append("## Score table across runs")
+    lines.append("")
+
+    header = ["Stage", "Stage name"] + [f"Run {run.run_number}" for run in runs] + ["Average", "Std dev"]
+    lines.append("| " + " | ".join(header) + " |")
+    lines.append("| " + " | ".join(["---"] * len(header)) + " |")
+
+    for stage_number in range(1, 7):
+        stages = [stage_by_number(run, stage_number) for run in runs]
+        scores = [stage.score for stage in stages]
+        avg = statistics.mean(scores)
+        std = statistics.pstdev(scores) if len(scores) > 1 else 0.0
+
+        row = [
+            str(stage_number),
+            stages[0].stage_name,
+            *[str(score) for score in scores],
+            f"{avg:.1f}",
+            f"{std:.1f}",
+        ]
+        lines.append("| " + " | ".join(md_escape(cell) for cell in row) + " |")
+
+    if include_total:
+        totals = [run.total_score for run in runs if run.total_score is not None]
+        if totals:
+            avg = statistics.mean(totals)
+            std = statistics.pstdev(totals) if len(totals) > 1 else 0.0
+            lines.append("")
+            lines.append("## Total score")
+            lines.append("")
+            lines.append("| Run | Total score |")
+            lines.append("| --- | ---: |")
+            for run in runs:
+                lines.append(f"| {run.run_number} | {run.total_score} |")
+            lines.append("")
+            lines.append(f"Average total score: **{avg:.1f}**; population standard deviation: **{std:.1f}**.")
+            lines.append("")
+
+    lines.append("## Consolidated references by stage")
+    lines.append("")
+    lines.append(
+        "References cited across all runs, deduplicated by URL. The runs that cited each "
+        "reference are noted in parentheses; references cited by more runs appear first."
+    )
+    lines.append("")
+
+    run_count = len(runs)
+    for stage_number in range(1, 7):
+        stages = [stage_by_number(run, stage_number) for run in runs]
+        scores = [stage.score for stage in stages]
+        avg = statistics.mean(scores)
+        lines.append(f"### Stage {stage_number}: {stages[0].stage_name}")
+        lines.append("")
+        lines.append(
+            f"Average score {avg:.1f} (range {min(scores)}–{max(scores)} across {run_count} runs)."
+        )
+        lines.append("")
+
+        references = consolidate_references(runs, stage_number)
+        if not references:
+            lines.append("No references supplied across runs.")
+            lines.append("")
+            continue
+
+        for ref in references:
+            label = md_escape(ref["label"])
+            url = md_escape(ref["url"])
+            finding = md_escape(ref["finding"])
+            cited = ", ".join(str(n) for n in sorted(ref["runs"]))
+            lines.append(
+                f"- [{label}]({url}): {finding} "
+                f"_(cited in {len(ref['runs'])}/{run_count} runs: {cited})_"
+            )
+        lines.append("")
+
+    lines.append("## Consolidated limitations across runs")
+    lines.append("")
+    limitations = consolidate_limitations(runs)
+    if limitations:
+        lines.append(
+            "Distinct limitations raised by one or more runs (deduplicated):"
+        )
+        for limitation in limitations:
+            lines.append(f"- {limitation}")
+        lines.append("")
+    else:
+        lines.append("No limitations were reported across runs.")
+        lines.append("")
+
+    output_path.write_text("\n".join(lines), encoding="utf-8")
+
+
+# -----------------------------
+# CLI
+# -----------------------------
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Run an Open Traceability Assessment multiple times with the OpenAI API."
+    )
+    parser.add_argument("--project-url", default=DEFAULT_PROJECT_URL)
+    parser.add_argument("--definition-url", default=DEFAULT_DEFINITION_URL)
+    parser.add_argument("--runs", type=int, default=3)
+    parser.add_argument("--model", default="gpt-5.5")
+    parser.add_argument(
+        "--reasoning-effort",
+        choices=["none", "low", "medium", "high", "xhigh"],
+        default="medium",
+        help="Use 'none' for models that do not support reasoning parameters.",
+    )
+    parser.add_argument(
+        "--include-total",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Include or omit numeric total assessment scores.",
+    )
+    parser.add_argument("--output-dir", default="reports")
+    parser.add_argument("--out-prefix", default="open_traceability_assessment")
+    parser.add_argument("--sleep-seconds", type=float, default=1.0)
+    parser.add_argument("--max-evidence-files", type=int, default=60)
+    parser.add_argument("--max-file-chars", type=int, default=5_000)
+    parser.add_argument("--max-evidence-chars", type=int, default=120_000)
+    parser.add_argument("--max-definition-chars", type=int, default=20_000)
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+
+    if args.runs < 1:
+        raise ValueError("--runs must be at least 1")
+
+    if not os.getenv("OPENAI_API_KEY"):
+        raise RuntimeError("OPENAI_API_KEY is not set.")
+
+    print(f"Fetching Open Traceability definition from: {args.definition_url}")
+    definition_text = fetch_url_text(args.definition_url, max_chars=args.max_definition_chars)
+
+    print(f"Collecting evidence from: {args.project_url}")
+    evidence_bundle, _ = collect_evidence(args)
+
+    client = OpenAI()
+    runs: list[AssessmentRun] = []
+
+    for run_number in range(1, args.runs + 1):
+        print(f"Running assessment {run_number}/{args.runs}...")
+        run = run_assessment(
+            client,
+            model=args.model,
+            reasoning_effort=args.reasoning_effort,
+            run_number=run_number,
+            runs=args.runs,
+            project_url=args.project_url,
+            definition_url=args.definition_url,
+            definition_text=definition_text,
+            evidence_bundle=evidence_bundle,
+            include_total=args.include_total,
+        )
+        runs.append(run)
+
+        if run_number < args.runs and args.sleep_seconds > 0:
+            time.sleep(args.sleep_seconds)
+
+    project_slug = slugify(runs[0].project_name)
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    name_prefix = f"{project_slug}_{args.out_prefix}"
+    run_dir = Path(args.output_dir) / f"{timestamp}_{name_prefix}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    json_path = run_dir / f"{name_prefix}.runs.json"
+    md_path = run_dir / f"{name_prefix}.report.md"
+
+    json_path.write_text(
+        json.dumps([model_to_dict(run) for run in runs], indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    write_markdown_report(
+        runs,
+        output_path=md_path,
+        project_url=args.project_url,
+        definition_url=args.definition_url,
+        include_total=args.include_total,
+    )
+
+    print(f"Wrote structured run data: {json_path}")
+    print(f"Wrote Markdown report: {md_path}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,1257 @@
+[
+  {
+    "run_number": 1,
+    "project_name": "InVEST",
+    "project_url": "https://github.com/natcap/invest",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 42,
+        "score_derivation": "There is moderate but incomplete evidence for input-data traceability. The repository clearly uses and tests against model input datasets, sample data, regression data, datastacks, and geospatial input files, and the README points to sample-data and test-data repositories. Tests show concrete required inputs for many environmental models, such as DEMs, land-cover rasters, watersheds, biophysical tables, precipitation, and yield tables. However, the evidence bundle does not include the actual input datasets, dataset metadata, measurement protocols, uncertainty estimates, quality-control documentation, primary-data provenance, data licenses, or versioned data releases for the sample/test data. Because InVEST is a modeling software project rather than a single environmental claim, inputs are largely user-supplied; the available evidence supports identifiable model inputs but not full external verification of measurement evidence. The score is therefore above fragmentary, but not high because primary and secondary data provenance, uncertainties, and reuse conditions are mostly absent from the supplied evidence.",
+        "uncertainty": "Medium uncertainty: the repository links to external sample and test data resources, but their contents and metadata are not included in the evidence bundle.",
+        "references": [
+          {
+            "label": "README data repositories",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README lists related repositories for the InVEST User's Guide, InVEST Sample Data, and InVEST Test Data, including sample data from InVEST 3.7.0-present and test data from InVEST 3.7.0-present.",
+            "relevance": "Shows that model input and test datasets are identifiable and externally hosted, but does not itself document their provenance, uncertainty, or licenses."
+          },
+          {
+            "label": "Annual Water Yield test inputs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_annual_water_yield.py",
+            "quote_or_finding": "The Annual Water Yield regression tests define input paths for LULC, depth to root restricting layer, precipitation, PAWC, ETo, watersheds, and a biophysical table under data/invest-test-data/annual_water_yield.",
+            "relevance": "Demonstrates concrete, inspectable model input categories for one environmental model, but not measurement provenance or uncertainty."
+          },
+          {
+            "label": "SDR test inputs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "The SDR regression tests define inputs including biophysical_table.csv, dem.tif, erodibility, erosivity, landuse, watersheds, and model parameters.",
+            "relevance": "Provides evidence that input files and parameters are specified in code for reproducible tests."
+          },
+          {
+            "label": "Datastack tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Tests exercise building and extracting datastack archives that collect model parameters and input files such as rasters, vectors, and nonspatial files.",
+            "relevance": "Supports input packaging and parameter capture, though the bundle does not show complete data provenance or licensing."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 88,
+        "score_derivation": "The evidence for open-source software traceability is strong. The project is a public GitHub repository with an Apache-2.0 license, citation metadata with a version DOI, explicit Python project metadata, dependency lists, build configuration, Docker container configuration, tests, build scripts, and documentation pointers. The code is released in a version-controlled repository and appears designed for independent installation and execution through Python, desktop releases, and containers. The score is not higher because the evidence bundle does not include a full lockfile or fully pinned computational environment, and some infrastructure such as code signing depends on nonpublic secrets and organization-controlled machines. Still, the software, license, dependencies, build system, and containerization evidence are excellent.",
+        "uncertainty": "Low uncertainty: the evidence bundle directly contains license, dependency, build, Docker, and repository metadata.",
+        "references": [
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "The repository is public as natcap/invest, described as InVEST models that map and value ecosystem services, with license Apache-2.0 and default branch main.",
+            "relevance": "Establishes public source repository, project purpose, and open-source license metadata."
+          },
+          {
+            "label": "Apache license",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/LICENSE.txt",
+            "quote_or_finding": "LICENSE.txt contains the Apache License Version 2.0 terms for use, reproduction, and distribution.",
+            "relevance": "Confirms a recognized open-source license with redistribution and modification permissions."
+          },
+          {
+            "label": "Python project metadata",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/pyproject.toml",
+            "quote_or_finding": "pyproject.toml defines project name natcap.invest, Python >=3.10, Apache-2.0 license, maintainers, classifiers, console script invest, and build-system requirements.",
+            "relevance": "Documents package metadata, runtime constraints, and build-system configuration."
+          },
+          {
+            "label": "Runtime dependencies",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements.txt",
+            "quote_or_finding": "requirements.txt records runtime requirements including GDAL, pandas, numpy, scipy, pygeoprocessing, taskgraph, geopandas, matplotlib, and other packages.",
+            "relevance": "Provides dependency information needed to understand and run the software."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/Dockerfile",
+            "quote_or_finding": "The Dockerfile builds InVEST in a micromamba container, installs conda-forge dependencies, builds a wheel, installs it, and defines an entrypoint.",
+            "relevance": "Shows infrastructure software for a reusable execution environment."
+          },
+          {
+            "label": "CITATION metadata",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff identifies InVEST as software, version 3.20.0, DOI 10.60793/natcap-invest-3.20.0, repository-code URL, release artifact URL, and Apache-2.0 license.",
+            "relevance": "Provides versioned citation and artifact metadata for the software."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 76,
+        "score_derivation": "Execution and reproducibility evidence is strong. The project includes CLI tests, datastack functionality for packaging parameters and inputs, a file registry for expected outputs, many regression tests that execute real model runs with sample/test data, pytest configuration, dependency files, build scripts, and a Docker container. These artifacts make many paths from inputs to outputs inspectable and partially repeatable by external users. The score is not higher because the evidence bundle does not include CI workflow definitions, recorded workflow-run logs, exact release build provenance, checksums for input datasets, or a fully pinned/locked environment. Also, some tests are skipped because sample data are not usually cloned, which limits turnkey reproducibility. The score is not lower because the available tests and datastack/file-registry mechanisms explicitly support re-execution and output checking.",
+        "uncertainty": "Medium uncertainty: substantial reproducibility mechanisms are visible, but CI results and exact run artifacts are not supplied.",
+        "references": [
+          {
+            "label": "CLI reproducibility tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "CLI tests run models using JSON datastacks, override workspaces, validate error cases, and check that file_registry.json is produced in the workspace.",
+            "relevance": "Shows command-line execution paths and output registry generation for reproducible runs."
+          },
+          {
+            "label": "Datastack archive tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Datastack tests build archives from model args and model names, extract archives, validate args, and execute modules from extracted parameter sets.",
+            "relevance": "Directly supports repeatable packaging of inputs and parameters for model execution."
+          },
+          {
+            "label": "Regression tests for SDR",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "The SDR base regression test executes the model with sample data, enables report generation and file registry saving, and checks expected watershed totals and raster outputs.",
+            "relevance": "Demonstrates end-to-end reproducibility checks from specified inputs to expected outputs."
+          },
+          {
+            "label": "Regression tests for Carbon",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_carbon.py",
+            "quote_or_finding": "The Carbon full model test creates input rasters and carbon-pools CSV, executes the model, and asserts expected raster and report values.",
+            "relevance": "Shows externally inspectable test logic for expected computational results."
+          },
+          {
+            "label": "Pytest configuration",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/pyproject.toml",
+            "quote_or_finding": "pyproject.toml includes pytest warning configuration and dependency/build metadata; requirements-dev.txt lists pytest, coverage, build, and related development dependencies.",
+            "relevance": "Supports automated testing and reproducible development workflows."
+          },
+          {
+            "label": "Docker documentation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/README.md",
+            "quote_or_finding": "The Docker README states that Docker images and digests are published to GitHub Packages and points users to API docs for container usage.",
+            "relevance": "Indicates availability of containerized execution environments, though exact digests are not included in the bundle."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 74,
+        "score_derivation": "The project has strong public community and review mechanisms. The repository exposes a public issue tracker with many open issues, CONTRIBUTING.md directs users to search and file GitHub issues, provides bug-report and feature-request processes, points users to a public community forum, and states that major features and science-related model changes require peer review or NatCap science review. This is good evidence of visible channels for critique, contribution, bug reports, and methodological scrutiny. The score is not higher because the supplied evidence does not include actual issue discussions, pull-request reviews, Platform Steering Committee records, science review reports, correction notices, or evidence of affected-community review. The score is not lower because contribution and review processes are explicit and public channels are clearly identified.",
+        "uncertainty": "Medium uncertainty: review processes are documented, but the bundle contains little evidence of actual review records or outcomes.",
+        "references": [
+          {
+            "label": "Repository issue metadata",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "Repository metadata reports open_issues_count: 213.",
+            "relevance": "Shows an active public issue tracker where problems and requests can be raised."
+          },
+          {
+            "label": "CONTRIBUTING bug process",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "CONTRIBUTING.md instructs users to search InVEST Open Issues on GitHub and create a new issue using the Bug report template with details.",
+            "relevance": "Documents public bug-reporting and correction channels."
+          },
+          {
+            "label": "CONTRIBUTING feature and science review",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Feature requests are weighed by impact and team capacity; major features, including new models, must go through peer review with the Platform Steering Committee, and science-related changes require NatCap science review.",
+            "relevance": "Provides explicit evidence of review requirements for methodological and scientific changes."
+          },
+          {
+            "label": "Community forum link",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "For questions and troubleshooting, contributors are directed to the NatCap Community Forum at community.naturalcapitalalliance.org.",
+            "relevance": "Shows a public channel for user questions and interpretation discussions."
+          },
+          {
+            "label": "Contribution workflow",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Contributors are instructed to comment on issues, wait for a NatCap team response, use descriptive commits with issue numbers, update automated tests, and manually test code changes.",
+            "relevance": "Shows visible contribution, response, and quality-control expectations."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 69,
+        "score_derivation": "Publication and communication traceability is strong but not complete. The README clearly explains what InVEST is, links to releases, the website, API documentation, the User's Guide repository, sample data, test data, and historical releases. CITATION.cff provides a formal software citation, DOI, version, abstract, release date, repository-code URL, and artifact URL. Docker documentation and package metadata also point to user-facing documentation. The score is not higher because the evidence bundle does not include the actual user guide pages, API documentation pages, scientific publications describing individual model methods, dashboard/version-history documentation, or explicit open licenses for documentation/publications. The score is not lower because the project has public release, citation, and documentation entry points with a versioned DOI and clear project description.",
+        "uncertainty": "Medium uncertainty: the bundle includes links to documentation and citation metadata but not the content or licensing of the documentation itself.",
+        "references": [
+          {
+            "label": "README overview and installation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README describes InVEST as tools for quantifying values of natural capital, links to the Natural Capital Alliance website, GitHub releases, software downloads, and API documentation.",
+            "relevance": "Shows public-facing communication of project purpose, installation, and documentation access."
+          },
+          {
+            "label": "README related repositories",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README links to the InVEST User's Guide repository, sample data, test data, older source-code repositories, and archived release locations.",
+            "relevance": "Provides public pointers to supporting materials and historical context."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff gives title InVEST, version 3.20.0, release date 2026-06-11, DOI 10.60793/natcap-invest-3.20.0, repository code URL, artifact URL, keywords, and an abstract.",
+            "relevance": "Supports formal citation, versioned communication, and preservation of context for external users."
+          },
+          {
+            "label": "Docker README",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/README.md",
+            "quote_or_finding": "The Docker README points to published Docker images and to API documentation for container guidance.",
+            "relevance": "Provides user-facing documentation for a reproducible execution pathway."
+          },
+          {
+            "label": "Python package metadata",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/pyproject.toml",
+            "quote_or_finding": "pyproject.toml classifies the project as Production/Stable, Intended Audience Science/Research, and Topic Scientific/Engineering GIS.",
+            "relevance": "Communicates intended use, maturity, and scientific domain for package users."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Verifiability",
+        "score": 60,
+        "score_derivation": "The evidence chain is partially explicit and externally inspectable but not complete for claim-level verification. Strong positive evidence includes a versioned DOI for the software, public source code, open license, dependency declarations, Docker build configuration, datastack packaging of parameters and inputs, CLI generation of file_registry.json, regression tests that compare outputs to expected values, and contribution/review processes. These mechanisms can help link a model run to code, inputs, parameters, and outputs. However, the evidence bundle does not show a specific environmental claim with exact datasets, code commit, model configuration, workflow run, review record, and publication all linked together. Input datasets lack supplied provenance and uncertainty metadata, CI run artifacts are absent, and documentation/publication artifacts are mostly linked rather than included. The score is therefore at the high end of moderate: the project has many verifiability mechanisms, but the exact cross-stage evidence chain for any particular environmental claim is not demonstrated in the supplied evidence.",
+        "uncertainty": "Medium uncertainty: project-level traceability mechanisms are visible, but no complete claim-specific evidence chain is supplied.",
+        "references": [
+          {
+            "label": "Versioned citation and artifact",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff identifies version 3.20.0, DOI 10.60793/natcap-invest-3.20.0, repository-code URL, and repository-artifact URL.",
+            "relevance": "Provides a versioned anchor for verifying the software artifact used in a claim."
+          },
+          {
+            "label": "Datastack archive functionality",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Datastack tests build archives from args and model name, extract them, validate them, and execute the referenced model.",
+            "relevance": "Supports explicit linkage among model name, parameters, and input files for repeatable runs."
+          },
+          {
+            "label": "CLI file registry output",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "A CLI test asserts that running a model produces file_registry.json in the workspace, mapping expected output identifiers to paths.",
+            "relevance": "Supports traceability from execution to named outputs."
+          },
+          {
+            "label": "File registry tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_file_registry.py",
+            "quote_or_finding": "Tests verify FileRegistry behavior, including unique output IDs and paths, patterned outputs, and directory creation for output paths.",
+            "relevance": "Shows infrastructure for deterministic output identification and verification."
+          },
+          {
+            "label": "Regression test output checks",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "The SDR regression test executes the model and checks expected aggregate values and raster-output properties.",
+            "relevance": "Demonstrates verification of a model output against expected results, though not tied to a published environmental claim."
+          },
+          {
+            "label": "Open community process",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "CONTRIBUTING.md documents issue reporting, feature requests, peer review for major features, and science review for science-related changes.",
+            "relevance": "Adds review and correction-process evidence to the broader verifiability chain."
+          }
+        ]
+      }
+    ],
+    "total_score": 68,
+    "total_score_derivation": "Computed locally as round(mean([42, 88, 76, 74, 69, 60])) = 68.",
+    "single_paragraph_summary": "InVEST shows strong Open Traceability as an open-source environmental modeling software project: it has a public GitHub repository, Apache-2.0 licensing, versioned citation metadata with a DOI, dependency and build files, Docker support, extensive regression tests, datastack and file-registry mechanisms, public issue processes, and documented contribution/review pathways. Its main limitations are at the claim and input-data levels: the supplied evidence does not include complete provenance, measurement methods, uncertainty, quality controls, or licenses for sample/test/input datasets, and it does not demonstrate a full chain from a specific environmental claim to exact data versions, code commit, model configuration, workflow run, review record, and publication. Overall, the project has excellent open-source and reproducibility foundations, but only moderate end-to-end claim verifiability in the evidence provided.",
+    "limitations": [
+      "The evidence bundle assesses the InVEST repository as a software project, not a specific environmental claim or report output.",
+      "The actual sample-data and test-data repositories are linked but their contents, metadata, licenses, provenance, and uncertainty documentation are not included in the bundle.",
+      "No CI configuration, CI logs, release-build logs, checksums, or signed release verification records are included in the supplied evidence.",
+      "Documentation pages, user-guide content, API docs, and scientific method publications are referenced by links but not included for direct assessment.",
+      "The bundle does not include public pull-request review records, Platform Steering Committee records, NatCap science review reports, correction notices, or forum discussions.",
+      "Dependency files are present, but the evidence does not show a fully pinned lockfile or exact computational environment for each release or test run.",
+      "Some infrastructure described in the code-signing README depends on secrets and organization-controlled systems, so that part is not independently reproducible from public evidence alone."
+    ]
+  },
+  {
+    "run_number": 2,
+    "project_name": "InVEST",
+    "project_url": "https://github.com/natcap/invest",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 43,
+        "score_derivation": "The repository provides some identifiable input-data pathways: the README points to separate sample-data and test-data repositories, and many regression tests identify concrete input files used by models. This is more than fragmentary evidence because model inputs are named and exercised in tests, including rasters, vectors, tables, and parameter sets. However, the evidence bundle does not include the actual input datasets, their metadata, licenses, provenance, measurement methods, primary-data sources, uncertainty estimates, quality-control documentation, or versioned releases for those datasets. Secondary data are not traceable back to primary measurements in the supplied evidence. The score is therefore in the moderate-to-low range: not lower because input artifacts and sample/test data locations are clearly referenced, but not higher because the core measurement-evidence requirements are mostly absent from the bundle.",
+        "uncertainty": "Medium: the repository points to external sample and test data, but the evidence bundle does not include their metadata or contents.",
+        "references": [
+          {
+            "label": "README related data repositories",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README lists related repositories for “InVEST Sample Data” and “InVEST Test Data,” including Bitbucket URLs, and states that downloads of binaries and sample data for older versions are available.",
+            "relevance": "Shows that input/sample/test datasets are publicly identified, but does not itself document provenance, licensing, uncertainty, or measurement methods."
+          },
+          {
+            "label": "Annual Water Yield test inputs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_annual_water_yield.py",
+            "quote_or_finding": "Regression tests define SAMPLE_DATA paths such as lulc.tif, precip.tif, pawc.tif, eto.tif, watersheds.shp, and biophysical_table.csv under data/invest-test-data/annual_water_yield/input.",
+            "relevance": "Demonstrates that model tests use identifiable geospatial and tabular inputs, supporting partial input traceability."
+          },
+          {
+            "label": "SDR test inputs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "The SDR regression test defines inputs including biophysical_table.csv, dem.tif, erodibility_SI_clip.tif, erosivity.tif, landuse_90.tif, and watersheds.shp.",
+            "relevance": "Shows concrete input files for a model execution, but without measurement provenance or uncertainty documentation in the supplied evidence."
+          },
+          {
+            "label": "Datastack tests with sample data skipped",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Several datastack archive tests are marked skipped with the note: “Sample data not usually cloned for test runs.”",
+            "relevance": "Indicates that some sample input data are external to typical repository clones, limiting reproducibility and direct inspection from the provided repository evidence."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 88,
+        "score_derivation": "The software is hosted in a public version-controlled GitHub repository, has an Apache-2.0 license, includes source code, build configuration, runtime and development dependencies, tests, Docker support, code-signing infrastructure code, and citation metadata with a version-specific DOI. This is strong open-source traceability. The score is not higher because dependencies are mostly specified as version ranges rather than fully locked environments, some deployment/code-signing operations require private secrets and a specific machine, and the evidence bundle does not include full API/user-guide method documentation content. It is not lower because the repository clearly meets major open-source software criteria: inspectable code, recognized open-source license, dependency declarations, packaging metadata, and reusable build artifacts.",
+        "uncertainty": "Low: the evidence bundle directly includes repository metadata, license, dependency files, build files, and Docker configuration.",
+        "references": [
+          {
+            "label": "Repository metadata and license",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "The GitHub metadata identifies natcap/invest as “InVEST®: models that map and value the goods and services from nature…” with license “Apache-2.0,” default branch “main,” and topics including ecosystem-services, geospatial, and gis.",
+            "relevance": "Supports that the project is publicly hosted, version-controlled, and openly licensed."
+          },
+          {
+            "label": "Apache license file",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/LICENSE.txt",
+            "quote_or_finding": "The repository includes Apache License Version 2.0 terms for use, reproduction, and distribution.",
+            "relevance": "Confirms use of a recognized open-source license."
+          },
+          {
+            "label": "Python packaging metadata",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/pyproject.toml",
+            "quote_or_finding": "pyproject.toml defines project name natcap.invest, requires-python >=3.10, license Apache-2.0, scripts entry point invest = natcap.invest.cli:main, and dynamic dependencies from requirements.txt.",
+            "relevance": "Shows software packaging, runtime configuration, and executable entry point needed to understand and run the software."
+          },
+          {
+            "label": "Runtime dependencies",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements.txt",
+            "quote_or_finding": "requirements.txt lists dependencies such as gdal>=3.4.2, pandas, numpy, scipy, pygeoprocessing, taskgraph, fiona, geopandas, matplotlib, and others.",
+            "relevance": "Documents dependencies needed for model operation, though mostly not pinned to exact versions."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/Dockerfile",
+            "quote_or_finding": "The Dockerfile builds an InVEST wheel in a micromamba container, installs dependencies from docker/environment.yml plus Python and GDAL arguments, and installs the built wheel.",
+            "relevance": "Shows containerized infrastructure for building and running the software."
+          },
+          {
+            "label": "CITATION with DOI and version",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff identifies version 3.20.0, release date 2026-06-11, repository-code https://github.com/natcap/invest, license Apache-2.0, and DOI 10.60793/natcap-invest-3.20.0.",
+            "relevance": "Provides versioned citation and persistent identifier for the software artifact."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 72,
+        "score_derivation": "The project has substantial execution and reproducibility evidence: regression tests execute many models with explicit argument dictionaries, expected outputs, validation checks, datastack functionality, file registries, CLI execution tests, Docker image documentation, and dependency files. These artifacts make many computational paths inspectable and partly re-executable. The score is not higher because the evidence bundle does not show CI configuration or CI run logs, exact locked environments, checksums for input data, complete availability of test/sample data in the repository, or a specific published environmental claim linked to an exact run. It is not lower because the tests and datastack machinery are extensive and directly encode inputs, parameters, expected outputs, and execution modes for many models.",
+        "uncertainty": "Medium: code-level reproducibility evidence is strong, but external execution records and complete data/environment capture are not supplied.",
+        "references": [
+          {
+            "label": "CLI execution tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "CLI tests run models using commands such as cli.main(['run', 'delineateit', '--datastack', parameter_set_path, '--workspace', self.workspace_dir]) and test production of file_registry.json.",
+            "relevance": "Shows scripted command-line execution with parameter sets and output registry checks."
+          },
+          {
+            "label": "Datastack archive tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Datastack tests build a datastack archive from args and model name, extract it, validate args, and execute the model; simple-parameter tests confirm workspace exclusion and archived args content.",
+            "relevance": "Demonstrates mechanisms for packaging model parameters and input files to support repeatable execution."
+          },
+          {
+            "label": "DelineateIt regression test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_delineateit.py",
+            "quote_or_finding": "The test defines explicit args for dem_path, outlet_vector_path, workspace_dir, snap_points, snap_distance, flow_threshold, results_suffix, and n_workers, executes MODEL_SPEC, then asserts expected feature counts and areas.",
+            "relevance": "Shows an inspectable model run with parameters and expected output checks."
+          },
+          {
+            "label": "Carbon regression test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_carbon.py",
+            "quote_or_finding": "The carbon test creates simple rasters and a carbon pools CSV, executes the model, and asserts expected raster values and report results.",
+            "relevance": "Provides a self-contained computational test with generated inputs and expected numerical outputs."
+          },
+          {
+            "label": "Docker usage documentation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/README.md",
+            "quote_or_finding": "The Docker README states that Docker images and digests are published to GitHub Packages and that usage guidance is available in API docs.",
+            "relevance": "Supports reproducible computational environments, though the bundle does not include specific image digests or full usage docs."
+          },
+          {
+            "label": "Development requirements",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements-dev.txt",
+            "quote_or_finding": "requirements-dev.txt lists testing and build tools such as pytest, coverage, build, pyinstaller, setuptools_scm, and cython.",
+            "relevance": "Documents tools needed for local testing and build workflows."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 68,
+        "score_derivation": "The project has visible mechanisms for community interaction and review: public GitHub issues, a community forum for questions, bug and feature request instructions, contribution procedures, automated and manual testing expectations, and explicit statements that major features and science-related model changes require peer/science review. The repository metadata reports many open issues, indicating an active public issue tracker. The score is not higher because the evidence bundle does not include actual issue discussions, pull request review records, Platform Steering Committee records, NatCap science review records, correction notices, governance minutes, or examples of responses to external critique. It is not lower because public contribution pathways and review requirements are clearly documented.",
+        "uncertainty": "Medium: review processes are documented, but the bundle provides little direct evidence of actual review records or outcomes.",
+        "references": [
+          {
+            "label": "Contributing guide questions and bug reports",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "The guide directs users with questions to the NatCap Community Forum and instructs bug reporters to search InVEST Open Issues on GitHub or create a new issue with details.",
+            "relevance": "Shows open channels for questions, bug reporting, and user feedback."
+          },
+          {
+            "label": "Contributing guide feature and science review",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Feature requests are to be submitted as GitHub issues, and “major features, including new InVEST models, must go through a peer-review process with our Platform Steering Committee”; science-related changes require a NatCap science review.",
+            "relevance": "Documents formal review expectations for major features and methodological changes."
+          },
+          {
+            "label": "Contributing guide code workflow",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Contributors are told to fork the repository, create branches from main, use descriptive commit messages including issue numbers, update automated tests, and manually test changes.",
+            "relevance": "Shows contribution and review workflow norms that support traceable software changes."
+          },
+          {
+            "label": "Repository issue count",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "GitHub metadata reports open_issues_count: 213.",
+            "relevance": "Indicates an active public issue tracker, though individual issue content is not included in the evidence bundle."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 74,
+        "score_derivation": "The project provides open communication artifacts: a public README explaining InVEST’s purpose, installation paths, release locations, related repositories, contribution instructions, and license notice; citation metadata with version, DOI, release artifact, abstract, and project URL; references to API documentation and a user-guide repository; and GitHub releases/archive locations. This supports strong public communication for software use. The score is not higher because the evidence bundle does not include the user-guide content, API documentation content, documentation license, update-cycle policy for dynamic outputs, complete model-method descriptions, or peer-reviewed publication records tied to the software claims. It is not lower because the supplied public documentation and citation metadata are clear and versioned.",
+        "uncertainty": "Medium: public documentation is clearly referenced, but much of the detailed documentation is external and not included in the bundle.",
+        "references": [
+          {
+            "label": "README project description",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README states that InVEST is “a family of tools for quantifying the values of natural capital” and describes its use for assessing tradeoffs and integrating conservation and human development.",
+            "relevance": "Provides an accessible public statement of the project’s environmental decision-support purpose."
+          },
+          {
+            "label": "README installation and releases",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README states that the desktop application can be downloaded from GitHub releases or the website, that InVEST is available as a Python package, and that API documentation is at invest.readthedocs.io.",
+            "relevance": "Shows public communication about how to access and use the software."
+          },
+          {
+            "label": "README related documentation repositories",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README links to the InVEST User’s Guide repository, sample data, test data, and archived older source repositories.",
+            "relevance": "Shows public pointers to supporting explanatory and data materials."
+          },
+          {
+            "label": "CITATION metadata",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff includes a detailed abstract, keywords, license Apache-2.0, version 3.20.0, release date, DOI, repository code URL, and repository artifact URL.",
+            "relevance": "Provides a clear, citable, versioned publication-style record for the software."
+          },
+          {
+            "label": "Docker documentation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/README.md",
+            "quote_or_finding": "The Docker README points users to published Docker images and API documentation for usage guidance.",
+            "relevance": "Supports communication of executable deployment options, though detailed documentation is outside the supplied evidence."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Verifiability",
+        "score": 61,
+        "score_derivation": "The project has meaningful verifiability mechanisms across several dimensions: version-controlled source code, an Apache license, versioned citation DOI and artifact URL, dependency declarations, Docker build artifacts, regression tests with explicit parameters and expected outputs, datastack archiving, and file registry generation. These make parts of the evidence chain externally inspectable. The score is not higher because the bundle does not provide an explicit, end-to-end, versioned linkage from any particular environmental claim to exact primary input datasets, dataset versions/checksums, code commit or release, model configuration, workflow run logs, review records, and publication artifact. Input-data provenance and uncertainty are particularly weak in the supplied evidence, and review records are only referenced procedurally. It is not lower because the software contains clear mechanisms—especially datastacks, file registries, tests, Docker, and DOI-versioned releases—that could support strong traceability when combined with specific datasets and run records.",
+        "uncertainty": "Medium: verifiability tooling is evident, but no complete claim-to-evidence chain is supplied.",
+        "references": [
+          {
+            "label": "Versioned citation DOI",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff gives DOI 10.60793/natcap-invest-3.20.0, version 3.20.0, date-released 2026-06-11, repository-code URL, and repository-artifact URL.",
+            "relevance": "Supports external verification of the exact software version as a citable artifact."
+          },
+          {
+            "label": "Datastack packaging",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Tests build datastack archives from model args and model names, extract them, validate the arguments, and execute the model.",
+            "relevance": "Shows a mechanism for linking configurations and inputs to a model run."
+          },
+          {
+            "label": "File registry behavior",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_file_registry.py",
+            "quote_or_finding": "FileRegistry tests verify that output IDs resolve to concrete workspace paths and that duplicate output IDs or paths raise errors.",
+            "relevance": "Supports traceability between model output identifiers and generated files."
+          },
+          {
+            "label": "CLI file registry output",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "A CLI test is titled “CLI: file_registry.json should be produced in the workspace” and verifies expected output registry paths for a run.",
+            "relevance": "Shows that executions can produce a machine-readable output registry linking a run to output files."
+          },
+          {
+            "label": "Dockerfile build path",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/Dockerfile",
+            "quote_or_finding": "The Dockerfile copies source, pyproject.toml, setup.py, requirements.txt, license files, and .git into the build context, builds a wheel, and installs it in the container.",
+            "relevance": "Supports external inspection of the computational environment and build process."
+          },
+          {
+            "label": "Contributing review requirements",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Major features and new models require Platform Steering Committee peer review, and science-related changes require NatCap science review.",
+            "relevance": "Provides a procedural link to review requirements, but not the specific review records needed for full verifiability."
+          }
+        ]
+      }
+    ],
+    "total_score": 68,
+    "total_score_derivation": "Computed locally as round(mean([43, 88, 72, 68, 74, 61])) = 68.",
+    "single_paragraph_summary": "InVEST has strong open-source and software-process traceability: it is a public Apache-2.0 GitHub repository with versioned citation metadata, dependencies, build files, Docker support, extensive regression tests, datastack functionality, file registries, public issue pathways, and user-facing documentation links. Its main limitations for Open Traceability are that the supplied evidence does not include primary input-data provenance, measurement methods, uncertainty, licensing, checksums, or full sample/test data metadata; does not show actual CI logs or complete locked environments; and does not connect a specific environmental claim to exact data versions, code versions, parameters, workflow runs, review records, and publications. Overall, the project is highly open as scientific software, but only moderately traceable as a complete environmental evidence chain in the evidence bundle provided.",
+    "limitations": [
+      "The assessment uses only the supplied evidence bundle and does not inspect external documentation, sample data repositories, test data repositories, GitHub issues, pull requests, releases, CI systems, or API docs beyond the URLs and excerpts provided.",
+      "The project is a software suite rather than a single environmental report or claim, so stages involving claim-specific inputs, executions, publications, and verification were scored conservatively.",
+      "Input-data provenance, measurement methods, quality controls, licensing, uncertainty estimates, and links to primary data are mostly absent from the supplied bundle.",
+      "The evidence bundle references public review mechanisms but does not include concrete issue threads, pull request reviews, Platform Steering Committee records, NatCap science reviews, correction notices, or replication attempts.",
+      "The bundle does not provide CI configuration or run logs, exact container image digests, environment lockfiles, dataset checksums, or a complete re-executable workflow for a published environmental claim.",
+      "Some evidence artifacts are truncated, so details in omitted sections could affect scores but were not assumed."
+    ]
+  },
+  {
+    "run_number": 3,
+    "project_name": "InVEST",
+    "project_url": "https://github.com/natcap/invest",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 34,
+        "score_derivation": "The project provides some public pointers to sample data and test data repositories, and the regression tests identify many model-specific input files used for testing. This supports partial traceability of example inputs for software validation. However, the evidence bundle does not expose the actual primary environmental datasets, their measurement methods, uncertainty, quality controls, data licenses, provenance, or transformations. InVEST appears primarily to be a modeling software suite where users supply their own environmental inputs, so there is no complete public input-data evidence chain for a specific environmental claim. The score is not lower because sample/test data repositories and many explicit test input paths are documented; it is not higher because input-data provenance and uncertainty evidence are largely absent from the supplied materials.",
+        "uncertainty": "High uncertainty because the bundle links to sample and test data repositories but does not include their contents, metadata, licenses, or provenance documentation.",
+        "references": [
+          {
+            "label": "README related data repositories",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "README lists related repositories for “InVEST Sample Data” and “InVEST Test Data” and links older and current release/sample-data locations.",
+            "relevance": "Shows that example and test inputs are publicly identifiable, but does not itself document primary measurement provenance or uncertainty."
+          },
+          {
+            "label": "Regression test input paths",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "SDR regression tests define input paths such as biophysical_table.csv, dem.tif, erodibility_SI_clip.tif, erosivity.tif, landuse_90.tif, and watersheds.shp under data/invest-test-data/sdr/input.",
+            "relevance": "Demonstrates explicit, model-specific test inputs used for validation, but not their underlying data provenance or measurement methods."
+          },
+          {
+            "label": "Datastack tests and sample data limitation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Several datastack tests using sample data are marked skipped with the note “Sample data not usually cloned for test runs.”",
+            "relevance": "Indicates sample data are part of the ecosystem but not consistently present in the repository evidence chain, limiting input-data traceability."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 90,
+        "score_derivation": "The software is openly hosted in a public GitHub repository, has an Apache-2.0 license, a CITATION.cff with software DOI and version metadata, explicit Python packaging configuration, dependency files, build scripts, Docker support, and many model-specific tests. This is strong evidence that analytical logic, software dependencies, build methods, and reuse rights are inspectable. The score is not higher because the supplied bundle does not include full source-code files for the model implementations, complete user-guide contents, CI configuration, or exact locked dependency versions; nevertheless, the repository-level evidence is excellent for open-source software traceability.",
+        "uncertainty": "Low uncertainty because the evidence bundle directly includes repository metadata, license, packaging, dependency, build, Docker, and test artifacts.",
+        "references": [
+          {
+            "label": "Repository metadata and license",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "Repository description identifies InVEST as models that map and value ecosystem services; metadata reports license “Apache-2.0” and public GitHub repository natcap/invest.",
+            "relevance": "Supports public, licensed, version-controlled source availability."
+          },
+          {
+            "label": "Apache license file",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/LICENSE.txt",
+            "quote_or_finding": "LICENSE.txt contains the Apache License Version 2.0 terms for use, reproduction, and distribution.",
+            "relevance": "Confirms a recognized open-source license allowing reuse and redistribution."
+          },
+          {
+            "label": "Python project configuration",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/pyproject.toml",
+            "quote_or_finding": "pyproject.toml declares project name natcap.invest, requires Python >=3.10, license Apache-2.0, package discovery under src, dynamic dependencies from requirements.txt, and build-system requirements.",
+            "relevance": "Documents packaging, build metadata, supported Python versions, and dependency handling."
+          },
+          {
+            "label": "Runtime dependencies",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements.txt",
+            "quote_or_finding": "requirements.txt lists runtime dependencies including gdal, pandas, numpy, scipy, pygeoprocessing, taskgraph, geopandas, matplotlib, and others.",
+            "relevance": "Makes the software dependency stack inspectable."
+          },
+          {
+            "label": "Build configuration",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/setup.py",
+            "quote_or_finding": "setup.py defines compiled Cython/GDAL extension modules for several InVEST model components and platform-specific build configuration.",
+            "relevance": "Provides inspectable build and implementation details for compiled model components."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/Dockerfile",
+            "quote_or_finding": "Dockerfile builds InVEST in a micromamba-based container, installs dependencies, builds a wheel, and installs the package.",
+            "relevance": "Supports independent operation and inspection of the runtime/build infrastructure."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 72,
+        "score_derivation": "The repository provides substantial reproducibility infrastructure: dependency files, a Dockerfile, development/test requirements, CLI execution tests, datastack archive tests, file-registry tests, and many regression tests that execute models on test inputs and compare expected outputs. This makes many computational paths inspectable and partially re-executable. The score is not higher because the evidence bundle does not include CI workflow definitions or logs, exact environment lockfiles, container image digests for a specific release, or a specific published environmental claim linked to an exact workflow run. Many dependencies are lower-bounded rather than fully pinned, and some sample-data tests are skipped because sample data are not usually cloned.",
+        "uncertainty": "Medium uncertainty because the bundle shows strong test and container infrastructure but not full CI records or exact reproducible run artifacts.",
+        "references": [
+          {
+            "label": "Docker build environment",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/Dockerfile",
+            "quote_or_finding": "Dockerfile specifies a micromamba Debian base image, Python and GDAL arguments, environment installation, wheel build, package installation, and cleanup.",
+            "relevance": "Provides a reusable computational environment for building and running the software."
+          },
+          {
+            "label": "Docker usage documentation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/README.md",
+            "quote_or_finding": "Docker README states that Docker images and digests are published to GitHub Packages and points users to API docs for container guidance.",
+            "relevance": "Indicates containerized execution artifacts are available, although exact digest evidence is not included in the bundle."
+          },
+          {
+            "label": "Development requirements",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements-dev.txt",
+            "quote_or_finding": "requirements-dev.txt lists pytest, coverage, build, pyinstaller, cython, and other development infrastructure packages.",
+            "relevance": "Shows public test/build tooling needed for reproducibility."
+          },
+          {
+            "label": "CLI run and file-registry test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "CLI tests run models with datastack JSON and verify behavior such as workspace handling and production of file_registry.json.",
+            "relevance": "Demonstrates scripted execution paths and output recording mechanisms."
+          },
+          {
+            "label": "Datastack archive tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Datastack tests build a datastack archive from args and model name, extract it, validate args, and execute the model.",
+            "relevance": "Supports reproducibility by preserving model parameters and input files in an archive."
+          },
+          {
+            "label": "Regression test execution",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "SDR regression test executes the model with defined args, requests report generation and file-registry saving, and checks expected watershed totals and raster outputs.",
+            "relevance": "Shows an inspectable test workflow from inputs through execution to checked outputs."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 72,
+        "score_derivation": "The project has a public issue tracker with many open issues, a CONTRIBUTING guide that directs users to GitHub issues for bugs and feature requests, a public community forum for questions, and stated review processes for major features and science-related model changes. This is strong evidence for open channels of critique and correction. The score is not higher because the supplied bundle does not include actual peer-review records, Platform Steering Committee records, science-review outcomes, issue discussions, pull-request reviews, correction notices, or governance minutes. The score is not lower because the public contribution and review pathways are explicit and substantial.",
+        "uncertainty": "Medium uncertainty because the process is well documented but the bundle does not include examples of actual review records or their outcomes.",
+        "references": [
+          {
+            "label": "Repository issue metadata",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "Repository metadata reports open_issues_count: 213.",
+            "relevance": "Shows a public issue tracker with active visible issues, supporting inspectable community feedback and correction processes."
+          },
+          {
+            "label": "CONTRIBUTING bug reports and feature requests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "CONTRIBUTING instructs users to search InVEST Open Issues on GitHub and create new bug reports or feature requests with detail.",
+            "relevance": "Documents public mechanisms for users to report errors and request changes."
+          },
+          {
+            "label": "CONTRIBUTING community forum",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "The guide directs users with questions or troubleshooting needs to the NatCap Community Forum.",
+            "relevance": "Shows an open community support channel beyond the issue tracker."
+          },
+          {
+            "label": "CONTRIBUTING scientific review process",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Major features including new InVEST models must go through a peer-review process with the Platform Steering Committee, and science-related changes require NatCap science review.",
+            "relevance": "Supports review traceability in principle, though the actual review records are not present in the evidence bundle."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 78,
+        "score_derivation": "The project communicates its purpose, installation routes, related documentation/data repositories, releases, citation information, DOI, version, release date, repository-code URL, and artifact URL. This makes the software and its outputs relatively discoverable and citable. The score is not higher because the supplied bundle does not include the full user guide, API documentation contents, model equations documentation, publication license terms such as Creative Commons for documentation, or a specific environmental claim publication with linked evidence. The score is not lower because core public communication and citation artifacts are clear and versioned.",
+        "uncertainty": "Medium uncertainty because the bundle links to documentation and the user guide but does not include their contents or licensing.",
+        "references": [
+          {
+            "label": "README project description and installation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "README describes InVEST as tools for quantifying natural capital values and lists installation routes via GitHub releases, project website, and Python API documentation.",
+            "relevance": "Provides accessible public communication of the software’s purpose and how to obtain it."
+          },
+          {
+            "label": "README related documentation and data",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "README links to the InVEST User’s Guide repository, sample data, test data, archived source repositories, and release archives.",
+            "relevance": "Shows public pathways to supporting documentation and artifacts."
+          },
+          {
+            "label": "CITATION.cff versioned citation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff provides title InVEST, type software, DOI 10.60793/natcap-invest-3.20.0, version 3.20.0, release date 2026-06-11, repository-code URL, and release artifact URL.",
+            "relevance": "Supports citable, versioned communication and preservation of software releases."
+          },
+          {
+            "label": "Python package metadata",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/pyproject.toml",
+            "quote_or_finding": "pyproject.toml classifies the package for science/research, GIS, production/stable status, supported operating systems, and Python versions.",
+            "relevance": "Communicates intended audience, maturity, platform support, and package identity."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Verifiability",
+        "score": 58,
+        "score_derivation": "The project has several components that support verifiability: versioned citation metadata with DOI and release artifact URL, public source repository, Docker-based execution infrastructure, datastack archives that can preserve model arguments and inputs, and file-registry mechanisms that record expected outputs. These are meaningful building blocks for linking inputs, model configurations, and outputs. However, the supplied evidence does not show a complete, explicit, externally verifiable chain from any specific environmental claim to exact datasets, code commit/release, dependency environment, workflow run, review record, and publication. Review records and input-data provenance are not linked to claims, and dependency/runtime evidence is not fully locked to exact versions. The score is therefore moderate: stronger than generic openness, but below the level of explicit claim-to-evidence traceability required for high open verifiability.",
+        "uncertainty": "Medium uncertainty because the evidence shows verifiability mechanisms but not their use for a concrete published environmental claim.",
+        "references": [
+          {
+            "label": "Versioned citation and artifact link",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff identifies DOI 10.60793/natcap-invest-3.20.0, version 3.20.0, repository-code URL, and repository-artifact release URL.",
+            "relevance": "Provides a persistent versioned anchor for verifying a specific software release."
+          },
+          {
+            "label": "Datastack archive preservation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Tests build datastack archives from parameters and model name, extract archives, validate args, and execute the model from extracted contents.",
+            "relevance": "Shows a mechanism for preserving and replaying model configuration and input references, which is central to evidence-chain verifiability."
+          },
+          {
+            "label": "File registry behavior",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_file_registry.py",
+            "quote_or_finding": "FileRegistry tests verify mapping output IDs to workspace paths, detection of duplicate output IDs or paths, and patterned output paths.",
+            "relevance": "Supports explicit tracking of model outputs, although not a full claim-to-output chain by itself."
+          },
+          {
+            "label": "CLI file-registry output",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "CLI test checks that running a model can produce file_registry.json in the workspace.",
+            "relevance": "Shows that execution can emit machine-readable output registry information useful for later verification."
+          },
+          {
+            "label": "Docker publication note",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/README.md",
+            "quote_or_finding": "Docker README states that Docker images and digests are published to GitHub Packages.",
+            "relevance": "Indicates potential environment verification through container digests, but the exact digest for a specific assessed run is not supplied."
+          }
+        ]
+      }
+    ],
+    "total_score": 67,
+    "total_score_derivation": "Computed locally as round(mean([34, 90, 72, 72, 78, 58])) = 67.",
+    "single_paragraph_summary": "InVEST shows strong open traceability as open-source environmental modeling software: it is publicly hosted, Apache-2.0 licensed, citable with a versioned DOI, has documented dependencies, build and Docker infrastructure, extensive tests, datastack and file-registry mechanisms, public issue channels, and clear contribution/review processes. Its main weaknesses under the Open Traceability definition are that the supplied evidence does not document primary environmental input-data provenance, measurement uncertainty, quality controls, or licenses, and it does not demonstrate a complete externally verifiable chain from a specific environmental claim to exact datasets, code version, execution environment, workflow run, review record, and publication. Overall, the project is highly open as software and moderately strong on reproducible execution mechanisms, but less complete as a traceable evidence chain for specific environmental claims.",
+    "limitations": [
+      "The assessment used only the supplied evidence bundle; it did not inspect files, issues, releases, documentation pages, sample-data repositories, or Docker package pages beyond the provided excerpts.",
+      "The bundle contains many tests and configuration files but not the full model source code, full user guide, API documentation contents, CI workflow files, CI logs, or release checksums/container digests.",
+      "The project is a general modeling software suite rather than a single environmental claim or report, so stages focused on input data, publications, and claim-level verifiability were scored conservatively.",
+      "Links to sample and test data are present, but the bundle does not provide their dataset metadata, measurement provenance, uncertainty, quality controls, or licenses.",
+      "The contribution guide states review processes, but the bundle does not include actual peer-review records, science-review outcomes, pull-request reviews, or correction histories."
+    ]
+  },
+  {
+    "run_number": 4,
+    "project_name": "natcap/invest",
+    "project_url": "https://github.com/natcap/invest",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 43,
+        "score_derivation": "The repository provides moderate evidence that model inputs are identifiable and that test/sample datasets exist: the README links to sample-data and test-data repositories, and many regression tests explicitly name required geospatial and tabular inputs for models such as Annual Water Yield, SDR, and NDR. This is stronger than fragmentary evidence because external users can see what inputs are expected and where sample/test data are referenced. The score is not higher because the evidence bundle does not include metadata for the underlying datasets, primary measurement provenance, quantified uncertainties, quality-control procedures, licensing for sample/test datasets, or traceability from secondary datasets back to primary measurements. Because InVEST is a model suite rather than a single environmental claim, input-data traceability depends heavily on user-supplied datasets that are not documented in this evidence bundle.",
+        "uncertainty": "Medium uncertainty: the bundle references external sample/test data repositories and documentation, but their contents, metadata, and licences were not supplied for inspection.",
+        "references": [
+          {
+            "label": "README related data repositories",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README links to “InVEST Sample Data (InVEST 3.7.0-present)” at Bitbucket and “InVEST Test Data (InVEST 3.7.0-present)” at Bitbucket.",
+            "relevance": "Shows that input datasets for examples/tests are publicly identified, but does not by itself show dataset provenance, measurement uncertainty, or licensing."
+          },
+          {
+            "label": "Annual Water Yield regression inputs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_annual_water_yield.py",
+            "quote_or_finding": "The test defines sample inputs such as lulc.tif, precipitation_path, pawc_path, eto_path, watersheds.shp, biophysical_table.csv, and water_demand_table.csv under data/invest-test-data/annual_water_yield/input.",
+            "relevance": "Demonstrates explicit identification of model input files used in reproducible regression tests."
+          },
+          {
+            "label": "SDR regression inputs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "The SDR test defines required input paths including biophysical_table.csv, dem.tif, erodibility_SI_clip.tif, erosivity.tif, landuse_90.tif, and watersheds.shp.",
+            "relevance": "Shows that input evidence for a model run is named and structured, though dataset origin and measurement quality are not documented in the supplied evidence."
+          },
+          {
+            "label": "NDR regression inputs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_ndr.py",
+            "quote_or_finding": "The NDR test constructs base args with biophysical_table_path, dem_path, lulc_path, runoff_proxy_path, and watersheds_path under data/invest-test-data/ndr.",
+            "relevance": "Supports partial input traceability through explicit test input declarations."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 92,
+        "score_derivation": "The software traceability evidence is excellent: the project is a public GitHub repository, has an Apache-2.0 licence, includes citation metadata with a DOI and version, declares runtime and development dependencies, and includes build/configuration files for Python packaging, Cython extensions, Docker distribution, executable builds, and codesigning infrastructure. This is close to the highest standard because the analytical software and infrastructure are inspectable in version control under a recognised open-source licence. The score is not 100 because the evidence bundle does not include every source file or model-method documentation page, and some operational details such as codesigning secrets are necessarily excluded; also, dependency versions are mostly lower bounds rather than fully locked reproducible versions.",
+        "uncertainty": "Low uncertainty: the supplied evidence directly includes repository metadata, licence, dependency files, packaging configuration, and infrastructure files.",
+        "references": [
+          {
+            "label": "Repository metadata and licence",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "The repository is public as natcap/invest, described as InVEST models, with licence Apache-2.0 and topics including ecosystem-services, geospatial, and GIS.",
+            "relevance": "Establishes public source availability and recognised open-source licensing."
+          },
+          {
+            "label": "Apache licence text",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/LICENSE.txt",
+            "quote_or_finding": "The repository includes Apache License Version 2.0 terms for use, reproduction, and distribution.",
+            "relevance": "Confirms open-source reuse rights."
+          },
+          {
+            "label": "Python project configuration",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/pyproject.toml",
+            "quote_or_finding": "pyproject.toml declares project name natcap.invest, requires Python >=3.10, licence Apache-2.0, package discovery under src, and dependencies read from requirements.txt.",
+            "relevance": "Documents packaging, runtime requirements, and build configuration needed to inspect and run the software."
+          },
+          {
+            "label": "Runtime dependencies",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements.txt",
+            "quote_or_finding": "requirements.txt lists dependencies including gdal, pandas, numpy, scipy, pygeoprocessing, taskgraph, geopandas, matplotlib, and others.",
+            "relevance": "Provides inspectable dependency information for model execution."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/Dockerfile",
+            "quote_or_finding": "The Dockerfile builds an InVEST wheel in a micromamba environment and installs runtime dependencies for distribution.",
+            "relevance": "Shows open infrastructure configuration for running/distributing the software independently of a desktop installer."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 76,
+        "score_derivation": "The project has strong execution and reproducibility evidence: many regression tests execute models with explicit argument dictionaries, temporary workspaces, expected output checks, and file-registry assertions; CLI tests verify datastack-based execution; datastack tests demonstrate archiving parameters and data; and a Docker container is documented for execution. This is much stronger than merely publishing code. The score is not higher because the bundle does not include CI workflow results, exact release-run logs, pinned lockfiles, checksums for all datasets, or a fully explicit workflow run connecting a particular environmental claim to exact input versions and outputs. Re-execution appears feasible for software tests, but exact computational environments and external test data availability are only partially evidenced.",
+        "uncertainty": "Medium uncertainty: execution tests and Docker evidence are strong, but CI status, run logs, and complete data availability were not included.",
+        "references": [
+          {
+            "label": "CLI datastack execution test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "Tests run models through the CLI using parameter-set JSON files and include a test that file_registry.json should be produced in the workspace.",
+            "relevance": "Shows executable workflows and output registries that help trace model runs."
+          },
+          {
+            "label": "Datastack archive tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "The test builds a datastack archive from args and model name, extracts it, validates args, and executes the model; sample-data full-run tests are present but skipped because sample data are not usually cloned.",
+            "relevance": "Demonstrates a mechanism for packaging inputs and parameters for re-execution, while also showing a limitation in routine availability of sample data."
+          },
+          {
+            "label": "Carbon full model test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_carbon.py",
+            "quote_or_finding": "test_carbon_full creates input rasters and a pools CSV, executes carbon.MODEL_SPEC with save_file_registry=True, and asserts raster and report values against expected results.",
+            "relevance": "Provides concrete evidence of reproducible model execution with expected numerical outputs."
+          },
+          {
+            "label": "SDR base regression test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "The SDR base regression test executes the model with sample inputs, save_file_registry=True, and checks watershed totals and raster outputs.",
+            "relevance": "Shows regression testing of a complete geospatial model workflow."
+          },
+          {
+            "label": "Docker documentation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/README.md",
+            "quote_or_finding": "Docker images and digests are published to GitHub Packages, with usage guidance in the API docs.",
+            "relevance": "Supports reproducible execution through containerized environments, though exact digest evidence was not included in the bundle."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 72,
+        "score_derivation": "The project has strong public community and review mechanisms: GitHub issues are used for bug reports and feature requests, the repository metadata reports 213 open issues, a community forum is linked for questions, and the contributing guide states that major features and science-related model changes require peer/science review. This supports visible critique and correction channels. The score is not higher because the evidence bundle does not include actual issue discussions, pull-request reviews, steering-committee records, peer-review reports, correction notices, or examples showing how challenges changed claims or methods. The review process is described, but the review record itself is only indirectly evidenced.",
+        "uncertainty": "Medium uncertainty: public channels and review policies are documented, but the bundle lacks concrete examples of completed reviews or corrections.",
+        "references": [
+          {
+            "label": "Contributing guide: questions and bugs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Users are directed to the NatCap Community Forum for questions and to GitHub Issues for bug reports after searching existing open issues.",
+            "relevance": "Shows open channels for questions, bug reporting, and scrutiny."
+          },
+          {
+            "label": "Contributing guide: feature and science review",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Major features, including new InVEST models, must go through peer review with the Platform Steering Committee; science-related changes require NatCap science review.",
+            "relevance": "Documents a review process for methodological and scientific changes."
+          },
+          {
+            "label": "Repository issue count",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "Repository metadata reports open_issues_count: 213.",
+            "relevance": "Indicates active public issue tracking, though the supplied bundle does not include issue contents."
+          },
+          {
+            "label": "Contributor workflow",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Contributors are instructed to comment on issues, wait for a NatCap team response, use descriptive commit messages with issue numbers, update automated tests, and manually test changes.",
+            "relevance": "Shows a structured public contribution and review workflow."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 78,
+        "score_derivation": "The project communicates outputs and usage well: the README clearly states what InVEST is for, links to downloads, releases, API documentation, user guide, sample data, and archived older versions; CITATION.cff provides software citation metadata, DOI, version, release date, repository code, release artifact, abstract, keywords, and licence. This is strong publication traceability for a software product. The score is not higher because the bundle does not include the linked user guide/API documentation content, a clear Creative Commons licence for documentation, detailed indicator definitions for any dashboard, formal peer-reviewed publications supporting each model, or a versioned mapping from environmental claims to specific reports or publications.",
+        "uncertainty": "Low-to-medium uncertainty: citation and README evidence are direct, but key linked documentation and publications were not included in the bundle.",
+        "references": [
+          {
+            "label": "README project description and installation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README describes InVEST as tools for quantifying natural capital, links to releases, the website, API documentation, sample data, test data, and older archived releases.",
+            "relevance": "Shows accessible communication of purpose, installation, documentation, and supporting resources."
+          },
+          {
+            "label": "CITATION metadata",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff identifies InVEST as software, provides DOI 10.60793/natcap-invest-3.20.0, version 3.20.0, date-released 2026-06-11, repository-code, release artifact URL, abstract, keywords, and Apache-2.0 licence.",
+            "relevance": "Provides versioned citation and publication-style metadata for the software release."
+          },
+          {
+            "label": "Repository releases referenced in README",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "The README states that the desktop application can be downloaded from GitHub releases and that InVEST 3.8.1-present are archived as GitHub releases.",
+            "relevance": "Supports public access to versioned software outputs."
+          },
+          {
+            "label": "Documentation requirements",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements-docs.txt",
+            "quote_or_finding": "requirements-docs.txt lists Sphinx and related packages used to build documentation.",
+            "relevance": "Shows that documentation is part of the project infrastructure, though the rendered documentation content was not supplied."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Verifiability",
+        "score": 60,
+        "score_derivation": "The project has moderate-to-strong building blocks for verifiability: releases have citation metadata with a DOI and artifact URL, the repository is version-controlled, tests exercise exact parameter dictionaries and outputs, datastack functionality packages parameters and input files, and file_registry.json records outputs from CLI/model runs. These mechanisms can support explicit evidence chains. The score is not higher because the supplied evidence does not show a complete externally verifiable chain for any specific environmental claim linking exact input data versions, model code commit/release, configuration, workflow run, review record, and publication. The evidence establishes verifiability of the software and test workflows more than verifiability of particular environmental claims produced with the software.",
+        "uncertainty": "Medium uncertainty: the bundle documents verifiability mechanisms, but not a complete claim-to-evidence chain for a real published result.",
+        "references": [
+          {
+            "label": "Versioned citation and release artifact",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff provides DOI 10.60793/natcap-invest-3.20.0, version 3.20.0, date-released 2026-06-11, repository-code, and repository-artifact URL.",
+            "relevance": "Supports exact identification of a released software artifact."
+          },
+          {
+            "label": "Datastack archiving mechanism",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Tests build a datastack archive from model args and model name, extract the archive, validate parameters, and execute the model.",
+            "relevance": "Shows a mechanism for linking parameters, data files, and executable model identity."
+          },
+          {
+            "label": "CLI file registry",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "A CLI test asserts that running a datastack model produces file_registry.json in the workspace.",
+            "relevance": "Shows that model outputs can be recorded in a machine-readable registry for later inspection."
+          },
+          {
+            "label": "File registry implementation tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_file_registry.py",
+            "quote_or_finding": "Tests verify that FileRegistry maps output IDs to workspace paths, detects duplicate outputs, handles path patterns, and creates required output directories.",
+            "relevance": "Supports output-level traceability within a run, but not complete claim-level provenance."
+          },
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "The public repository has default branch main, creation/update timestamps, licence metadata, and public issue tracking.",
+            "relevance": "Provides externally inspectable version-control context for software artifacts."
+          }
+        ]
+      }
+    ],
+    "total_score": 70,
+    "total_score_derivation": "Computed locally as round(mean([43, 92, 76, 72, 78, 60])) = 70.",
+    "single_paragraph_summary": "InVEST shows strong Open Traceability as an open-source environmental modeling platform: the code is public and Apache-2.0 licensed, citation metadata provides a DOI and release artifact, dependencies and build infrastructure are documented, and an extensive regression-test suite plus datastack/file-registry mechanisms support reproducible execution. Community channels, GitHub issues, contribution rules, and stated peer/science review requirements provide meaningful review traceability. The main limitations are at the level of environmental-claim traceability rather than software traceability: the evidence bundle does not include primary dataset provenance, measurement uncertainty, dataset licensing, complete external sample/test data metadata, CI/run logs, or a full versioned chain linking a specific environmental claim to exact inputs, code version, workflow run, review record, and publication.",
+    "limitations": [
+      "The evidence bundle is repository-focused and does not include the contents, licences, provenance metadata, quality controls, or uncertainty estimates for the referenced sample/test datasets.",
+      "No complete environmental claim was supplied, so assessment of claim-to-evidence traceability is necessarily conservative.",
+      "The bundle does not include CI configuration, CI results, workflow-run logs, checksums, or exact container image digests.",
+      "The bundle references user guides, API docs, website pages, GitHub releases, Bitbucket data repositories, and a community forum, but their contents were not supplied for direct evaluation.",
+      "Public review mechanisms are documented, but actual issue discussions, pull-request reviews, steering-committee records, science-review records, and correction histories were not included.",
+      "Dependency specifications are visible, but many are minimum-version constraints rather than fully pinned, independently reproducible environment locks."
+    ]
+  },
+  {
+    "run_number": 5,
+    "project_name": "InVEST",
+    "project_url": "https://github.com/natcap/invest",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 43,
+        "score_derivation": "The repository provides some identifiable input-data artifacts and pathways: the README points to sample-data and test-data repositories, and the test suite references concrete regression inputs such as DEMs, land-cover rasters, watersheds, biophysical tables, and model-specific CSVs. This is enough to show that external users can identify many input categories used by the models and tests. The score is not lower because these data paths are public-facing and are used in regression tests, which gives partial traceability from expected model behavior to example inputs. The score is not higher because the evidence bundle does not include the actual sample/test datasets, their metadata, measurement methods, primary-data provenance, uncertainty estimates, quality-control documentation, transformations, or licensing terms. For environmental claims produced with InVEST, user-provided inputs are central, but no specific claim-linked dataset package is provided here.",
+        "uncertainty": "Medium uncertainty: the bundle references external sample-data and test-data repositories and user-guide documentation, but their contents, metadata, and licenses were not included for inspection.",
+        "references": [
+          {
+            "label": "README related repositories and data links",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "README lists 'InVEST Sample Data' at Bitbucket and 'InVEST Test Data' at Bitbucket, plus historical release/sample-data locations.",
+            "relevance": "Shows public identification of supporting sample/test input-data repositories, but not their metadata or uncertainty information."
+          },
+          {
+            "label": "Annual Water Yield regression inputs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_annual_water_yield.py",
+            "quote_or_finding": "Tests construct args using input files including 'lulc.tif', 'depth_to_root_rest_layer.tif', 'precip.tif', 'pawc.tif', 'eto.tif', 'watersheds.shp', and 'biophysical_table.csv'.",
+            "relevance": "Demonstrates concrete model input categories and regression-data paths for one environmental model."
+          },
+          {
+            "label": "SDR regression inputs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "SDR tests use 'biophysical_table.csv', 'dem.tif', 'erodibility_SI_clip.tif', 'erosivity.tif', 'landuse_90.tif', and 'watersheds.shp'.",
+            "relevance": "Shows that regression tests are tied to identifiable geospatial and tabular environmental inputs."
+          },
+          {
+            "label": "Crop production model data paths",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_crop_production.py",
+            "quote_or_finding": "Crop production tests define model-data and input paths including landcover, crop mapping, climate-bin, observed-yield, nutrient, percentile-yield, and regression-yield CSVs.",
+            "relevance": "Supports partial input-data traceability for model tests, while also illustrating reliance on secondary datasets whose provenance is not shown in the bundle."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 88,
+        "score_derivation": "The software is publicly hosted in a version-controlled GitHub repository, has an OSI-compatible Apache-2.0 license, provides Python packaging metadata, dependency lists, build configuration, source/build scripts, test code, Docker build files, and citation metadata with a version DOI. The score is high because analytical logic and infrastructure are substantially inspectable and reusable. It is not higher because the evidence bundle does not include a complete inspection of all model source files, model equations/user-guide content, CI configuration, or proof that every runtime/frontend/infrastructure dependency can be independently operated without NatCap services; the code-signing service also explicitly omits secrets, and some release infrastructure depends on organizational resources.",
+        "uncertainty": "Low uncertainty: licensing, repository metadata, dependencies, packaging, and infrastructure files are directly present in the evidence bundle.",
+        "references": [
+          {
+            "label": "GitHub repository metadata",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "Repository description: 'InVEST®: models that map and value the goods and services from nature'; license is 'Apache-2.0'; default branch is 'main'.",
+            "relevance": "Establishes public version-controlled repository and recognized open-source license."
+          },
+          {
+            "label": "Apache License file",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/LICENSE.txt",
+            "quote_or_finding": "LICENSE.txt contains Apache License Version 2.0 terms for use, reproduction, and distribution.",
+            "relevance": "Confirms permissive open-source licensing of the software."
+          },
+          {
+            "label": "Python project metadata",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/pyproject.toml",
+            "quote_or_finding": "pyproject defines package 'natcap.invest', requires Python >=3.10, license Apache-2.0, dynamic dependencies from requirements.txt, and build-system requirements.",
+            "relevance": "Provides inspectable package/build configuration needed to understand and install the software."
+          },
+          {
+            "label": "Runtime dependencies",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements.txt",
+            "quote_or_finding": "requirements.txt lists runtime packages including GDAL, pandas, numpy, scipy, pygeoprocessing, taskgraph, fiona, geopandas, matplotlib, and others.",
+            "relevance": "Documents software dependencies needed to run the models."
+          },
+          {
+            "label": "Build script",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/setup.py",
+            "quote_or_finding": "setup.py compiles Cython/C++ extensions for model components including delineateit, recreation, scenic_quality, ndr, sdr, and seasonal_water_yield, linking to GDAL.",
+            "relevance": "Shows inspectable build logic for compiled analytical components."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/Dockerfile",
+            "quote_or_finding": "Dockerfile builds a container from micromamba, installs conda-forge environment requirements, builds a wheel, and installs the package.",
+            "relevance": "Provides open infrastructure code for a reproducible runtime/distribution environment."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 76,
+        "score_derivation": "The project has substantial execution traceability: there are regression tests for many models, tests create or reference explicit argument dictionaries, the CLI supports datastack-based execution, file registries are tested, dependencies are documented, and a Docker container build is provided. This supports external understanding and partial repetition of computational workflows. The score is not lower because tests demonstrate model runs and expected outputs across many modules, including checks on raster/vector values and generated file lists. The score is not higher because the bundle does not include CI run records, exact workflow-run logs for releases, pinned full computational environments/lockfiles, checksums for all input data, or a specific environmental claim with exact input versions and output artifacts re-executable end-to-end. Some tests are skipped because sample data are 'not usually cloned for test runs', limiting turnkey reproducibility.",
+        "uncertainty": "Medium uncertainty: the evidence strongly shows tests and execution mechanisms, but actual CI status, complete data availability, and release-run provenance are not supplied.",
+        "references": [
+          {
+            "label": "CLI datastack execution test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "CLI tests run models with '--datastack' parameter-set JSON and workspace arguments; one test checks that 'file_registry.json should be produced in the workspace'.",
+            "relevance": "Shows an inspectable mechanism for parameterized model execution and output registry creation."
+          },
+          {
+            "label": "Datastack archive tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Tests build a datastack archive from args and model name, extract it, validate args, and execute the model; several full sample-data tests are skipped because sample data are not usually cloned.",
+            "relevance": "Strong evidence for reproducibility tooling, with a noted limitation around sample-data availability in ordinary test runs."
+          },
+          {
+            "label": "SDR regression test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "SDR regression test executes the model with explicit args, calls MODEL_SPEC.execute with save_file_registry=True, and checks expected watershed totals and raster outputs.",
+            "relevance": "Demonstrates repeatable model execution and output validation for a core environmental model."
+          },
+          {
+            "label": "Carbon regression test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_carbon.py",
+            "quote_or_finding": "Carbon full model test constructs input rasters and CSV tables, executes the model, and asserts exact raster values and aggregate report values.",
+            "relevance": "Shows executable tests that connect defined inputs, parameters, and expected outputs."
+          },
+          {
+            "label": "Docker usage documentation",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/README.md",
+            "quote_or_finding": "Docker README says images and digests are published to GitHub Packages and points to API docs for container use.",
+            "relevance": "Supports accessible standardized runtime infrastructure, though the bundle does not include specific image digests or run logs."
+          },
+          {
+            "label": "Development requirements",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements-dev.txt",
+            "quote_or_finding": "Development requirements include pytest, coverage, build, pyinstaller, requests, cython, and related tools.",
+            "relevance": "Documents tooling needed to run tests and build artifacts."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 69,
+        "score_derivation": "The project provides visible public channels for bug reports, feature requests, code contributions, community questions, and review procedures. CONTRIBUTING.md directs users to GitHub issues and a public community forum, requires PRs and tests, and states that major features and science-related model changes undergo review by a Platform Steering Committee or NatCap science review. The repository metadata shows many open issues, indicating active public issue tracking. The score is not lower because these procedures are explicit and public. The score is not higher because the evidence bundle does not include actual issue discussions, pull-request review histories, steering-committee records, peer-review documents, governance minutes, correction notices, or evidence of affected-community review outcomes.",
+        "uncertainty": "Medium uncertainty: public processes are documented, but the bundle does not include concrete review records or examples of issue/PR resolution.",
+        "references": [
+          {
+            "label": "Contributing guide: questions and bugs",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "CONTRIBUTING directs questions to the NatCap Community Forum and asks bug reporters to search InVEST Open Issues on GitHub and create a new issue with details.",
+            "relevance": "Shows open channels for user questions, bug reports, and troubleshooting."
+          },
+          {
+            "label": "Contributing guide: features and science review",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Feature requests are made through GitHub issues; major features must go through Platform Steering Committee peer review, and science-related changes require NatCap science review.",
+            "relevance": "Documents review processes for model changes and scientific methods."
+          },
+          {
+            "label": "Contributing guide: code contribution process",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CONTRIBUTING.md",
+            "quote_or_finding": "Code contributors are instructed to fork, branch from main, use descriptive commits with issue numbers, update automated tests, and manually test changes.",
+            "relevance": "Shows a public workflow for contribution scrutiny and traceable code changes."
+          },
+          {
+            "label": "GitHub issue metadata",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "Repository metadata reports 'open_issues_count': 213.",
+            "relevance": "Indicates use of public issue tracking, although individual issue content was not included in the bundle."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 74,
+        "score_derivation": "The project communicates its purpose, installation routes, related data/documentation repositories, license, citation metadata, version DOI, release artifact location, and links to API/user documentation. The score is not lower because public README and CITATION metadata make the software and its scientific purpose understandable and citeable, and releases/sample data are clearly signposted. The score is not higher because the evidence bundle does not include the full user guide, model-equation documentation, dashboard/update-cycle documentation, publication review status, Creative Commons licensing for documentation, or a specific environmental output that clearly states a claim and cites exact supporting artifacts.",
+        "uncertainty": "Medium uncertainty: communication artifacts are visible, but important linked documentation and publications are referenced rather than provided in the evidence bundle.",
+        "references": [
+          {
+            "label": "README overview",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "README describes InVEST as tools for quantifying natural capital values, assessing tradeoffs, and integrating conservation and human development.",
+            "relevance": "Provides a public, accessible summary of the project’s purpose and environmental decision-support context."
+          },
+          {
+            "label": "README installation and documentation links",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/README.md",
+            "quote_or_finding": "README links to GitHub releases, the InVEST website, API documentation, binaries, sample data, test data, and the user guide repository.",
+            "relevance": "Shows public communication of how to obtain software, docs, and supporting materials."
+          },
+          {
+            "label": "CITATION metadata",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff gives title InVEST, software type, author Natural Capital Alliance, DOI 10.60793/natcap-invest-3.20.0, repository-code URL, artifact URL, version 3.20.0, release date 2026-06-11, and Apache-2.0 license.",
+            "relevance": "Supports clear citation, versioning, and communication of release artifacts."
+          },
+          {
+            "label": "Documentation requirements",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/requirements-docs.txt",
+            "quote_or_finding": "requirements-docs.txt lists Sphinx and related documentation build dependencies.",
+            "relevance": "Indicates that project documentation is buildable from open tooling, though the documentation source/content is not included in this evidence excerpt."
+          },
+          {
+            "label": "Docker README",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/docker/README.md",
+            "quote_or_finding": "Docker README points to published container images and API documentation for container usage.",
+            "relevance": "Provides public communication about containerized use of the software."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Verifiability",
+        "score": 66,
+        "score_derivation": "InVEST has several strong verifiability mechanisms: public version-controlled source, Apache license, version DOI and release artifact metadata, test suites linking parameters to expected outputs, datastack archives for packaging model inputs/parameters, and file registries for outputs. These make parts of the evidence chain externally inspectable. The score is not lower because the project explicitly supports versioned citation and executable parameter stacks, and tests demonstrate output verification. The score is not higher because the bundle does not provide an explicit end-to-end chain for a specific environmental claim: there are no exact primary dataset versions/checksums, no model source commit or release artifact tied to a particular claim output, no captured workflow-run record, no review record linked to a result, and no publication that maps a claim to exact datasets, code, configuration, and outputs. Thus, the software is verifiable as a tool, but claim-level traceability remains incomplete in the supplied evidence.",
+        "uncertainty": "Medium uncertainty: verifiability features are evident, but no complete claim-specific evidence chain was supplied.",
+        "references": [
+          {
+            "label": "CITATION DOI and artifact",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff identifies version 3.20.0 with DOI 10.60793/natcap-invest-3.20.0 and a repository-artifact URL for the release.",
+            "relevance": "Provides persistent, versioned identification of a software release, supporting external verification of code version."
+          },
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/natcap/invest",
+            "quote_or_finding": "Repository metadata gives public repository 'natcap/invest', default branch 'main', Apache-2.0 license, and creation/update timestamps.",
+            "relevance": "Supports external inspection of the version-controlled software source."
+          },
+          {
+            "label": "Datastack archive tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_datastack.py",
+            "quote_or_finding": "Datastack tests build archives from model args and model names, extract them, validate args, and execute models.",
+            "relevance": "Shows a mechanism to bind model configuration and input files into a reusable package, important for claim-to-run traceability."
+          },
+          {
+            "label": "File registry tests",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_file_registry.py",
+            "quote_or_finding": "FileRegistry tests map output IDs to paths, detect duplicate outputs, and handle patterned outputs and directories.",
+            "relevance": "Supports explicit mapping between model specifications and generated output artifacts."
+          },
+          {
+            "label": "CLI file registry test",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_cli.py",
+            "quote_or_finding": "A CLI test asserts that running a model produces 'file_registry.json' in the workspace.",
+            "relevance": "Shows output provenance/registry generation during execution, aiding verification of produced artifacts."
+          },
+          {
+            "label": "SDR executable regression check",
+            "url": "https://raw.githubusercontent.com/natcap/invest/main/tests/test_sdr.py",
+            "quote_or_finding": "SDR regression test executes a model with explicit input paths and checks expected numerical outputs in watershed results and rasters.",
+            "relevance": "Demonstrates external-checkable links between inputs, execution, and outputs for a model test case, though not for a published environmental claim."
+          }
+        ]
+      }
+    ],
+    "total_score": 69,
+    "total_score_derivation": "Computed locally as round(mean([43, 88, 76, 69, 74, 66])) = 69.",
+    "single_paragraph_summary": "InVEST shows strong open-source and reproducibility foundations as a public, Apache-2.0-licensed, versioned ecosystem-services modeling suite with citation metadata, dependency/build files, Docker infrastructure, extensive regression tests, datastack tooling, file registries, and public contribution/issue processes. Its main traceability weakness in the supplied evidence is claim-level linkage: the bundle does not include the actual sample/test datasets and their metadata, primary-data provenance, uncertainty and quality-control documentation, CI/release run records, full user-guide/model-equation documentation, concrete review histories, or any specific environmental claim tied to exact datasets, code version, configuration, run, outputs, review, and publication. As a software project it is highly inspectable; as a complete Open Traceability chain for environmental claims, important input-data and end-to-end verification gaps remain.",
+    "limitations": [
+      "The evidence bundle is centered on the software repository, not on a specific environmental claim or report generated with InVEST.",
+      "Linked sample-data, test-data, user-guide, API documentation, release artifacts, container images, and community forum contents were referenced but not included for detailed inspection.",
+      "The actual primary/secondary datasets used in tests or sample workflows were not supplied, so their provenance, measurement methods, uncertainty, quality controls, transformations, and licensing could not be evaluated.",
+      "No CI configuration, CI run logs, build provenance attestations, checksums, or exact release workflow records were provided.",
+      "No pull-request discussions, peer-review reports, Platform Steering Committee records, science-review records, issue-resolution examples, or correction notices were included.",
+      "The assessment cannot verify scientific validity of model equations or environmental outputs; it only evaluates traceability evidence supplied in the bundle.",
+      "Some evidence excerpts are truncated, limiting inspection of full contribution guidance and test implementations."
+    ]
+  }
+]
