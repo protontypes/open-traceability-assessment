@@ -1,4 +1,4 @@
-# Open Traceability Assessment Runner
+# Open Traceability Assessment
 
 A Python command-line tool for running repeated **Open Traceability Assessments** against an open-source project, open-science project, report, dashboard, or other public sustainability-related evidence artifact.
 
