@@ -1,0 +1,1248 @@
+[
+  {
+    "run_number": 1,
+    "project_name": "PyPSA-Earth",
+    "project_url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 55,
+        "score_derivation": "The evidence shows a clear intention to use open and reusable input data: the README states that data needed for simulations are automatically retrieved from open sources, including energy demand, generation capacities, networks, and renewable potentials, and the contribution guide describes contributing datasets through public storage such as Zenodo and bundle configuration. This is stronger than fragmentary evidence because input categories and an open-data workflow are explicitly described. However, the supplied bundle does not include the actual data-source registry, bundle_config contents, dataset DOIs, licences for each dataset, measurement methods, quality controls, uncertainty estimates, versioning of primary datasets, or traceability from secondary data back to primary measurements. The score is therefore moderate rather than high.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The repository likely contains more data-source documentation than is present in the supplied bundle, but it was not provided here.",
+        "references": [
+          {
+            "label": "README.md",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "States that all data needed for a simulation are automatically and flexibly retrieved from open sources, including energy demand, generation capacities, networks, and renewable energy potentials.",
+            "relevance": "Supports the existence of identifiable open input-data categories and automated retrieval, but does not itself provide dataset-level provenance or uncertainty metadata."
+          },
+          {
+            "label": "Contributing guide",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "Encourages contribution of new datasets, suggests uploading datasets to public storage such as Zenodo, and adding specifications to configs/bundle_config.yaml.",
+            "relevance": "Shows a public mechanism for adding and specifying datasets, but the evidence bundle does not include the actual dataset specifications."
+          },
+          {
+            "label": "README.md",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "Says custom datasets can also be integrated as needed and kept private if required.",
+            "relevance": "Shows flexibility but also indicates that not all possible input data are necessarily public or externally verifiable."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 86,
+        "score_derivation": "The project has strong open-source software evidence: it is a public GitHub repository for a Python-based open optimisation model, includes SPDX licence headers, README licence badge for AGPLv3, CITATION metadata, dependency declarations, Dockerfile, conda environment, documentation requirements, and CI workflows. This makes the model logic, software environment, and dependencies substantially inspectable and reusable. The score is not higher because GitHub metadata reports license as null, the supplied evidence does not include a top-level LICENSE file, and some dependency/infrastructure details are only represented through environment files rather than complete execution documentation. The environment also references Gurobi as a channel/dependency, which may complicate fully independent execution, although GLPK is listed as the default solver for tests.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The supplied evidence directly includes multiple core software, dependency, container, licence, and CI artifacts.",
+        "references": [
+          {
+            "label": "GitHub repository metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "Public repository described as 'PyPSA-Earth: A flexible Python-based open optimisation model to study energy system futures around the world.'",
+            "relevance": "Establishes that the model software is publicly hosted and version-controlled."
+          },
+          {
+            "label": "README.md",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README includes an AGPL v3 licence badge and describes PyPSA-Earth as an open-source global energy system model.",
+            "relevance": "Supports open-source status and stated modelling purpose."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "SPDX-License-Identifier: AGPL-3.0-or-later; repository-code points to the GitHub repository; version 1.0.0 and release date are given.",
+            "relevance": "Provides software citation, version metadata, and licence indication."
+          },
+          {
+            "label": "envs/environment.yaml",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/envs/environment.yaml",
+            "quote_or_finding": "Lists Python version constraints and many model dependencies including pypsa, atlite, snakemake-minimal, geopandas, xarray, glpk, and gurobi.",
+            "relevance": "Documents the software dependencies needed to understand and run the model."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/Dockerfile",
+            "quote_or_finding": "Builds from condaforge/mambaforge, creates a pypsa-earth conda environment from envs/linux-64.lock.yaml, and activates it.",
+            "relevance": "Provides containerized infrastructure for running the software."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 78,
+        "score_derivation": "The project has strong reproducibility infrastructure: it uses Snakemake-related dependencies, environment files and lockfile-generation workflows, Docker, multi-platform CI tests, make test, test artifacts, and objective-value comparison against reference objectives. Documentation snippets are generated from configuration to keep docs synchronized with executable settings. This is substantially stronger than merely publishing code. The score is not higher because the supplied evidence does not show a complete end-to-end scientific run connecting a named environmental claim or publication result to exact input datasets, model configuration, code commit, workflow logs, solver version, and preserved outputs. CI artifacts are retained only briefly in the test workflow, and publication-reproduction instructions or archived run records are not included in the bundle.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Execution infrastructure is well evidenced, but exact reproduction of reported scientific claims is not demonstrated in the supplied artifacts.",
+        "references": [
+          {
+            "label": "Test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "Runs tests on ubuntu, macos, and windows; sets up conda environments from lock files or the base environment; runs make test; uploads logs and results; extracts objective-function values from solver logs.",
+            "relevance": "Strong evidence of automated execution checks and reproducibility validation across platforms."
+          },
+          {
+            "label": "Update locked environments workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-locked-env.yml",
+            "quote_or_finding": "Generates conda lockfiles for linux-64, osx-64, win-64, and osx-arm64 using conda-lock and creates a pull request with updated locked environments.",
+            "relevance": "Supports reproducible computational environments across platforms."
+          },
+          {
+            "label": "Update reference objectives workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-ref-objectives.yml",
+            "quote_or_finding": "Manual workflow runs tests, extracts objective values from logs, writes updated_obj_ref.csv, and creates a pull request to update test/utils/obj_ref.csv.",
+            "relevance": "Shows explicit checking of computational outputs against reference objective values."
+          },
+          {
+            "label": "Objective extraction utility",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/test/utils/extract_ref_objective.py",
+            "quote_or_finding": "Reads test/utils/obj_ref.csv and returns reference objective values for named run folders and log files.",
+            "relevance": "Provides a reusable mechanism to compare model execution outputs to reference results."
+          },
+          {
+            "label": "Configuration snippets README",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/configtables/snippets/README.md",
+            "quote_or_finding": "Explains that documentation snippets are extracted from config.default.yaml so configuration examples stay in sync with the actual config file.",
+            "relevance": "Supports transparency between documented parameters and executable configuration."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 74,
+        "score_derivation": "The project shows strong public community and review mechanisms: a large public issue tracker is indicated, the contributing guide invites questions, feedback, bug reports, bug fixes, documentation improvements, regional modelling insights, and dataset contributions, and the README advertises Discord and community participation. CI, linting, documentation checks, CodeQL, pre-commit, type-checking summaries, and pull-request workflows provide visible technical review gates. The associated Applied Energy publications provide evidence of scholarly communication, though the bundle does not include peer-review reports. The score is not higher because the evidence does not show governance records, correction notices, issue-resolution examples, public methodological debates, replication attempts, or affected-community review records.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Open channels and review workflows are visible, but the supplied bundle lacks examples of actual review discussions or corrections.",
+        "references": [
+          {
+            "label": "GitHub repository metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "Repository has open_issues_count: 298.",
+            "relevance": "Shows an active public issue-tracking surface for critique and bug reporting."
+          },
+          {
+            "label": "Contributing guide",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "Invites contributors to submit questions and feedback, propose features, report bugs, submit fixes, improve documentation, share regional modelling insights, and contribute datasets.",
+            "relevance": "Evidence of open channels for community participation and review."
+          },
+          {
+            "label": "README.md",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "Includes a Discord badge/link and states that the initiative looks for users, co-developers, and leaders.",
+            "relevance": "Shows public community engagement channels beyond code hosting."
+          },
+          {
+            "label": "Lint workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/lint.yml",
+            "quote_or_finding": "Runs pre-commit checks, docstring coverage reporting, and mypy type checking on pull requests to main.",
+            "relevance": "Provides evidence of visible automated review and quality-control processes for contributions."
+          },
+          {
+            "label": "CodeQL workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/codeql.yml",
+            "quote_or_finding": "Runs CodeQL analysis on push, pull_request, and scheduled events for Python.",
+            "relevance": "Shows an additional public security/code-quality review mechanism."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 80,
+        "score_derivation": "The project has strong publication and communication evidence: the README states the model purpose, scope, claims, data categories, community goals, documentation homepage, DOI badges, and two Applied Energy publications; CITATION.cff gives structured citation metadata, DOI, repository-code, version, release date, and authors; documentation is built with MkDocs and checked in CI. This supports external scrutiny and reuse. The score is not higher because the evidence bundle does not include the full documentation pages, publication licence/open-access status, peer-review status details, version history for dynamic outputs, or explicit publication-to-artifact mapping beyond the repository citation. It is not lower because the public README, docs site link, and citation metadata are unusually clear.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The supplied evidence directly includes publication links, citation metadata, documentation infrastructure, and communication materials.",
+        "references": [
+          {
+            "label": "README.md",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "Links to documentation at pypsa-earth.readthedocs.io and lists Applied Energy publications with DOIs 10.1016/j.apenergy.2023.121096 and 10.1016/j.apenergy.2025.125316.",
+            "relevance": "Shows public-facing documentation and scholarly publications describing the model."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "Provides title, abstract, repository-code URL, version 1.0.0, release date 2023-04-18, DOI 10.1016/j.apenergy.2023.121096, and author metadata.",
+            "relevance": "Supports clear citation, attribution, and connection between a publication and repository code."
+          },
+          {
+            "label": "Docs workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/docs.yml",
+            "quote_or_finding": "Builds documentation with mkdocs build --strict and checks spelling on pull requests affecting docs and markdown files.",
+            "relevance": "Shows quality-control processes for public documentation."
+          },
+          {
+            "label": "Documentation requirements",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/requirements.txt",
+            "quote_or_finding": "Lists MkDocs, mkdocs-material, mkdocstrings, table-reader, git-revision-date plugin, and other documentation dependencies.",
+            "relevance": "Indicates maintained documentation infrastructure for explaining methods and configuration."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 63,
+        "score_derivation": "There is meaningful linkage across parts of the evidence chain: CITATION.cff links the publication, repository code, version, date, and authors; the README links claims about the model to documentation, publications, a status repository, and community channels; CI workflows link environments, tests, logs, objective extraction, and reference objective files; documentation snippets are generated from the actual config to keep communication linked to executable settings. This is stronger than generic openness. However, the supplied evidence does not provide an explicit, externally verifiable chain from a specific environmental claim or published result to exact input dataset versions, preprocessing transformations, code commit/tag, model configuration, workflow run ID, solver/container digest, output files, review records, and final publication section. Linkage is therefore partial rather than excellent.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The project has many linkable artifacts, but the evidence bundle does not show a complete claim-level provenance graph or archived run record.",
+        "references": [
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "Links the Applied Energy paper metadata to repository-code https://github.com/pypsa-meets-earth/pypsa-earth, version 1.0.0, and release date 2023-04-18.",
+            "relevance": "Provides explicit linkage between publication, software repository, and software version."
+          },
+          {
+            "label": "README.md",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "Connects model claims to documentation, DOI publications, PyPSA-Earth-Status, Discord, and Google Drive links.",
+            "relevance": "Shows public cross-linking among communication, community, and supporting resources."
+          },
+          {
+            "label": "Test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "Builds environments from specific environment files, runs make test, uploads logs/results, and extracts objective-function values from solver logs.",
+            "relevance": "Links execution environments, workflows, logs, and numerical outputs for tests."
+          },
+          {
+            "label": "Update reference objectives workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-ref-objectives.yml",
+            "quote_or_finding": "Extracts objective values from a manual CI run and creates a pull request updating test/utils/obj_ref.csv.",
+            "relevance": "Links workflow execution outputs to version-controlled reference-output files."
+          },
+          {
+            "label": "Configuration snippets README",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/configtables/snippets/README.md",
+            "quote_or_finding": "Configuration documentation snippets are extracted from config.default.yaml so documentation examples stay in sync with actual config.",
+            "relevance": "Links documentation to executable configuration, improving traceability of parameters."
+          }
+        ]
+      }
+    ],
+    "total_score": 73,
+    "total_score_derivation": "Computed locally as round(mean([55, 86, 78, 74, 80, 63])) = 73.",
+    "single_paragraph_summary": "PyPSA-Earth shows strong open-source and reproducibility practices for an environmental/energy-system modelling project: it is a public GitHub repository with explicit open-source licence indicators, citation metadata, dependency files, Docker support, documentation infrastructure, CI testing across operating systems, lockfile workflows, and public contribution channels. Its weakest areas in the supplied evidence are input-data provenance and claim-level linkage: the README states that simulations retrieve data from open sources, but the bundle does not include detailed dataset registries, primary-source provenance, uncertainty/quality metadata, or dataset versioning; similarly, there is no complete archived chain from a specific published environmental claim to exact datasets, code commit, configuration, workflow run, outputs, review records, and publication text. Overall, the project has a robust open modelling foundation, but the supplied evidence supports only partial end-to-end open traceability for specific claims.",
+    "limitations": [
+      "The assessment uses only the supplied evidence bundle and does not inspect repository files or documentation pages not included in the bundle.",
+      "The bundle does not include a top-level LICENSE file, although multiple SPDX headers and README badges indicate AGPL-3.0-or-later or other open licences for specific files.",
+      "The bundle does not include the actual data-source registry, bundle_config.yaml, dataset DOIs, data licences, primary measurement methods, quality controls, or uncertainty estimates.",
+      "The bundle does not include complete reproduction instructions or archived workflow records for the Applied Energy publication results.",
+      "The bundle does not include examples of actual issue discussions, pull-request reviews, correction notices, governance records, or peer-review reports.",
+      "The GitHub test workflow evidence is truncated, so some details of the testing and objective-comparison process may be incomplete.",
+      "Dynamic resources mentioned in the README, such as PyPSA-Earth-Status or Google Drive materials, were not assessed because their contents were not provided."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 2,
+    "project_name": "PyPSA-Earth",
+    "project_url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 52,
+        "score_derivation": "The evidence shows a clear intention to use open and automatically retrievable input data: the README states that all data needed for simulations are automatically retrieved from open sources and names broad categories such as energy demand, generation capacities, networks, and renewable potentials. The contribution guide also describes a process for contributing public datasets, including use of public storage such as Zenodo and specifications in a bundle configuration file. This supports a moderate score. However, the supplied evidence does not include the actual data-source catalogue, bundle configuration, primary dataset identifiers, data licenses, measurement methods, quantified uncertainty, quality controls, transformations, or versioned data snapshots. The score is therefore not higher because external verification of the origin, uncertainty, quality, and reuse conditions of the actual input datasets is only asserted, not demonstrated in the bundle. It is not lower because the project explicitly orients itself around open data and documented community data contribution workflows.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence bundle contains high-level statements about open input data but not the detailed data-source documentation needed to verify this dimension fully.",
+        "references": [
+          {
+            "label": "README open data statement",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README says all data needed for a simulation are automatically and flexibly retrieved from open sources, including energy demand, generation capacities, networks, and renewable energy potentials.",
+            "relevance": "Supports the existence of identifiable open input-data workflows, but only at a high level."
+          },
+          {
+            "label": "Contributing guide data contribution process",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "The guide encourages contribution of regional datasets and says contributors can upload datasets to public storage such as Zenodo and add specifications to configs/bundle_config.yaml.",
+            "relevance": "Shows a documented process for public dataset contribution and dataset specification, though the actual specifications are not included in the evidence bundle."
+          },
+          {
+            "label": "Repository description",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "Repository topics and description identify PyPSA-Earth as an open optimisation model for global energy-system futures and scenario analysis.",
+            "relevance": "Provides context that input data are used for environmental/energy-system modelling claims, but does not itself document data provenance or uncertainty."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 84,
+        "score_derivation": "There is strong public evidence that the model and software are open and reusable: the GitHub repository is public, version-controlled, and described as a Python-based open optimisation model; the README carries AGPL-3.0-or-later SPDX text and an AGPL badge; CITATION.cff provides citation metadata, a repository-code URL, and version 1.0.0; dependency and environment files list substantial Python, conda, solver, GIS, and modelling dependencies; and a Dockerfile defines a containerized environment. CI workflows for linting, CodeQL, documentation, tests, and environment locking further support inspectability of software quality and dependencies. The score is not higher because the GitHub metadata reports license as null, the evidence bundle does not include a LICENSE file, full source-code structure, model equations/method documentation, or confirmation that all solver dependencies are open-source and independently operable; for example Gurobi appears as a dependency. It is not lower because the public repository, SPDX headers, dependency files, Dockerfile, and CI configuration provide strong open-source software evidence.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The bundle contains multiple direct repository, licensing, dependency, container, and CI artifacts supporting this score.",
+        "references": [
+          {
+            "label": "GitHub repository metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "The repository is pypsa-meets-earth/pypsa-earth, described as 'A flexible Python-based open optimisation model to study energy system futures around the world,' with default branch main.",
+            "relevance": "Shows the software is hosted publicly in a version-controlled repository and identifies its modelling purpose."
+          },
+          {
+            "label": "README licensing and model description",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README includes SPDX-License-Identifier: AGPL-3.0-or-later, an AGPL v3 badge, and describes PyPSA-Earth as a global open-source multi-energy system model.",
+            "relevance": "Supports open-source licensing and public description of the model scope."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff lists repository-code as the GitHub URL, version 1.0.0, release date 2023-04-18, and Applied Energy DOI 10.1016/j.apenergy.2023.121096.",
+            "relevance": "Provides formal software citation metadata and version information."
+          },
+          {
+            "label": "Environment specification",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/envs/environment.yaml",
+            "quote_or_finding": "The environment file defines the pypsa-earth conda environment, channels, Python version bounds, PyPSA, atlite, Snakemake, GIS packages, solvers, and other dependencies.",
+            "relevance": "Documents dependencies needed to understand and run the software."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/Dockerfile",
+            "quote_or_finding": "The Dockerfile builds from condaforge/mambaforge, creates the pypsa-earth environment from envs/linux-64.lock.yaml, installs OpenJDK, and sets PATH for the environment.",
+            "relevance": "Supports containerized operation and reproducible software setup."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 72,
+        "score_derivation": "The project has strong evidence for reproducible execution infrastructure: a Dockerfile builds a standardized environment from a locked conda file; environment files and a workflow to generate platform lock files are present; the test workflow runs on Ubuntu, macOS, and Windows, installs or updates the conda environment from lock files, runs make test, uploads logs/results artifacts, and extracts objective values from solver logs; a separate workflow can update reference objectives. These artifacts make parts of the computational pathway inspectable and testable. The score is not higher because the evidence bundle does not include the full Snakefile, scenario configuration files, example input/output artifacts, archived workflow run IDs, complete logs, or an exact execution record linking a published environmental claim to a particular dataset version, code commit, model configuration, and output. It is not lower because the supplied CI, lockfile, Docker, and reference-objective mechanisms are substantial reproducibility infrastructure.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence clearly documents CI and environment reproducibility, but not complete end-to-end reproduction of a reported scientific result.",
+        "references": [
+          {
+            "label": "Test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "The workflow runs tests on ubuntu, macos, and windows, uses platform-specific lock files, runs make test, uploads logs and results, and extracts objective-function values from solver logs.",
+            "relevance": "Shows automated execution, artifact collection, and regression-style objective checking."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/Dockerfile",
+            "quote_or_finding": "The Dockerfile creates a pypsa-earth conda environment from temp/linux-64.lock.yaml and configures the container to run with that environment.",
+            "relevance": "Provides a standardized computational environment for re-execution."
+          },
+          {
+            "label": "Locked-environment update workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-locked-env.yml",
+            "quote_or_finding": "The workflow generates conda-lock files for linux-64, osx-64, win-64, and osx-arm64 and creates a pull request with updated locked environments.",
+            "relevance": "Supports reproducible dependency resolution across platforms."
+          },
+          {
+            "label": "Reference objective extraction utility",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/test/utils/extract_ref_objective.py",
+            "quote_or_finding": "The utility reads test/utils/obj_ref.csv and returns reference objective values for modelling-run log files.",
+            "relevance": "Shows a mechanism for comparing computational outputs against reference objectives."
+          },
+          {
+            "label": "Update reference objectives workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-ref-objectives.yml",
+            "quote_or_finding": "The workflow runs tests, extracts objective-function values from logs, creates an updated reference CSV, uploads it, and opens a pull request.",
+            "relevance": "Documents a visible process for maintaining reproducibility checks, though not a full published-result reproduction record."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 68,
+        "score_derivation": "The project has visible community and review mechanisms: the GitHub repository has many open issues, the README links a Discord community and invites users, co-developers, and leaders, the contributing guide explains how to submit questions, feedback, bug reports, fixes, documentation, datasets, and regional expertise, and CI workflows enforce or report checks for tests, linting, docs, CodeQL, docstring coverage, and type checking. The README and CITATION file also identify peer-reviewed Applied Energy publications, which suggests external academic review of at least some model claims. The score is not higher because the evidence bundle does not include actual issue discussions, pull-request reviews, governance records, correction notices, peer-review reports, replication attempts, moderation processes, or documented responses to challenges. It is not lower because there are clear public channels and contribution/review infrastructure.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The bundle documents community channels and review infrastructure but not the contents or effectiveness of review and correction processes.",
+        "references": [
+          {
+            "label": "GitHub repository metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "The repository metadata reports 298 open issues.",
+            "relevance": "Indicates an active public issue tracker where critique and bug reports may be raised."
+          },
+          {
+            "label": "Contributing guide",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "The guide welcomes questions, feedback, new features, bug reports, bug fixes, documentation improvements, regional modelling insights, and datasets.",
+            "relevance": "Shows documented public participation and correction channels."
+          },
+          {
+            "label": "README community links",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README includes a Discord badge/link and says the initiative works on open data, open source modelling, open solver support, and open communities, inviting users and co-developers.",
+            "relevance": "Supports open community engagement beyond code hosting."
+          },
+          {
+            "label": "Lint workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/lint.yml",
+            "quote_or_finding": "The lint workflow runs pre-commit checks, docstring coverage checks, and mypy type checking on pull requests.",
+            "relevance": "Shows automated review/quality-control processes for contributions."
+          },
+          {
+            "label": "CodeQL workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/codeql.yml",
+            "quote_or_finding": "CodeQL analysis runs on pushes, pull requests, and a weekly schedule for Python.",
+            "relevance": "Provides public evidence of automated security/code-quality review."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 78,
+        "score_derivation": "The project communicates its purpose and claims clearly through a public README, documentation homepage, citation metadata, and DOI-linked academic publications. The README describes the model scope, sectors, use cases, data categories, and cites both the power-model and sector-coupled Applied Energy papers. CITATION.cff provides formal metadata, authors, version, release date, repository-code URL, and DOI for the 2023 paper. Documentation dependencies and Docs CI indicate an actively built documentation site, and the README includes badges for documentation and DOI. The score is not higher because the supplied evidence does not include the actual papers, their access/licensing status, full method text, dashboard/version-history documentation, update cycles, or specific cited artifacts behind individual claims. It is not lower because the project has strong public-facing documentation and citation practices.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The bundle strongly evidences public communication and citation metadata, but not the accessibility/licensing and detailed content of the publications themselves.",
+        "references": [
+          {
+            "label": "README publications and model description",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README describes PyPSA-Earth as a global sector-coupled open-source multi-energy system model and cites Applied Energy publications with DOIs 10.1016/j.apenergy.2023.121096 and 10.1016/j.apenergy.2025.125316.",
+            "relevance": "Shows public communication of claims, model scope, and supporting publications."
+          },
+          {
+            "label": "CITATION.cff publication metadata",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff gives the title 'PyPSA-Earth. A new global open energy system optimization model demonstrated in Africa,' authors, abstract, repository-code URL, version 1.0.0, release date, and DOI.",
+            "relevance": "Provides structured citation and publication linkage metadata."
+          },
+          {
+            "label": "Documentation requirements",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/requirements.txt",
+            "quote_or_finding": "The documentation stack uses MkDocs, mkdocs-material, mkdocstrings, table-reader, revision-date, and other documentation dependencies.",
+            "relevance": "Supports the existence of a maintained documentation system for communication."
+          },
+          {
+            "label": "Docs CI workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/docs.yml",
+            "quote_or_finding": "Docs CI builds documentation strictly on pull requests affecting doc files and checks spelling with codespell.",
+            "relevance": "Shows documentation quality-control processes for public communication."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 58,
+        "score_derivation": "There is moderate linkage across artifacts: CITATION.cff links a named publication to the repository code, version 1.0.0, release date, and DOI; the README links the model description to documentation, DOI publications, community channels, and the related status repository; the Dockerfile and CI workflows link execution to specific environment files and lock files; and documentation snippets are generated from the default configuration to keep documentation synchronized with configuration. However, the evidence bundle does not provide an explicit, externally inspectable chain from any specific environmental claim to exact input dataset versions, code commit or release, model configuration, workflow run, logs, outputs, review records, and publication section. The score is therefore not higher because openness exists in several components but claim-to-evidence linkage is incomplete. It is not lower because there are meaningful version, citation, configuration, environment, CI, and documentation links that support partial traceability.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence shows artifact-to-artifact linkage but not a complete claim-specific evidence chain.",
+        "references": [
+          {
+            "label": "CITATION.cff links publication and code",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff lists the Applied Energy paper DOI, repository-code URL, software version 1.0.0, and release date 2023-04-18.",
+            "relevance": "Provides an explicit link between a publication and a software repository/version."
+          },
+          {
+            "label": "README links documentation, publications, and related repositories",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README links the documentation site, DOI publications, Discord, Google Drive, and PyPSA-Earth-Status repository.",
+            "relevance": "Shows public navigation among communication, community, publications, and supporting project artifacts."
+          },
+          {
+            "label": "Test workflow links execution to environments and outputs",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "The test workflow selects environment or lock files, runs make test, uploads logs/results, and extracts objective values from logs.",
+            "relevance": "Links computational execution to environment specifications and output checks."
+          },
+          {
+            "label": "Config snippet documentation",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/configtables/snippets/README.md",
+            "quote_or_finding": "The snippet README explains that YAML snippets are extracted from config.default.yaml so documentation examples stay in sync with the actual config file and are version controlled.",
+            "relevance": "Supports linkage between configuration and documentation, reducing drift between methods and communication."
+          },
+          {
+            "label": "Update locked environments workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-locked-env.yml",
+            "quote_or_finding": "The workflow generates and updates lock files for multiple platforms and creates pull requests for those changes.",
+            "relevance": "Links dependency specifications, generated lock files, and reviewable pull-request updates."
+          }
+        ]
+      }
+    ],
+    "total_score": 69,
+    "total_score_derivation": "Computed locally as round(mean([52, 84, 72, 68, 78, 58])) = 69.",
+    "single_paragraph_summary": "PyPSA-Earth shows strong open-source and reproducibility infrastructure: it is a public GitHub-hosted Python optimisation model with AGPL SPDX markings, citation metadata, documented dependencies, a Dockerfile, CI for tests/lint/docs/security, platform lock-file workflows, and public-facing documentation and publications. Its community infrastructure is also visible through open issues, contribution guidance, Discord, and automated review checks. The main traceability gaps are on the evidence-chain side: the supplied bundle does not include detailed input-data catalogues, primary data provenance, data licensing, measurement methods, uncertainty and quality controls, full scenario configurations, archived workflow runs, exact output artifacts, review records, or claim-specific links connecting a published environmental claim to exact datasets, code versions, configurations, executions, and publications. Overall, the project appears substantially open and well engineered, but the supplied evidence supports only moderate-to-strong traceability rather than a fully explicit, versioned, claim-level evidence chain.",
+    "limitations": [
+      "The assessment uses only the supplied evidence bundle and did not inspect repository files, documentation pages, issues, pull requests, releases, or papers beyond the provided excerpts.",
+      "The evidence bundle does not include the actual data-source catalogue, bundle_config.yaml, input-data licenses, primary dataset identifiers, measurement methods, uncertainty estimates, or quality-control documentation.",
+      "The evidence bundle does not include the full model code, Snakefile, configuration files, example scenarios, or complete method documentation, so method inspectability is inferred from repository and environment evidence.",
+      "The evidence bundle includes CI workflow definitions but not actual successful workflow run logs, run IDs, artifacts, or archived outputs for published results.",
+      "The evidence bundle identifies journal publications by DOI but does not include their full text, licensing/open-access status, peer-review reports, or detailed artifact citations.",
+      "Open community evidence is limited to metadata, contribution guidance, and workflow files; actual issue discussions, pull-request reviews, governance records, correction notices, and replication attempts were not supplied.",
+      "Open Linkage scoring is limited because no specific environmental claim was provided with an exact chain to datasets, code commit, configuration, workflow execution, review record, and publication output."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 3,
+    "project_name": "PyPSA-Earth",
+    "project_url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 55,
+        "score_derivation": "The evidence shows a meaningful commitment to open input data: the README states that all data needed for simulations are automatically retrieved from open sources and lists major categories such as energy demand, generation capacities, networks, and renewable potentials; the contribution guide describes community contribution of datasets and recommends public storage such as Zenodo. This supports a moderate score. The score is not higher because the supplied bundle does not include the actual data-source registry, bundle configuration, dataset licenses, provenance metadata, primary-data links, measurement methods, uncertainty estimates, quality-control documentation, or versioned data releases. It is not lower because the project explicitly identifies open-source data acquisition as part of the workflow and has documented mechanisms for adding datasets.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The bundle contains high-level data-policy evidence but not the detailed dataset inventory or provenance files needed to verify input-data traceability fully.",
+        "references": [
+          {
+            "label": "README data-source statement",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README says: “All the data needed for a simulation are automatically and flexibly retrieved from open sources,” including energy demand, generation capacities, medium- to high-voltage networks, and renewable energy potentials.",
+            "relevance": "Shows that model inputs are intended to be obtained from open sources and identifies key input categories."
+          },
+          {
+            "label": "Data contribution guidance",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "The contribution guide says contributors can add datasets, including cutouts and hourly electricity-demand time series, by uploading them to public storage such as Zenodo and adding specifications to `configs/bundle_config.yaml`.",
+            "relevance": "Indicates a documented process for adding externally accessible datasets, though the actual bundle configuration was not supplied."
+          },
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "Repository topics include energy-system-model, power-system-planning, scenario-analysis, and the repository is public with an active default branch.",
+            "relevance": "Supports that the project is a public modelling repository, but does not itself document data provenance or uncertainty."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 86,
+        "score_derivation": "The project has strong public evidence for open-source software and methods: it is a public GitHub repository, the README describes PyPSA-Earth as an open-source global energy-system optimisation model, files include SPDX AGPL-3.0-or-later or Creative Commons headers, the README displays an AGPLv3 license badge, and the environment files list dependencies and solver requirements. The Dockerfile provides container setup, and the citation metadata links the repository to a peer-reviewed model paper and a versioned software release. The score is not higher because GitHub repository metadata reports `license: null`, the evidence bundle does not include a LICENSE file, full API/method documentation, or all model configuration files, and some solver/dependency licensing constraints such as Gurobi are visible but not fully explained in the supplied evidence. It is not lower because the code, dependency environment, containerization, and citation metadata are extensive and publicly inspectable.",
+        "uncertainty": "low",
+        "uncertainty_reason": "Multiple supplied artifacts directly document source availability, licensing headers, dependencies, containerization, and citation metadata.",
+        "references": [
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "Public repository `pypsa-meets-earth/pypsa-earth`; description: “A flexible Python-based open optimisation model to study energy system futures around the world”; default branch `main`.",
+            "relevance": "Establishes public version-controlled software availability and model purpose."
+          },
+          {
+            "label": "README license and open-source claims",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README calls PyPSA-Earth an “open-source global cross-sectoral energy system model” and includes an AGPLv3 license badge and REUSE status badge.",
+            "relevance": "Supports open-source model and licensing evidence."
+          },
+          {
+            "label": "CITATION metadata",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff has SPDX-License-Identifier `AGPL-3.0-or-later`, repository-code URL, version `1.0.0`, date-released `2023-04-18`, and DOI `10.1016/j.apenergy.2023.121096`.",
+            "relevance": "Provides versioned citation metadata linking software to a publication."
+          },
+          {
+            "label": "Conda environment",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/envs/environment.yaml",
+            "quote_or_finding": "Environment file defines `name: pypsa-earth`, Python version bounds, channels, and dependencies including pypsa, atlite, snakemake-minimal, geopandas, xarray, glpk, and gurobi.",
+            "relevance": "Documents dependencies and software environment needed to understand and run the model."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/Dockerfile",
+            "quote_or_finding": "Dockerfile builds from `condaforge/mambaforge`, creates the `pypsa-earth` conda environment from `envs/linux-64.lock.yaml`, installs OpenJDK, and activates the environment.",
+            "relevance": "Shows infrastructure software for a reusable computational environment."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 76,
+        "score_derivation": "The evidence for reproducible execution is strong but not complete. The project provides a Dockerfile, conda environment files, locked-environment update workflows, cross-platform CI tests on Ubuntu, macOS, and Windows, automated objective extraction from solver logs, and reference objective handling. Documentation snippets are generated from configuration files to keep configuration examples in sync. These are substantial reproducibility practices. The score is not higher because the evidence bundle does not include a complete reproducible workflow example connecting specific input data, exact configuration, solver settings, run logs, and final published outputs for a scientific claim; CI artifacts are retained only briefly; and full Snakemake rules/configs and data bundles were not supplied. It is not lower because the supplied CI, lockfile, Docker, and reference-objective mechanisms make much of the execution path inspectable and re-runnable for tests.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence demonstrates reproducible software testing and environments, but not a fully preserved end-to-end run for a specific environmental claim.",
+        "references": [
+          {
+            "label": "Test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "CI runs `make test` on Ubuntu, macOS, and Windows using platform-specific lock files; uploads logs and results artifacts; extracts objective-function values from solver logs; compares current and reference objectives.",
+            "relevance": "Strong evidence of automated execution checks and reproducibility testing."
+          },
+          {
+            "label": "Locked environment workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-locked-env.yml",
+            "quote_or_finding": "Workflow generates conda-lock files for linux-64, osx-64, win-64, and osx-arm64 and creates a pull request to update locked environments.",
+            "relevance": "Shows dependency pinning and reproducible environment maintenance across platforms."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/Dockerfile",
+            "quote_or_finding": "Container creates the `pypsa-earth` environment from `temp/linux-64.lock.yaml` and sets the PATH to the conda environment.",
+            "relevance": "Provides a reusable execution environment."
+          },
+          {
+            "label": "Reference objective update workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-ref-objectives.yml",
+            "quote_or_finding": "Manual workflow runs tests, extracts objective-function values from logs, builds `updated_obj_ref.csv`, and opens a PR to update `test/utils/obj_ref.csv`.",
+            "relevance": "Shows an explicit mechanism for preserving and updating expected computational outputs."
+          },
+          {
+            "label": "Objective extraction utility",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/test/utils/extract_ref_objective.py",
+            "quote_or_finding": "Utility reads `test/utils/obj_ref.csv` and returns reference objective values by folder and log filename.",
+            "relevance": "Supports traceability of test outputs to named runs/logs."
+          },
+          {
+            "label": "Configuration snippet documentation",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/configtables/snippets/README.md",
+            "quote_or_finding": "Documentation snippets are extracted from `config.default.yaml` and regenerated to keep docs in sync with actual configuration sections.",
+            "relevance": "Shows effort to keep configuration documentation aligned with executable configuration."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 73,
+        "score_derivation": "The project has strong open-community evidence: the public repository has many open issues, the README links Discord and invites users, co-developers, and regional experts, and the contribution guide explains how to submit questions, feedback, bug reports, fixes, documentation improvements, datasets, and tests. CI workflows for linting, docs, tests, CodeQL, docstring coverage, and type checking provide visible quality gates for pull requests. The score is not higher because the supplied bundle does not include issue discussions, pull-request review records, governance documents, correction notices, release-review procedures, or peer-review reports; the evidence shows open channels and automated checks more than actual records of critique and response. It is not lower because the available artifacts clearly document open contribution pathways and multiple review/quality-control mechanisms.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Open channels and CI checks are well evidenced, but actual review histories and governance/correction records are not included in the bundle.",
+        "references": [
+          {
+            "label": "Repository issue metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "Repository metadata reports `open_issues_count: 298`.",
+            "relevance": "Indicates a public issue tracker with active/open community discussion potential."
+          },
+          {
+            "label": "Contribution guide",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "Contributions include submitting questions and feedback, proposing features, reporting bugs, submitting fixes, improving documentation, sharing regional modelling insights, and contributing datasets.",
+            "relevance": "Documents public channels and expected forms of community participation and scrutiny."
+          },
+          {
+            "label": "README community links",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README includes a Discord badge/link and says the initiative looks for users, co-developers, and leaders; it also invites regional expertise via PyPSA-Earth-Status issues.",
+            "relevance": "Shows public community engagement channels."
+          },
+          {
+            "label": "Lint workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/lint.yml",
+            "quote_or_finding": "Pull-request lint workflow runs pre-commit, docstring coverage checks, and mypy type checking, with summaries posted to GitHub step summaries.",
+            "relevance": "Evidence of automated review and quality-control checks on contributions."
+          },
+          {
+            "label": "CodeQL workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/codeql.yml",
+            "quote_or_finding": "CodeQL analysis runs on push, pull requests, and a weekly schedule for Python.",
+            "relevance": "Provides public automated security/static-analysis review infrastructure."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 82,
+        "score_derivation": "The project has strong publication and communication traceability. The README clearly states the model purpose and claims, links to documentation, lists peer-reviewed Applied Energy publications with DOIs, and describes model scope and data categories. CITATION.cff provides structured citation metadata with authors, ORCIDs for several authors, DOI, repository-code URL, version, and release date. Documentation is built with MkDocs and ReadTheDocs, and documentation CI enforces strict builds and spelling checks. The score is not higher because the evidence bundle does not include the full publications, their licenses/access status, complete method documentation pages, release notes, or a versioned history of dynamic dashboard outputs; GitHub metadata has no detected license field despite README/SPDX evidence. It is not lower because the supplied evidence gives clear, accessible communication artifacts and structured citation links to published work.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The bundle directly includes README, citation metadata, documentation requirements, and docs CI evidence.",
+        "references": [
+          {
+            "label": "README publications and model description",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README describes PyPSA-Earth as a global sector-coupled open-source multi-energy system model and lists Applied Energy papers with DOIs `10.1016/j.apenergy.2023.121096` and `10.1016/j.apenergy.2025.125316`.",
+            "relevance": "Shows accessible communication of claims, model scope, and supporting publications."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff identifies the paper title, authors, repository-code URL, software version `1.0.0`, release date `2023-04-18`, and DOI `10.1016/j.apenergy.2023.121096`.",
+            "relevance": "Provides structured, machine-readable publication and software citation metadata."
+          },
+          {
+            "label": "Documentation requirements",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/requirements.txt",
+            "quote_or_finding": "Documentation stack includes MkDocs, mkdocs-material, mkdocstrings, table-reader, redirects, and dependencies needed to build documentation.",
+            "relevance": "Shows that public documentation is a maintained project artifact."
+          },
+          {
+            "label": "Docs CI",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/docs.yml",
+            "quote_or_finding": "Documentation CI builds MkDocs in strict mode and runs codespell on documentation paths for pull requests.",
+            "relevance": "Shows review and quality control for communication materials."
+          },
+          {
+            "label": "README documentation badge",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README includes a ReadTheDocs documentation status badge linking to `https://pypsa-earth.readthedocs.io/en/latest/`.",
+            "relevance": "Indicates public documentation availability."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 60,
+        "score_derivation": "The project shows moderate-to-strong linkage among some artifacts: citation metadata links a specific software version and repository to a publication DOI; the README links model claims to documentation, publications, a status repository, and community channels; CI workflows link tests to lock files, logs, objective values, and reference objective CSV updates; documentation snippets are linked to configuration extraction from `config.default.yaml`. However, the supplied evidence does not demonstrate a fully explicit, versioned evidence chain from any particular environmental or energy-system result to exact input datasets, dataset versions, code commit/tag, configuration, solver settings, workflow run, logs, review records, and publication figure/table. The score is not higher because this exact claim-to-evidence chain is the central requirement for Open Linkage and is only partially evidenced. It is not lower because there are clear public links between repository, publication metadata, environments, tests, objectives, and configuration documentation.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Several internal linkages are visible, but the bundle lacks a complete end-to-end trace for a specific reported environmental claim or result.",
+        "references": [
+          {
+            "label": "CITATION version-to-publication linkage",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff links repository-code `https://github.com/pypsa-meets-earth/pypsa-earth`, version `1.0.0`, date-released `2023-04-18`, and DOI `10.1016/j.apenergy.2023.121096`.",
+            "relevance": "Provides explicit linkage between software version, repository, and publication."
+          },
+          {
+            "label": "README links to publications and status repository",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README links the project to academic publications, ReadTheDocs documentation, a Google Drive, Discord, DOI badge, and PyPSA-Earth-Status repository for sharing regional insights.",
+            "relevance": "Shows communication-level linkage among model, publications, documentation, and community/data-status resources."
+          },
+          {
+            "label": "Test workflow run-to-output linkage",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "Test workflow extracts objective-function values from solver log files and formats tables comparing current and reference objective values.",
+            "relevance": "Links execution logs to numerical outputs used for regression testing."
+          },
+          {
+            "label": "Reference objective update linkage",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-ref-objectives.yml",
+            "quote_or_finding": "Workflow extracts objectives from logs, writes `updated_obj_ref.csv`, moves it to `test/utils/obj_ref.csv`, and creates a pull request documenting that values came from a manual CI run.",
+            "relevance": "Shows a linkage process from workflow execution to version-controlled reference outputs."
+          },
+          {
+            "label": "Configuration snippet linkage",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/configtables/snippets/README.md",
+            "quote_or_finding": "Configuration snippets are extracted from `config.default.yaml` so documentation examples stay synchronized with actual configuration sections.",
+            "relevance": "Links documentation to configuration artifacts, reducing drift between explanation and executable settings."
+          }
+        ]
+      }
+    ],
+    "total_score": 72,
+    "total_score_derivation": "Computed locally as round(mean([55, 86, 76, 73, 82, 60])) = 72.",
+    "single_paragraph_summary": "PyPSA-Earth has a strong open-source and communication foundation: the public repository, AGPL/REUSE indicators, structured citation metadata, documented conda/Docker environments, automated CI testing, documentation builds, contribution guidance, and peer-reviewed publication links provide substantial external inspectability. Its strongest areas are open-source software, publications, and reproducible software-environment/testing infrastructure. The main traceability limitations in the supplied evidence are around the environmental evidence chain itself: the bundle does not include the actual input-data registry, primary-source provenance, dataset licenses and uncertainties, complete workflow/configuration examples for a published result, persistent run artifacts, review histories, or a versioned claim-to-dataset-to-code-to-run-to-publication linkage for a specific output. Overall, the project appears highly open as a modelling platform, with moderate evidence for fully traceable environmental claims based on the supplied artifacts.",
+    "limitations": [
+      "The evidence bundle does not include the full data-source registry, `configs/bundle_config.yaml`, or concrete dataset metadata, so input-data provenance, licensing, uncertainty, and primary-data traceability could not be fully assessed.",
+      "The evidence bundle does not include a LICENSE file, although README badges and SPDX headers indicate AGPL-3.0-or-later and Creative Commons licensing for specific files.",
+      "The full documentation site, model-method pages, configuration files, Snakefile, and example workflows were not supplied, limiting assessment of method completeness and end-to-end reproducibility.",
+      "No complete published-result reproduction package was provided linking a specific claim, figure, or table to exact input data versions, code commit/tag, configuration, solver settings, run logs, and outputs.",
+      "GitHub Actions logs and uploaded artifacts were not inspected; the test workflow says artifacts are retained for 3 days, which limits long-term external verification of CI run outputs.",
+      "Issue discussions, pull-request reviews, governance records, correction notices, and peer-review reports were not included, so community review was assessed mainly from open channels and automated checks rather than actual review content.",
+      "The full papers linked by DOI were not included in the evidence bundle, so publication access conditions, licensing, and detailed methods in the articles could not be verified."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 4,
+    "project_name": "PyPSA-Earth",
+    "project_url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 54,
+        "score_derivation": "The evidence shows a clear intention to use and contribute open input data: the README states that data needed for simulations are automatically retrieved from open sources and names broad input categories such as energy demand, generation capacities, networks, and renewable potentials; the contribution guide describes public dataset contribution via storage such as Zenodo and registration in a bundle configuration. This supports a moderate score. The score is not higher because the supplied bundle does not include the actual data-source catalogue, bundle_config entries, source URLs, dataset versions, licences for each dataset, measurement methods, uncertainty estimates, quality-control documentation, or traceability from secondary datasets back to primary measurements. It is not lower because the project publicly documents data categories and an open contribution pathway for datasets, but the concrete input evidence chain is only partially visible in the supplied evidence.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The repository likely contains more data documentation than is included here, but the assessment must rely only on the supplied evidence bundle.",
+        "references": [
+          {
+            "label": "README open-source data statement",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README says all data needed for a simulation are automatically and flexibly retrieved from open sources, including energy demand, generation capacities, networks, and renewable energy potentials.",
+            "relevance": "Shows that input data categories are identified and intended to come from open sources."
+          },
+          {
+            "label": "Dataset contribution guidance",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "The guide encourages contribution of regional datasets, says datasets can be uploaded to public storage such as Zenodo, and should be specified in configs/bundle_config.yaml.",
+            "relevance": "Shows a documented process for adding externally accessible datasets, but also indicates the actual dataset specifications are not present in the evidence bundle."
+          },
+          {
+            "label": "README custom datasets note",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README notes that custom datasets can be integrated and kept private if required.",
+            "relevance": "Indicates flexibility, but also a potential traceability limitation when analyses rely on private datasets."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 88,
+        "score_derivation": "The project has strong public evidence for open-source models, methods, and software. It is hosted in a public version-controlled GitHub repository, describes itself as an open optimisation model, includes SPDX licence headers and an AGPL-3.0-or-later badge/metadata in key files, provides citation metadata with repository and version, and supplies environment and documentation dependency files. The Dockerfile and conda environment files make the software stack inspectable, while CI workflows for linting, testing, docs, CodeQL, and locked environments show mature software engineering practice. The score is not higher because the GitHub metadata reports license as null, the evidence includes a Gurobi channel/dependency that may rely on proprietary solver infrastructure despite open alternatives being present, and the bundle does not prove every component, dependency, or user-facing infrastructure piece is independently operable under open-source terms. It is not lower because the core analytical code and configuration infrastructure are clearly public, documented, version-controlled, and largely licensed.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The supplied evidence contains multiple direct repository, licensing, dependency, and workflow artifacts supporting this stage.",
+        "references": [
+          {
+            "label": "Repository metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "The repository is public at pypsa-meets-earth/pypsa-earth, describes PyPSA-Earth as a flexible Python-based open optimisation model, and has default branch main.",
+            "relevance": "Establishes public, version-controlled availability of the software project."
+          },
+          {
+            "label": "README licence and model description",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README includes an AGPLv3 licence badge and describes PyPSA-Earth as an open-source global cross-sectoral energy system model.",
+            "relevance": "Supports open-source status and model scope."
+          },
+          {
+            "label": "CITATION metadata",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff lists SPDX-License-Identifier: AGPL-3.0-or-later, repository-code, version 1.0.0, release date 2023-04-18, and DOI-linked paper metadata.",
+            "relevance": "Provides reusable citation and version metadata connecting the software to a publication."
+          },
+          {
+            "label": "Environment specification",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/envs/environment.yaml",
+            "quote_or_finding": "The conda environment lists Python, PyPSA, atlite, Snakemake, GIS libraries, GLPK, Gurobi, and other dependencies.",
+            "relevance": "Makes dependencies and computational software requirements inspectable."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/Dockerfile",
+            "quote_or_finding": "The Dockerfile builds from condaforge/mambaforge and creates a pypsa-earth environment from envs/linux-64.lock.yaml.",
+            "relevance": "Provides containerized infrastructure for operating the software environment."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 78,
+        "score_derivation": "The project provides strong execution and reproducibility evidence: there is a Dockerfile, a conda environment file, platform-specific locked environments generated by CI, a multi-platform GitHub Actions test workflow, and workflows that extract objective values from solver logs and compare or update reference objectives. The documentation snippets are generated from the default configuration to keep documentation synchronized with executable configuration. The score is not higher because the supplied evidence does not include a fully specified workflow run for a published environmental claim, exact input-data snapshots, exact scenario parameters for the cited papers, permanent archived outputs, or a re-executable provenance record tying a particular reported result to a particular commit, data version, and CI run. It is not lower because the repository clearly contains reproducibility infrastructure beyond just source code, including locked environments, CI tests, logs/artifacts, and reference objective mechanisms.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "There is strong evidence for reproducible software testing, but less direct evidence for reproducing the specific published model results or claims.",
+        "references": [
+          {
+            "label": "Test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "The test workflow runs on Ubuntu, macOS, and Windows, uses locked environment files, runs make test, uploads logs/results artifacts, and extracts objective-function values from solver logs.",
+            "relevance": "Shows automated execution, cross-platform testing, and output checking infrastructure."
+          },
+          {
+            "label": "Locked environment update workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-locked-env.yml",
+            "quote_or_finding": "The workflow generates lockfiles for linux-64, osx-64, win-64, and osx-arm64 using conda-lock and opens a pull request with updated lock files.",
+            "relevance": "Supports reproducible computational environments across platforms."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/Dockerfile",
+            "quote_or_finding": "The Dockerfile creates a pypsa-earth conda environment from envs/linux-64.lock.yaml and sets PATH to the environment.",
+            "relevance": "Provides a containerized route to recreate the execution environment."
+          },
+          {
+            "label": "Reference objective utility",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/test/utils/extract_ref_objective.py",
+            "quote_or_finding": "The utility reads test/utils/obj_ref.csv and returns reference objective values for model run logs.",
+            "relevance": "Shows that numerical outputs from test runs are compared against stored references."
+          },
+          {
+            "label": "Configuration snippet synchronization",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/configtables/snippets/README.md",
+            "quote_or_finding": "The snippets are extracted from config.default.yaml so documentation examples stay in sync with actual configuration sections.",
+            "relevance": "Improves reproducibility by reducing divergence between documented and executable configuration."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 74,
+        "score_derivation": "The project has strong public evidence of open community and review mechanisms. It uses a public GitHub repository with many open issues, has contribution documentation inviting questions, bug reports, feature proposals, documentation improvements, regional expertise, and dataset contributions, and the README links a Discord community. Automated PR checks for linting, tests, documentation, and CodeQL provide visible technical review gates, and the software is associated with peer-reviewed Applied Energy papers. The score is not higher because the evidence bundle does not include actual issue discussions, pull-request review records, peer-review reports, governance records, correction notices, replication attempts, or documented processes for responding to affected communities. It is not lower because multiple open channels and review mechanisms are clearly present and publicly documented.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence documents review channels and CI gates, but not the quality or outcomes of actual community scrutiny.",
+        "references": [
+          {
+            "label": "Repository issue metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "Repository metadata reports 298 open issues.",
+            "relevance": "Shows use of a public issue tracker for questions, bugs, and critique."
+          },
+          {
+            "label": "Contributing guide",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "The guide invites users to submit questions and feedback, propose features, report bugs, submit fixes, improve documentation, share regional expertise, and contribute datasets.",
+            "relevance": "Documents open community participation and correction pathways."
+          },
+          {
+            "label": "README community links",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README includes a Discord badge/link and states that the initiative looks for users, co-developers, and leaders.",
+            "relevance": "Shows an open community communication channel beyond GitHub."
+          },
+          {
+            "label": "Lint workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/lint.yml",
+            "quote_or_finding": "Pull requests run pre-commit checks, docstring coverage checks, and mypy type checks with summaries.",
+            "relevance": "Provides visible automated review and quality-control mechanisms for contributions."
+          },
+          {
+            "label": "Publication metadata",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff identifies an Applied Energy article with DOI 10.1016/j.apenergy.2023.121096.",
+            "relevance": "Supports the existence of conventional scholarly review around at least one major project output."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 79,
+        "score_derivation": "The project communicates its claims and methods through a public README, ReadTheDocs documentation link, citation metadata, and DOI-linked Applied Energy publications. The README clearly states the project purpose, model scope, relevant sectors, data categories, and links to two academic publications; documentation is built and checked through CI, and documentation files carry open SPDX licences such as CC-BY-4.0 or CC0-1.0. The score is not higher because the supplied evidence does not show whether the journal articles themselves are openly licensed or freely accessible, does not include the full documentation content, and does not provide dashboard update cycles, indicator definitions, or version history for dynamic outputs such as the referenced PyPSA-Earth-Status. It is not lower because the public-facing communication artifacts are substantial, clearly linked, and maintained through documentation workflows.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence strongly supports public communication, but the openness and traceability of the cited publications and dynamic outputs are only partially visible.",
+        "references": [
+          {
+            "label": "README publications and overview",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README describes the model, its sectors, use cases, and links to Applied Energy papers with DOIs for the power model and sector-coupled model.",
+            "relevance": "Provides accessible public communication of the project claim, scope, and supporting publications."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "The citation file provides title, abstract, authors, repository-code URL, version 1.0.0, release date, and DOI.",
+            "relevance": "Supports clear citation and attribution for publication-linked software."
+          },
+          {
+            "label": "Documentation requirements",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/requirements.txt",
+            "quote_or_finding": "Documentation is built with MkDocs, mkdocs-material, mkdocstrings, and related plugins.",
+            "relevance": "Shows a maintained documentation system capable of explaining methods and APIs."
+          },
+          {
+            "label": "Docs CI workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/docs.yml",
+            "quote_or_finding": "The documentation workflow builds docs strictly and checks spelling on pull requests affecting documentation files.",
+            "relevance": "Shows publication/documentation quality control and maintenance."
+          },
+          {
+            "label": "Contributing documentation licence",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "The contributing page includes SPDX-License-Identifier: CC-BY-4.0.",
+            "relevance": "Shows at least some explanatory materials are openly licensed."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 62,
+        "score_derivation": "The project has meaningful but incomplete linkage across the evidence chain. CITATION.cff links the software repository, version 1.0.0, release date, authors, and DOI for a major publication; the README links the project purpose to documentation, papers, open-source/data claims, and community resources; CI workflows connect commits to tests, logs, objective extraction, and reference-objective updates; and documentation snippets are designed to stay synchronized with the default configuration. However, the supplied evidence does not expose an explicit, versioned, externally verifiable chain from a specific environmental claim or published result to exact input datasets, dataset versions, preprocessing transformations, code commit/tag, configuration, workflow run, solver/environment, outputs, review records, and publication text. The score is therefore above moderate because several artifact-to-artifact links exist, but not higher because the exact claim-level provenance chain remains incomplete in the evidence bundle.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "There is good linkage among software, citation, docs, and CI, but claim-level dataset-to-result provenance is not demonstrated by the supplied artifacts.",
+        "references": [
+          {
+            "label": "CITATION linkage to paper and code",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff lists repository-code, version 1.0.0, date-released 2023-04-18, and DOI 10.1016/j.apenergy.2023.121096.",
+            "relevance": "Provides a concrete link between software version metadata and a publication."
+          },
+          {
+            "label": "README links across project outputs",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README links to documentation, Google Drive, Discord, DOI publications, and PyPSA-Earth-Status, and describes the model and data sources at a high level.",
+            "relevance": "Shows high-level linkage among communication outputs, community channels, and model claims."
+          },
+          {
+            "label": "Test workflow output linkage",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "The workflow uploads logs/results artifacts and extracts objective values from specific solver log files for comparison with reference objectives.",
+            "relevance": "Links workflow execution to outputs and numerical objective checks."
+          },
+          {
+            "label": "Reference objective update workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-ref-objectives.yml",
+            "quote_or_finding": "The workflow runs tests, extracts objective values from logs, writes updated_obj_ref.csv, and creates a PR to update test/utils/obj_ref.csv.",
+            "relevance": "Provides traceable maintenance of reference numerical outputs in version control."
+          },
+          {
+            "label": "Configuration snippet linkage",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/configtables/snippets/README.md",
+            "quote_or_finding": "Documentation snippets are extracted from config.default.yaml so documentation examples stay in sync with the actual config file.",
+            "relevance": "Links explanatory documentation to executable configuration, improving traceability."
+          }
+        ]
+      }
+    ],
+    "total_score": 72,
+    "total_score_derivation": "Computed locally as round(mean([54, 88, 78, 74, 79, 62])) = 72.",
+    "single_paragraph_summary": "PyPSA-Earth shows strong open traceability for software, methods, community infrastructure, documentation, and reproducible testing: it is a public version-controlled energy-system model with open-source licensing signals, citation metadata, dependency specifications, Docker and conda environments, CI tests across platforms, documentation workflows, public issues, contribution guidance, community links, and DOI-linked publications. The main weaknesses in the supplied evidence are at the claim-level evidence-chain boundary: the bundle does not include detailed input dataset catalogues, licences, measurement methods, uncertainty and quality controls, exact data versions, or a complete provenance record connecting a specific environmental result to exact datasets, code commit, configuration, solver environment, workflow run, outputs, review records, and publication text. Overall, the project has a mature open-source and reproducibility foundation, but the supplied evidence only partially demonstrates end-to-end open traceability from inputs to specific published environmental claims.",
+    "limitations": [
+      "The assessment uses only the supplied evidence bundle and does not inspect repository files or documentation pages not included in the bundle.",
+      "The bundle does not include the actual data-source catalogue, bundle_config.yaml, dataset URLs, dataset licences, primary measurement methods, quality-control records, or uncertainty estimates.",
+      "The evidence does not include specific published result configurations, scenario files, input-data snapshots, archived workflow runs, or output archives for the DOI-linked papers.",
+      "GitHub repository metadata reports license as null even though README and file headers show AGPL/CC SPDX licensing signals; this inconsistency limits certainty about repository-level licensing metadata.",
+      "The evidence shows public issue counts and contribution channels but not the substance of issue discussions, pull-request reviews, peer-review reports, correction notices, or replication attempts.",
+      "The openness and licensing status of the external Applied Energy publications themselves are not shown in the evidence bundle.",
+      "Dynamic outputs such as PyPSA-Earth-Status are mentioned but their data sources, update cycles, indicator definitions, and version history are not included."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 5,
+    "project_name": "PyPSA-Earth",
+    "project_url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 56,
+        "score_derivation": "There is moderate public evidence that PyPSA-Earth is designed around open and externally retrievable input data: the README states that all data needed for simulations are automatically and flexibly retrieved from open sources, including sectoral demand, generation capacities, networks, and renewable potentials, and the contribution guide describes public dataset contributions and bundle specifications. This supports a score above the fragmentary range. However, the supplied evidence bundle does not include the actual data-source catalogue, bundle_config.yaml, dataset licences, provenance for each source, primary-data links, measurement methods, quality-control procedures, quantified uncertainty, or versioned input-data releases. Because Open Traceability requires input origins, transformations, uncertainty, reuse conditions, and verification to be inspectable, the score is limited to the mid range rather than high.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The repository likely contains more data-source documentation than was supplied, but the evidence bundle only includes general statements rather than the actual input-data traceability artifacts.",
+        "references": [
+          {
+            "label": "README data-source statement",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README says: “All the data needed for a simulation are automatically and flexibly retrieved from open sources,” including energy demand, generation capacities, networks, and renewable potentials.",
+            "relevance": "Shows that the project intends to use identifiable open input sources, but does not itself document the exact source list, provenance, uncertainties, or versions."
+          },
+          {
+            "label": "Data contribution guidance",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "The guide describes contributing datasets such as cutouts and hourly electricity demand time series, uploaded to public storage such as Zenodo and specified in configs/bundle_config.yaml.",
+            "relevance": "Indicates a mechanism for public data contribution and dataset registration, but the referenced bundle configuration and dataset metadata are not included in the evidence bundle."
+          },
+          {
+            "label": "README custom data note",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "The README notes that custom datasets can be integrated and kept private if required.",
+            "relevance": "Demonstrates flexibility, but private/custom datasets could weaken external verifiability unless separately documented for a given claim."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 86,
+        "score_derivation": "The supplied evidence gives strong public support for open-source software traceability. The project is hosted in a public GitHub repository, describes itself as an open optimisation model, includes SPDX licensing headers and an AGPL-3.0-or-later citation/README licence statement, provides dependency specifications in environment.yaml and documentation requirements, and includes Docker infrastructure for building a reproducible software environment. CI workflows also show linting, type checking, CodeQL, and documentation builds. The score is not higher because the GitHub metadata reports license as null, the supplied evidence does not include a full LICENSE file or complete source tree, and some execution infrastructure may depend on external services or solvers such as Gurobi. Still, the model and software evidence is strong, version-controlled, inspectable, and reusable.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The evidence bundle includes multiple direct software, licensing, dependency, and infrastructure artifacts from the public repository.",
+        "references": [
+          {
+            "label": "Public repository metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "Repository description: “PyPSA-Earth: A flexible Python-based open optimisation model to study energy system futures around the world”; default branch is main and repository is public in the evidence bundle.",
+            "relevance": "Establishes that the model software is publicly hosted and version-controlled."
+          },
+          {
+            "label": "README licence and open-source status",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README includes SPDX-License-Identifier: AGPL-3.0-or-later, a License: AGPL v3 badge, and describes PyPSA-Earth as an open-source global energy system model.",
+            "relevance": "Supports open-source licensing and public inspectability of model code and methods."
+          },
+          {
+            "label": "CITATION.cff software metadata",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff lists repository-code as https://github.com/pypsa-meets-earth/pypsa-earth, version 1.0.0, date-released 2023-04-18, and SPDX-License-Identifier: AGPL-3.0-or-later.",
+            "relevance": "Provides citable, versioned software metadata connecting the model to a release and publication."
+          },
+          {
+            "label": "Conda environment",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/envs/environment.yaml",
+            "quote_or_finding": "environment.yaml specifies the pypsa-earth environment, channels, Python version, PyPSA, atlite, powerplantmatching, earth-osm, Snakemake, solvers, geospatial, plotting, and other dependencies.",
+            "relevance": "Documents dependencies and configuration needed to understand and run the model."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/Dockerfile",
+            "quote_or_finding": "Dockerfile builds from condaforge/mambaforge, creates the pypsa-earth environment from envs/linux-64.lock.yaml, installs OpenJDK, and activates the environment.",
+            "relevance": "Provides open infrastructure for packaging and running the software environment."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 78,
+        "score_derivation": "There is strong evidence for reproducible execution infrastructure: the project uses Snakemake-related dependencies, locked environments for multiple platforms, a Dockerfile, multi-platform CI tests, artifacts containing logs/results, objective extraction from solver logs, reference objective comparison, and workflows to update locked environments and reference objectives. This makes the computational path more inspectable than simply releasing code. The score is not higher because the supplied evidence does not show the exact published-paper run, exact input data versions, complete scenario parameters, archived outputs, or a re-executable workflow record linking a specific environmental claim to specific data and code versions. CI artifacts also have short retention in the evidence shown. Therefore reproducibility is strong at the software/test-workflow level but incomplete for exact claim reproduction.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence clearly documents CI and environment reproducibility, but does not include full published scenario run records or input/output archives.",
+        "references": [
+          {
+            "label": "Multi-platform test workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "The test workflow runs on ubuntu, macos, and windows, uses platform lock files, executes make test, uploads logs/results artifacts, and extracts objective function values from solve_network logs.",
+            "relevance": "Shows automated execution checks and inspection of computational outputs across platforms."
+          },
+          {
+            "label": "Locked environment update workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-locked-env.yml",
+            "quote_or_finding": "Workflow generates conda-lock files for linux-64, osx-64, win-64, and osx-arm64 and creates a pull request with updated locked environments.",
+            "relevance": "Supports reproducible computational environments through generated platform-specific lock files."
+          },
+          {
+            "label": "Reference objective update workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-ref-objectives.yml",
+            "quote_or_finding": "Manual workflow runs tests, extracts objective values from logs, writes updated_obj_ref.csv, and creates a pull request updating test/utils/obj_ref.csv.",
+            "relevance": "Shows that numerical model outputs are checked against reference objective values, improving execution traceability."
+          },
+          {
+            "label": "Objective extraction utility",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/test/utils/extract_ref_objective.py",
+            "quote_or_finding": "Utility reads test/utils/obj_ref.csv and returns reference objective values by folder and log-file name.",
+            "relevance": "Provides concrete evidence of output comparison infrastructure for reproducibility tests."
+          },
+          {
+            "label": "Dockerfile",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/Dockerfile",
+            "quote_or_finding": "Docker image creation uses envs/linux-64.lock.yaml to create and activate a pypsa-earth environment.",
+            "relevance": "Helps external users recreate the software environment for execution."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 73,
+        "score_derivation": "The project has strong public evidence of open community processes: a public GitHub repository with hundreds of open issues, a contribution guide inviting questions, feedback, bugs, features, documentation, regional expertise, and datasets, CI checks on pull requests, Discord/community links, and peer-reviewed Applied Energy publications referenced in project metadata. These features make scrutiny and contribution channels visible. The score is not higher because the supplied bundle does not include specific issue discussions, pull-request review records, governance documents, correction notices, replication attempts, peer-review reports, or evidence of responses to scientific challenges. Thus the channels for review are open and active, but the record of substantive claim review is only partly evidenced here.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence confirms public channels and review infrastructure but not the detailed contents or outcomes of reviews and corrections.",
+        "references": [
+          {
+            "label": "Repository issue metadata",
+            "url": "https://github.com/pypsa-meets-earth/pypsa-earth",
+            "quote_or_finding": "Repository metadata reports open_issues_count: 298.",
+            "relevance": "Shows a public issue-tracking channel with visible ongoing discussion or problem reporting, though issue contents were not supplied."
+          },
+          {
+            "label": "Contribution guide",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/community/contributing.md",
+            "quote_or_finding": "The guide invites users to submit questions and feedback, propose features, report bugs, submit fixes, improve documentation, share regional modelling insights, and contribute datasets.",
+            "relevance": "Demonstrates open channels for critique, improvement, and community participation."
+          },
+          {
+            "label": "README community links",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README includes a Discord badge/link and says the initiative works on open data, open source modelling, open source solver support, and open communities.",
+            "relevance": "Supports the existence of public community interaction channels."
+          },
+          {
+            "label": "Lint and review CI",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/lint.yml",
+            "quote_or_finding": "Pull-request workflow runs pre-commit checks, docstring coverage, and mypy type checking, with summaries posted to GitHub step summaries.",
+            "relevance": "Shows automated review gates that contribute to visible quality-control processes for contributions."
+          },
+          {
+            "label": "Publication references in README",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README cites Applied Energy papers for the power model and sector-coupled model with DOIs 10.1016/j.apenergy.2023.121096 and 10.1016/j.apenergy.2025.125316.",
+            "relevance": "Indicates that at least some model claims are associated with formal journal publication, although peer-review reports are not provided."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 79,
+        "score_derivation": "The project communicates its claims and methods through a public README, ReadTheDocs documentation link, citation metadata, DOI-linked Applied Energy publications, documentation CI, and generated configuration documentation snippets that are intended to stay synchronized with config.default.yaml. The README clearly states the model purpose, scope, sectors, and intended use, and CITATION.cff provides citation metadata for a specific release and paper. This merits a strong score. The score is not higher because the supplied evidence does not show the full documentation pages, publication accessibility/licensing terms, version history for dynamic outputs, detailed update cycles, or all supporting artifacts cited from the publications. Open communication is strong, but complete publication traceability for each claim is not fully established in the bundle.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The bundle includes strong communication artifacts but not the full publications, documentation site contents, or publication licences.",
+        "references": [
+          {
+            "label": "README project communication",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README describes PyPSA-Earth as a global sector-coupled open-source multi-energy system model and explains its scope across electricity, heating, transport, industry, hydrogen, and more.",
+            "relevance": "Provides accessible public explanation of the project’s environmental/energy-system modelling claims and scope."
+          },
+          {
+            "label": "README publications",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README lists academic publications for the power model and sector-coupled model, including DOI links.",
+            "relevance": "Connects project communication to formal publications supporting the model."
+          },
+          {
+            "label": "CITATION.cff",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff gives title, abstract, authors, ORCIDs for several authors, DOI 10.1016/j.apenergy.2023.121096, repository-code URL, version 1.0.0, and release date.",
+            "relevance": "Provides standardized citation and publication metadata that improves publication traceability."
+          },
+          {
+            "label": "Documentation requirements",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/requirements.txt",
+            "quote_or_finding": "Documentation stack includes mkdocs, mkdocs-material, mkdocstrings, mkdocs-git-revision-date-localized-plugin, and related packages.",
+            "relevance": "Shows tooling for generating public documentation, including revision-date support."
+          },
+          {
+            "label": "Documentation CI",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/docs.yml",
+            "quote_or_finding": "Docs CI builds documentation with mkdocs build --strict and runs spelling checks on pull requests affecting documentation files.",
+            "relevance": "Supports quality control for public documentation."
+          },
+          {
+            "label": "Configuration snippets documentation",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/configtables/snippets/README.md",
+            "quote_or_finding": "Snippet README explains that YAML snippets are extracted from config.default.yaml so documentation pages stay in sync with the actual config file.",
+            "relevance": "Shows an effort to keep explanatory materials aligned with model configuration."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 62,
+        "score_derivation": "There is moderate-to-strong evidence of linkage across some parts of the chain: CITATION.cff links a named paper, DOI, repository, version, and release date; the README links the model to documentation, publications, data/status resources, and community channels; workflows link tests to lock files, logs, objective values, and reference objective CSVs; and documentation snippets are explicitly derived from config.default.yaml. These are meaningful traceability links. However, the supplied evidence does not provide a complete explicit chain from a specific environmental claim to exact input datasets, input versions, preprocessing transformations, code commit or release, model configuration, workflow run, outputs, review record, and publication text. The data-source linkage is especially incomplete, and CI/test linkage does not necessarily correspond to the published claims. The score is therefore above moderate but below the high range required for an explicit, versioned, externally verifiable end-to-end evidence chain.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Several linkage artifacts are present, but the evidence bundle lacks the end-to-end claim-to-data-to-code-to-run-to-publication mapping required for high open linkage.",
+        "references": [
+          {
+            "label": "CITATION release-to-paper linkage",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/CITATION.cff",
+            "quote_or_finding": "CITATION.cff links the repository code to the Applied Energy paper DOI, software version 1.0.0, and release date 2023-04-18.",
+            "relevance": "Provides a specific link between publication, repository, and software version."
+          },
+          {
+            "label": "README links to publications and documentation",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/README.md",
+            "quote_or_finding": "README links to ReadTheDocs, DOI publications, PyPSA-Earth-Status, Google Drive, Discord, and the project repository context.",
+            "relevance": "Shows public cross-linking among communication, documentation, community, and supporting resources."
+          },
+          {
+            "label": "Test workflow linkage from run logs to objectives",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/test.yml",
+            "quote_or_finding": "The test workflow extracts objective function values from solver log files and compares or reports them with reference objective values.",
+            "relevance": "Links execution artifacts, logs, and numerical outputs for reproducibility testing."
+          },
+          {
+            "label": "Reference objective utility",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/test/utils/extract_ref_objective.py",
+            "quote_or_finding": "extract_obj_for_path maps a run folder and log file to an objective value in test/utils/obj_ref.csv.",
+            "relevance": "Provides a concrete linkage mechanism between model-run artifacts and reference outputs."
+          },
+          {
+            "label": "Config snippet synchronization",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/doc/configtables/snippets/README.md",
+            "quote_or_finding": "Documentation snippets are extracted from config.default.yaml and version-controlled to keep configuration examples synchronized with the actual config file.",
+            "relevance": "Links documentation to configuration artifacts, improving traceability of methods communication."
+          },
+          {
+            "label": "Environment lock workflow",
+            "url": "https://raw.githubusercontent.com/pypsa-meets-earth/pypsa-earth/main/.github/workflows/update-locked-env.yml",
+            "quote_or_finding": "Workflow generates platform-specific lock files from envs/environment.yaml and creates pull requests for updates.",
+            "relevance": "Links dependency specifications to versioned reproducible environments, though not directly to a specific published claim."
+          }
+        ]
+      }
+    ],
+    "total_score": 72,
+    "total_score_derivation": "Computed locally as round(mean([56, 86, 78, 73, 79, 62])) = 72.",
+    "single_paragraph_summary": "PyPSA-Earth shows strong open-source and reproducibility infrastructure: it is a public, version-controlled energy-system modelling repository with AGPL/CC SPDX licensing statements, citation metadata linking a software release to DOI publications, documented dependencies, Docker and conda-lock environments, multi-platform CI testing, objective-value regression checks, documentation builds, and visible contribution/community channels. Its weakest traceability area in the supplied evidence is open input-data evidence: the README states that data are automatically retrieved from open sources, but the bundle does not include the actual source catalogue, dataset provenance, licences, measurement methods, uncertainty, quality controls, or versioned input-data artifacts. Overall, the project is highly open as software and moderately-to-strongly traceable as a modelling workflow, but the supplied materials do not establish a complete end-to-end, claim-specific linkage from exact data inputs through code version, configuration, run outputs, review record, and publication.",
+    "limitations": [
+      "The assessment used only the supplied evidence bundle; it did not inspect repository files, documentation pages, issues, pull requests, releases, data bundles, or publications beyond the provided excerpts.",
+      "The actual data-source catalogue, configs/bundle_config.yaml, dataset metadata, licences, provenance, primary-data links, transformations, uncertainty estimates, and quality-control procedures were not supplied.",
+      "The evidence does not include exact workflow runs, scenario configurations, input-data versions, archived outputs, or computational notebooks corresponding to the cited Applied Energy claims.",
+      "The full LICENSE file was not supplied, and GitHub metadata in the bundle reports license as null despite SPDX and README/CITATION licence statements.",
+      "Issue and pull-request contents, governance records, correction notices, peer-review reports, and replication attempts were not included, limiting assessment of community review depth.",
+      "The full ReadTheDocs documentation and full publication accessibility/licensing terms were not supplied, so publication and communication scoring relies on repository references rather than complete inspection.",
+      "Some evidence artifacts are truncated, especially README.md and test.yml, which may omit relevant details. The scoring therefore remains conservative where direct evidence is incomplete."
+    ],
+    "model_name": "gpt-5.5"
+  }
+]

@@ -1,0 +1,860 @@
+[
+  {
+    "run_number": 1,
+    "project_name": "Climate TRACE",
+    "project_url": "https://climatetrace.org/",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 48,
+        "score_derivation": "The homepage provides moderate public evidence that Climate TRACE exposes large-scale emissions data as open data, including 744,678,997 emitting assets / 745 million sources, 10+ years of data from 2015–2025, monthly data from 2021, and coverage of greenhouse gases and air pollutants. It also gives some high-level indication of input/measurement approaches, stating that the project uses satellites, other remote sensing techniques, and AI. The score is not lower because the public-facing claim clearly identifies the existence, scope, and broad measurement basis of an open emissions dataset. The score is not higher because the supplied evidence does not include inspectable dataset files, metadata records, licenses, measurement protocols, uncertainty estimates, quality controls, source-specific provenance, transformations, or traceability from secondary estimates back to primary measurements.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage gives substantial high-level data-scope claims, but the evidence bundle does not include the actual open data portal, metadata, or documentation needed to verify stronger traceability.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage data-scope statement",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states: “Open Data” and “Track Global Emissions from 745 million sources of greenhouse gases and air pollutants worldwide,” with “744,678,997 emitting assets” and data for “10+ years” with monthly data from 2021.",
+            "relevance": "Supports the existence and public communication of a large open input/output data resource, including temporal and asset-level scope."
+          },
+          {
+            "label": "Climate TRACE homepage measurement approach",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE uses “satellites, other remote sensing techniques, and artificial intelligence” to track greenhouse gas emissions.",
+            "relevance": "Provides limited evidence about measurement or estimation sources and methods, though not enough for full verification."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 18,
+        "score_derivation": "The supplied evidence contains only a high-level methods description: Climate TRACE uses satellites, remote sensing, and artificial intelligence. It also states that the coalition includes universities, scientists, and AI experts. However, there is no evidence in the bundle of open-source repositories, model code, method specifications, software licenses, dependency lists, configuration files, infrastructure code, or documentation sufficient to inspect and run the analytical software. The score is above zero because the project publicly identifies broad methodological categories, but it remains low because open-source model and software traceability is not demonstrated by the supplied evidence.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence bundle is limited to homepage text and may omit repositories or documentation elsewhere, but they are not provided here.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage method summary",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states: “We use satellites, other remote sensing techniques, and artificial intelligence” to provide global emissions tracking.",
+            "relevance": "Shows only a broad public description of methods, not inspectable software or model implementation."
+          },
+          {
+            "label": "Climate TRACE homepage coalition statement",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE is “built by a global not-for-profit coalition of over 100 universities, scientists, and AI experts.”",
+            "relevance": "Suggests technical expertise and collaborative development, but does not establish open-source code, licensing, or reusable model artifacts."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 22,
+        "score_derivation": "There is limited evidence of execution traceability. The homepage reports ongoing data releases, including “May release 5.7.0” with monthly emissions data through March 2026, and describes a time series with monthly data. This indicates some public version or release cadence for outputs. The score is not lower because a named release and data update cycle provide a minimal reproducibility anchor. The score is not higher because the evidence bundle does not include workflow scripts, run manifests, parameters, computational environments, notebooks, containers, logs, checksums, or specific run records connecting input observations to reported emissions outputs.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage mentions releases but does not expose the computational execution chain needed for external reproduction.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage release note",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page lists: “Climate TRACE Releases March 2026 Emissions Data” and says “May release 5.7.0 includes monthly emissions data through March 2026.”",
+            "relevance": "Provides evidence of a named data release and update history, which is relevant to execution traceability but insufficient for reproducibility."
+          },
+          {
+            "label": "Climate TRACE homepage temporal coverage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states users can “Follow 10+ years of data (2015-2025) with monthly data available from 2021.”",
+            "relevance": "Shows recurring structured outputs, but not the executable workflows that generated them."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 47,
+        "score_derivation": "The homepage provides moderate but incomplete evidence of visible community and review processes. Positive evidence includes a global not-for-profit coalition of over 100 universities, scientists, and AI experts; an invitation for feedback through a survey and contact mechanisms; and a public item responding to a recent study from Northern Arizona University regarding city-level road transportation emissions. The score is not lower because public response to critique and open feedback channels indicate some scrutiny and correction process. The score is not higher because the supplied evidence does not include open issue trackers, peer-review materials, governance records, correction logs, public methodological debate records, replication attempts, or detailed responses to challenges beyond the headline-level mention.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "There is clear homepage evidence of public feedback and response to critique, but no detailed review record is included in the bundle.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage response to critique",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The news section includes: “Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy,” described as a response to a study from Northern Arizona University regarding city-level road transportation emissions.",
+            "relevance": "Shows that Climate TRACE publicly responds to external criticism or validation challenges."
+          },
+          {
+            "label": "Climate TRACE homepage community and feedback statements",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says the project is built by “a global not-for-profit coalition of over 100 universities, scientists, and AI experts” and includes “We need your feedback. Fill out the survey!”",
+            "relevance": "Supports the presence of a community and public feedback channel, though not a full transparent review infrastructure."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 68,
+        "score_derivation": "The project has strong public-facing communication in the supplied evidence: the homepage clearly states the project purpose, the scale of the data, covered gases and pollutants, sector/subsector breakdowns, time coverage, a data-access call to action, explanatory “How it Works” text, and a News & Insights section with dated posts and release announcements. The score is not lower because the public output is accessible and communicates claims, scope, updates, and intended uses clearly. The score is not higher because the evidence bundle does not show detailed methodological publications, open licenses such as Creative Commons, formal citation of specific supporting artifacts, archived version history for publications, or full documentation of indicator definitions and update cycles beyond high-level statements.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The homepage directly demonstrates substantial public communication, while the missing elements are specific and identifiable.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage public claims and scope",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The homepage describes Climate TRACE as “Independent Greenhouse gas Emissions Tracking” and says it tracks emissions from 745 million sources across 10 sectors, 67 subsectors, 3 greenhouse gases, and 8 non-GHG air pollutants.",
+            "relevance": "Shows clear public communication of the project’s central environmental claims and scope."
+          },
+          {
+            "label": "Climate TRACE homepage news and release communication",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page includes a “News & Insights” section with dated items, including the March 2026 emissions data release and a 2026 study using Climate TRACE data on EU–India steel trade.",
+            "relevance": "Supports accessible ongoing publication and communication of updates, use cases, and releases."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 27,
+        "score_derivation": "The supplied evidence shows some weak linkage among public claims, data scope, releases, and communications: the homepage connects the emissions-tracking claim to open data, broad methods, data releases, news items, and feedback/critique. The score is not lower because users can at least see a high-level chain from public claim to data access, methodology summary, release announcements, and public communications. The score is not higher because the evidence bundle does not provide explicit, specific, versioned links from a particular environmental claim to exact datasets, source measurements, code versions, model configurations, workflow runs, review records, or publication artifacts. Open Linkage requires an externally verifiable evidence chain, and that chain is not demonstrated by the homepage text alone.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage contains high-level cross-links conceptually, but the evidence bundle lacks artifact-level linkage needed for strong traceability.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage combined claim-data-method communication",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page links the public claim of tracking greenhouse gas emissions to “Open Data,” data coverage statements, and a “How it Works” section describing satellites, remote sensing, and AI.",
+            "relevance": "Provides limited evidence of linkage between claims, data, and broad methods."
+          },
+          {
+            "label": "Climate TRACE homepage release and critique references",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page references a named data release, “May release 5.7.0,” and a public response to a Northern Arizona University study on city-level road transportation emissions.",
+            "relevance": "Shows some linkage to release and review-related communications, but not to exact reproducible artifacts."
+          }
+        ]
+      }
+    ],
+    "total_score": 38,
+    "total_score_derivation": "Computed locally as round(mean([48, 18, 22, 47, 68, 27])) = 38.",
+    "single_paragraph_summary": "Based only on the supplied homepage evidence, Climate TRACE shows substantial public communication and moderate input-data visibility: it presents itself as an open-data, global emissions-tracking platform covering hundreds of millions of sources/assets, multiple sectors, gases, pollutants, and monthly data releases, with high-level method claims involving satellites, remote sensing, and AI. However, the evidence bundle does not include the underlying datasets, metadata, licenses, uncertainty information, open-source code, model documentation, reproducible workflows, or artifact-level links needed to verify the full evidence chain. Public communication and some community response mechanisms are visible, including news posts, release announcements, feedback invitations, and a response to external critique, but explicit versioned linkage from claims to exact data, code, runs, reviews, and publications is not demonstrated in the supplied evidence.",
+    "limitations": [
+      "The evidence bundle contains only text extracted from the Climate TRACE homepage, not the actual open data portal, downloadable datasets, metadata, or API documentation.",
+      "No open-source repositories, software licenses, model cards, dependency files, or infrastructure documentation were supplied.",
+      "No workflow scripts, run manifests, computational environment specifications, notebooks, containers, or reproducibility instructions were supplied.",
+      "No primary measurement records, source-specific provenance, uncertainty estimates, quality-control procedures, or transformation documentation were supplied.",
+      "No detailed peer-review documents, public issue trackers, governance records, correction logs, or full critique-response records were supplied.",
+      "No explicit artifact-level linkage was supplied connecting a specific environmental claim to exact dataset versions, code versions, model configurations, workflow runs, review records, and publications."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 2,
+    "project_name": "Climate TRACE",
+    "project_url": "https://climatetrace.org/",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 52,
+        "score_derivation": "The evidence shows substantial public-facing emissions data coverage and an explicit “Open Data” claim, including hundreds of millions of assets, sectoral breakdowns, pollutants, years covered, and monthly data availability. It also identifies broad measurement inputs and techniques, including satellites, other remote sensing techniques, and AI. This supports a moderate score rather than a low one. However, the supplied evidence does not show the actual downloadable datasets, data license, primary-data provenance, quantified uncertainties, quality-control procedures, measurement protocols, transformations, or traceability from secondary estimates back to primary observations. A release version is mentioned, but the evidence does not establish dataset-level versioning or reproducible data provenance. Therefore the score is not higher.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage indicates open data and extensive coverage, but the evidence bundle does not include the actual data portal, metadata, licenses, uncertainty documentation, or data provenance records.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage data coverage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states it is “Loading data from 2,765,771 emissions sources summarized from 744,678,997 assets” and lets users “Examine 744,678,997 emitting assets individually or aggregated by city, state, country, etc.”",
+            "relevance": "Shows identifiable public emissions data coverage and aggregation levels relevant to input-data traceability."
+          },
+          {
+            "label": "Climate TRACE open data statement",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page includes “Open Data” and “Access Open Data,” and says data are provided “freely to the public.”",
+            "relevance": "Supports evidence that inputs or outputs are intended to be publicly reusable, though license and metadata details are not included in the bundle."
+          },
+          {
+            "label": "Climate TRACE measurement approach",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE uses “satellites, other remote sensing techniques, and artificial intelligence” to track greenhouse gas emissions.",
+            "relevance": "Provides a high-level indication of measurement and estimation sources, but not enough detail for full verification."
+          },
+          {
+            "label": "Climate TRACE temporal and pollutant coverage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states users can “Follow 10+ years of data (2015-2025) with monthly data available from 2021” and see “3 GHGs and 8 non-GHG air pollutants.”",
+            "relevance": "Shows documented scope of the dataset, including time coverage and variables."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 14,
+        "score_derivation": "The evidence gives only a broad methodological description: Climate TRACE uses satellites, remote sensing, artificial intelligence, and a global coalition. This is enough to show that methods exist at a conceptual level, so the score is above zero. However, the supplied evidence contains no public source-code repository, open-source license, model documentation, dependencies, software architecture, configuration files, infrastructure code, or independently operable software. It also does not show detailed methodological documentation sufficient to inspect the analytical logic. Because open-source models and software are central to this stage and are absent from the evidence bundle, the score remains low.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence bundle is limited to homepage text, so open-source artifacts may exist elsewhere, but they are not evidenced here.",
+        "references": [
+          {
+            "label": "High-level methods statement",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE uses “satellites, other remote sensing techniques, and artificial intelligence.”",
+            "relevance": "Shows only a high-level analytical approach, not inspectable code or model implementation."
+          },
+          {
+            "label": "Coalition description",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page describes Climate TRACE as “Built by a global not-for-profit coalition of over 100 universities, scientists, and AI experts.”",
+            "relevance": "Indicates technical expertise and collaboration, but does not provide open-source software evidence."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 16,
+        "score_derivation": "The evidence contains some signs of operational execution, including regular data releases, a named release version, monthly data availability, and public outputs through March 2026. This justifies a score above minimal. However, there is no evidence of workflow scripts, run manifests, parameters, computational environments, containers, notebooks, reproducibility instructions, execution logs, exact input-output mappings, or re-executable pipelines. The evidence does not allow an external actor to repeat or inspect the specific computations that produced the reported emissions data. Therefore reproducibility traceability is weak based on the supplied evidence.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Release-version and update evidence is present, but no workflow or execution artifacts are included in the evidence bundle.",
+        "references": [
+          {
+            "label": "Versioned data release news",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The homepage news item says “Climate TRACE Releases March 2026 Emissions Data” and “May release 5.7.0 includes monthly emissions data through March 2026.”",
+            "relevance": "Shows some evidence of versioned operational releases and update cadence, relevant to execution traceability."
+          },
+          {
+            "label": "Monthly data availability",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states users can “Follow 10+ years of data (2015-2025) with monthly data available from 2021.”",
+            "relevance": "Indicates repeated production of time-indexed outputs, but not reproducible execution details."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 44,
+        "score_derivation": "The evidence shows several public-facing community and review signals: a coalition of over 100 universities, scientists, and AI experts; an invitation for feedback via survey, contact, data contribution, funding, or joining teams; and a public response to a recent external study challenging city-level road transportation emissions accuracy. These support a moderate score because there is at least some visible scrutiny and response. The score is not higher because the evidence bundle does not include public issue trackers, open peer-review records, governance records, correction logs, replication records, detailed methodological discussions, or documented processes for handling challenges and corrections. Community engagement is visible, but the review trail is only partially inspectable from the supplied evidence.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage provides some evidence of public feedback and response to critique, but not the underlying review or governance records.",
+        "references": [
+          {
+            "label": "Coalition participation",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "Climate TRACE is described as “Built by a global not-for-profit coalition of over 100 universities, scientists, and AI experts.”",
+            "relevance": "Shows a broad expert community involved in producing the evidence base."
+          },
+          {
+            "label": "Public feedback channels",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says “We need your feedback. Fill out the survey!” and invites people to get involved by “contributing data,” “helping to fund,” or “joining one of our teams.”",
+            "relevance": "Shows public channels for engagement, though not a transparent issue or review system."
+          },
+          {
+            "label": "Response to external critique",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "A news item is titled “Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy” and says Climate TRACE responds to a recent NAU study regarding city-level road transportation emissions.",
+            "relevance": "Shows public response to challenge or critique, an important element of review traceability."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 66,
+        "score_derivation": "The project has strong public communication evidence: an accessible public website, clear headline claims about tracking global greenhouse gas emissions, dashboard-like access to open data, documented scale and scope, news and insights, release announcements, and explanatory text about how the system works. This supports a relatively strong score. It is not higher because the evidence bundle does not show formal publications, complete methodological reports, open publication licenses such as Creative Commons, citations to exact supporting artifacts, detailed indicator definitions, archived version history, or the content of the underlying news articles. The homepage communicates claims and data availability well, but publication traceability remains incomplete based on the supplied evidence.",
+        "uncertainty": "low",
+        "uncertainty_reason": "The supplied homepage text directly evidences extensive public communication, while also clearly lacking detailed publication licensing and artifact citation evidence.",
+        "references": [
+          {
+            "label": "Public project description",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The site headline describes Climate TRACE as “Independent Greenhouse gas Emissions Tracking” and “Comprehensive Emissions Insight.”",
+            "relevance": "Shows a clear public-facing environmental claim and project purpose."
+          },
+          {
+            "label": "Communication of data scope",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page communicates that users can track emissions from “745 million sources,” group emissions by “10 industrial sectors” and “67 sub-sectors,” and inspect data by city, state, or country.",
+            "relevance": "Shows explanatory material that helps users understand scope and outputs."
+          },
+          {
+            "label": "News and insights section",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The homepage lists news items including a 2026 CBAM steel-trade study, a March 2026 emissions data release, and a response to a NAU study.",
+            "relevance": "Shows ongoing public communication about findings, updates, and critiques."
+          },
+          {
+            "label": "Open data access communication",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page includes calls to “Access Open Data” and says Climate TRACE provides data “freely to the public.”",
+            "relevance": "Supports accessibility of public outputs, although licensing and artifact details are not shown."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 24,
+        "score_derivation": "There is limited but real linkage evidence: the public website connects broad environmental claims to open data access, asset counts, sectors, time coverage, pollutants, high-level measurement methods, versioned release news, and public communications. This keeps the score above the lowest range. However, the core requirement for this stage is explicit, specific, versioned, externally verifiable links among exact claims, datasets, code versions, model configurations, workflow runs, review records, and publications. The supplied evidence does not show exact dataset identifiers, persistent links to specific data snapshots, code commits, model configurations, execution records, uncertainty records, peer-review artifacts, or claim-to-evidence provenance. As a result, openness exists at a high level, but the end-to-end evidence chain is not inspectable from the bundle.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage indicates some connected artifacts and releases, but the supplied evidence lacks the specific provenance links needed to assess full linkage.",
+        "references": [
+          {
+            "label": "Claim-to-data connection",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The homepage connects the claim of tracking global emissions with “Open Data,” “Access Open Data,” and asset-level emissions coverage.",
+            "relevance": "Shows general linkage between public claims and a data-access pathway."
+          },
+          {
+            "label": "Release linkage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The homepage news item states “May release 5.7.0 includes monthly emissions data through March 2026.”",
+            "relevance": "Provides some version and release linkage, though not a full provenance chain."
+          },
+          {
+            "label": "Methods-to-output connection",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE uses “satellites, other remote sensing techniques, and artificial intelligence” to deliver global emissions data.",
+            "relevance": "Links outputs to broad methods, but not to exact data sources, code, configurations, or runs."
+          }
+        ]
+      }
+    ],
+    "total_score": 36,
+    "total_score_derivation": "Computed locally as round(mean([52, 14, 16, 44, 66, 24])) = 36.",
+    "single_paragraph_summary": "Based only on the supplied homepage evidence, Climate TRACE shows meaningful public openness around its emissions data products, especially in communication, stated open-data access, broad coverage, release cadence, and public engagement. The strongest evidence is for public communication and partial input-data traceability: the site describes hundreds of millions of emitting assets, sector and pollutant coverage, temporal coverage, open access, and high-level use of satellites, remote sensing, and AI. However, the evidence bundle does not include actual datasets, licenses, uncertainty documentation, primary-data provenance, source code, model specifications, reproducible workflows, run records, or explicit claim-to-artifact provenance. Review evidence is also partial: the project has a large expert coalition, public feedback channels, and a visible response to an external critique, but no inspectable review or correction infrastructure is shown. Overall, Climate TRACE appears publicly communicative and data-oriented, but the supplied evidence supports only limited end-to-end open traceability.",
+    "limitations": [
+      "The assessment is based only on the supplied evidence bundle, which contains homepage text extraction and not the actual open data portal, data files, documentation, or metadata.",
+      "No source-code repositories, open-source licenses, model documentation, dependencies, or software infrastructure evidence were supplied.",
+      "No workflow scripts, computational environments, run logs, parameters, notebooks, containers, or reproducibility instructions were supplied.",
+      "No detailed data provenance, primary measurement records, uncertainty estimates, quality-control procedures, or transformation documentation were supplied.",
+      "The evidence mentions a release version but does not provide persistent dataset identifiers, archived snapshots, checksums, or exact claim-to-version mappings.",
+      "No formal peer-review records, public issue tracker, governance documents, correction log, or detailed community review process were supplied.",
+      "News items are referenced in the homepage text, but the underlying article contents were not included in the evidence bundle."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 3,
+    "project_name": "Climate TRACE",
+    "project_url": "https://climatetrace.org/",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 48,
+        "score_derivation": "The homepage provides moderate evidence that input/output emissions data are publicly available and relatively detailed: it claims “Open Data,” describes 744,678,997 emitting assets, 10 industrial sectors and 67 sub-sectors, monthly data from 2021, annual coverage from 2015-2025, and multiple greenhouse gases and air pollutants. This supports a score well above minimal because the data products appear identifiable, public-facing, and regularly updated. However, the supplied evidence does not include actual dataset files, data dictionaries, licenses, primary measurement records, uncertainty estimates, quality-control procedures, transformations, or traceability from secondary emissions estimates back to primary observations such as satellite or facility measurements. The score is therefore not higher because the evidence shows public availability at a high level but not externally verifiable input-data provenance or reusable, versioned measurement evidence.",
+        "uncertainty": "high",
+        "uncertainty_reason": "Only homepage text was supplied, so the assessment cannot inspect the actual open-data portal, metadata, licensing, uncertainty fields, or primary-data provenance.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage open-data and data-scale claims",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states “Open Data,” “Track Global Emissions from 745 million sources,” and “Examine 744,678,997 emitting assets individually or aggregated by city, state, country, etc.”",
+            "relevance": "Shows public-facing emissions data availability and identifiable scale of the data product."
+          },
+          {
+            "label": "Climate TRACE homepage temporal and pollutant coverage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states users can “Follow 10+ years of data (2015-2025) with monthly data available from 2021” and see impacts of “3 GHGs and 8 non-GHG air pollutants.”",
+            "relevance": "Supports evidence of documented coverage dimensions, but not detailed measurement provenance or uncertainty."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 18,
+        "score_derivation": "The supplied evidence gives only a high-level methodological description: Climate TRACE says it uses satellites, remote sensing techniques, and artificial intelligence to track emissions. That is some evidence that analytical methods exist and are technology-based, so the score is not zero. However, there is no supplied evidence of open-source code, model repositories, dependency files, model documentation, configuration, open-source licensing, version control, or independently operable infrastructure. Because the definition emphasizes inspectable code, models, dependencies, documentation, and licensing, the absence of these artifacts in the evidence bundle keeps the score low.",
+        "uncertainty": "high",
+        "uncertainty_reason": "The evidence bundle contains no repository, software documentation, model card, dependency manifest, or license evidence, so the score is based only on a homepage summary.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage method summary",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE uses “satellites, other remote sensing techniques, and artificial intelligence” to deliver detailed global emissions information.",
+            "relevance": "Provides limited evidence of methods, but not open-source models, software, dependencies, or licensing."
+          },
+          {
+            "label": "Climate TRACE homepage coalition description",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE is “Built by a global not-for-profit coalition of over 100 universities, scientists, and AI experts.”",
+            "relevance": "Indicates expert development capacity, but does not establish open-source software traceability."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 22,
+        "score_derivation": "There is limited evidence of execution traceability through release and update information: the homepage references a “May release 5.7.0” and monthly emissions data through March 2026, suggesting a maintained data pipeline with identifiable releases. The page also indicates data are loaded from many emissions sources and assets. However, the supplied evidence does not provide workflows, scripts, parameters, computational environments, run logs, exact input-output mappings, containers, notebooks, or instructions that would allow an external actor to reproduce the calculations. The score is therefore low-to-partial: higher than zero because versioned release language and update cadence are visible, but far below strong reproducibility because the specific execution path from inputs to reported outputs is not inspectable in the bundle.",
+        "uncertainty": "high",
+        "uncertainty_reason": "No workflow, run record, computational environment, or reproduction instructions were supplied.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage release note",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The news section states: “Climate TRACE Releases March 2026 Emissions Data” and “May release 5.7.0 includes monthly emissions data through March 2026.”",
+            "relevance": "Shows some version/update information relevant to execution traceability, but not reproducible workflows."
+          },
+          {
+            "label": "Climate TRACE homepage data-loading statement",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says it is “Loading data from 2,765,771 emissions sources summarized from 744,678,997 assets.”",
+            "relevance": "Indicates a data-processing pipeline exists, but gives no reproducible execution details."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 43,
+        "score_derivation": "The homepage provides moderate but incomplete evidence of community and review processes. It describes Climate TRACE as a global not-for-profit coalition of over 100 universities, scientists, and AI experts, invites users to contribute data or join teams, asks for feedback through a survey, and includes a news item responding to a recent external study from Northern Arizona University about city-level road transportation accuracy. These are meaningful signs of public engagement and responsiveness to critique, so the score is not low. However, the evidence bundle does not include public issue trackers, peer-review records, correction logs, governance minutes, open methodological discussions, or detailed documentation of how feedback and challenges are resolved. Therefore, the score remains in the moderate range rather than strong.",
+        "uncertainty": "high",
+        "uncertainty_reason": "The homepage suggests engagement and response to critique, but no underlying review records or public discussion archives were supplied.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage response to external critique",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The news section lists “Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy” and says Climate TRACE responds to a recent study from Northern Arizona University regarding city-level road transportation emissions.",
+            "relevance": "Shows some visible response to external scrutiny, relevant to review traceability."
+          },
+          {
+            "label": "Climate TRACE homepage participation and feedback invitations",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states “We need your feedback. Fill out the survey!” and says users can get involved by “contributing data,” funding the mission, or joining teams.",
+            "relevance": "Evidence of public/community channels, though not a transparent issue or correction process."
+          },
+          {
+            "label": "Climate TRACE homepage coalition description",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states Climate TRACE is “Built by a global not-for-profit coalition of over 100 universities, scientists, and AI experts.”",
+            "relevance": "Supports evidence of broad expert participation, but not necessarily open review records."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 61,
+        "score_derivation": "The homepage is openly accessible and communicates the core environmental claim clearly: Climate TRACE tracks global greenhouse-gas emissions and air pollutants from hundreds of millions of sources, provides open data, and offers aggregation by geography and sector. It includes explanatory sections such as “How it Works,” “Measure Global Emissions,” “Reduce Your Footprint,” and a news/insights feed with dated updates, including release announcements and studies using Climate TRACE data. This supports a relatively strong score. The score is not higher because the supplied evidence does not include full reports, formal methodological publications, citation lists, explicit open publication licenses such as Creative Commons, detailed indicator definitions, dashboard version history beyond one release note, or complete source/method citations within the homepage text.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The supplied homepage text provides direct evidence of public communication, but not enough to inspect full publication licensing, citations, or detailed documentation.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage public communication of claim",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states “Track Global Emissions from 745 million sources of greenhouse gases and air pollutants worldwide” and describes Climate TRACE as providing data freely to the public.",
+            "relevance": "Shows an accessible public output with a clear emissions-tracking claim."
+          },
+          {
+            "label": "Climate TRACE homepage news and update communication",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The news section includes dated items such as “May 28, 2026 Climate TRACE Releases March 2026 Emissions Data” and “Jun 08, 2026 Early signs that the EU carbon border adjustment mechanism is reshaping EU–India steel trade.”",
+            "relevance": "Shows ongoing public communication and dated outputs using or announcing Climate TRACE data."
+          },
+          {
+            "label": "Climate TRACE homepage explanatory sections",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page includes sections titled “How it Works,” “Measure Global Emissions,” and “Reduce Your Footprint.”",
+            "relevance": "Supports public explanation of purpose and high-level methods, though not detailed enough for full traceability."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 26,
+        "score_derivation": "There is some evidence of linkage between the public claim and broad supporting artifacts: the homepage links the emissions-tracking claim to open data, stated asset/source counts, sector and temporal coverage, a release version, and news items. This supports a score above minimal. However, the evidence bundle does not show explicit, specific, versioned links from individual claims to exact datasets, code versions, model configurations, workflow runs, primary measurement sources, review records, or publications. The definition treats linkage as critical; openness without exact connections is insufficient. Because the supplied evidence mostly contains general public statements rather than a verifiable claim-to-evidence chain, the score remains low-partial.",
+        "uncertainty": "high",
+        "uncertainty_reason": "The evidence bundle lacks claim-specific provenance links, dataset identifiers, code hashes, workflow run IDs, and review/publication links.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage linkage to data product scale and coverage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page connects its emissions-tracking claim to “Open Data,” 744,678,997 emitting assets, 10 sectors, 67 sub-sectors, 2015-2025 coverage, and monthly data from 2021.",
+            "relevance": "Provides broad linkage between public claims and described data products, but not exact datasets or versions."
+          },
+          {
+            "label": "Climate TRACE homepage release version reference",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The news section states “May release 5.7.0 includes monthly emissions data through March 2026.”",
+            "relevance": "Shows some versioned linkage to a release, but not to exact code, inputs, model settings, or run records."
+          },
+          {
+            "label": "Climate TRACE homepage method-to-claim summary",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE uses “satellites, other remote sensing techniques, and artificial intelligence” to track greenhouse-gas emissions.",
+            "relevance": "Links the public claim to broad method categories, but not to specific inspectable methods or evidence chains."
+          }
+        ]
+      }
+    ],
+    "total_score": 36,
+    "total_score_derivation": "Computed locally as round(mean([48, 18, 22, 43, 61, 26])) = 36.",
+    "single_paragraph_summary": "Based only on the supplied homepage extraction, Climate TRACE shows meaningful public-facing openness: it claims open data, very large asset-level emissions coverage, monthly updates, public news/release communication, and some responsiveness to critique. The strongest areas are publication/communication and input-data visibility at a high level. However, the bundle does not provide the underlying datasets, licenses, metadata, uncertainty estimates, primary measurement provenance, open-source code, model documentation, workflows, reproducible execution environments, public issue/review records, or exact claim-to-evidence links. As a result, the assessment finds moderate public traceability for the existence and communication of the emissions data product, but only partial-to-low traceability for methods, reproducibility, and explicit linkage across the full evidence chain.",
+    "limitations": [
+      "The evidence bundle contains only homepage text extraction; no actual open-data portal contents, downloadable files, API documentation, metadata, or licenses were supplied.",
+      "No code repositories, model documentation, dependency manifests, software licenses, or infrastructure documentation were included.",
+      "No reproducible workflow artifacts, workflow run logs, notebooks, containers, parameters, or computational environment specifications were provided.",
+      "No public issue tracker, peer-review reports, correction logs, governance records, or detailed community discussion archives were supplied.",
+      "The assessment could not verify whether “Access Open Data,” news links, surveys, or reports on the live site provide additional traceability because only the supplied evidence bundle was used.",
+      "Scores are conservative where direct evidence is absent, even if such evidence may exist elsewhere on the Climate TRACE website or related repositories."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 4,
+    "project_name": "Climate TRACE",
+    "project_url": "https://climatetrace.org/",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 55,
+        "score_derivation": "The homepage provides moderate public evidence that Climate TRACE publishes input-like emissions data openly and at large scale: it states that users can access open data covering hundreds of millions of emitting assets, multiple sectors, pollutants, and years, with monthly data from 2021. It also gives some high-level provenance by saying the system uses satellites, other remote sensing techniques, and AI. The score is not lower because the public page clearly identifies the broad data scope, temporal coverage, aggregation levels, and open-data intent. It is not higher because the supplied evidence does not include direct dataset files, metadata, measurement protocols, primary-data lineage, uncertainty estimates, quality-control documentation, transformations, or licensing terms for reuse.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence bundle contains only homepage text, which shows substantial data-publication claims but not the underlying data documentation or metadata.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage open data statement",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says: “Open Data” and “Examine 744,678,997 emitting assets individually or aggregated by city, state, country, etc.”",
+            "relevance": "Supports the existence of publicly accessible emissions data and identifiable asset-level or aggregated inputs."
+          },
+          {
+            "label": "Climate TRACE homepage data coverage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says users can “Group emissions by 10 industrial sectors broken into 67 sub-sectors,” “Follow 10+ years of data (2015-2025) with monthly data available from 2021,” and see “3 GHGs and 8 non-GHG air pollutants.”",
+            "relevance": "Shows documented scope, time coverage, sector structure, and pollutant coverage for the data."
+          },
+          {
+            "label": "Climate TRACE homepage measurement approach",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE uses “satellites, other remote sensing techniques, and artificial intelligence” to track emissions.",
+            "relevance": "Provides high-level information about measurement and estimation sources, though not detailed enough for full verification."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 24,
+        "score_derivation": "The evidence gives only limited information about analytical methods: Climate TRACE says it uses satellites, remote sensing, and artificial intelligence, and that it is built by a coalition of universities, scientists, and AI experts. However, the bundle provides no evidence of open-source code repositories, model documentation, dependencies, configuration files, licenses, infrastructure software, or inspectable model implementations. The score is above the minimum because there is at least a high-level methodological description, but it remains low because the analytical logic and software are not externally inspectable from the supplied evidence.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage may not be the place where code or methods are documented, but no such supporting artifacts are included in the evidence bundle.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage method summary",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE uses “satellites, other remote sensing techniques, and artificial intelligence.”",
+            "relevance": "Shows a general class of models and methods, but not open-source implementation details."
+          },
+          {
+            "label": "Climate TRACE homepage coalition description",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page describes Climate TRACE as “Built by a global not-for-profit coalition of over 100 universities, scientists, and AI experts.”",
+            "relevance": "Suggests technical and scientific contributors, but does not establish open-source software, licenses, or reproducible model code."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 28,
+        "score_derivation": "There is some evidence of operational execution and update traceability: the homepage reports a named release, “May release 5.7.0,” with monthly emissions data through March 2026, and it describes current data loading from hundreds of millions of assets. This indicates a versioned or release-based data product and recurring updates. The score is not lower because versioned releases and monthly data availability are relevant to execution traceability. It is not higher because the supplied evidence includes no workflows, scripts, parameter files, computational environment specifications, run logs, provenance manifests, or instructions that would let an external actor reproduce the path from inputs to outputs.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The evidence demonstrates release/update activity but lacks the detailed execution artifacts needed to assess reproducibility.",
+        "references": [
+          {
+            "label": "Climate TRACE homepage release note",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The news item says: “Climate TRACE Releases March 2026 Emissions Data” and “May release 5.7.0 includes monthly emissions data through March 2026.”",
+            "relevance": "Supports some versioning and update-cycle evidence for outputs."
+          },
+          {
+            "label": "Climate TRACE homepage live data scale",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says it is “Loading data from 2,765,771 emissions sources summarized from 744,678,997 assets.”",
+            "relevance": "Shows that the public product is generated from a large data-processing pipeline, though the pipeline itself is not documented in the evidence."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 52,
+        "score_derivation": "The evidence shows a reasonably visible community and some public response mechanisms: Climate TRACE is described as a global not-for-profit coalition of over 100 universities, scientists, and AI experts; the site invites feedback through a survey, contact, data contributions, funding, or joining teams; and a news item explicitly says Climate TRACE responded to a recent external study on city-level road-transportation accuracy. These are meaningful indicators of review and scrutiny. The score is not lower because the supplied evidence includes both community participation and a public correction/response context. It is not higher because there is no included public issue tracker, open peer-review record, governance archive, methodological discussion forum, correction log, replication archive, or detailed record of how criticism is handled.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage gives clear signs of community engagement and public response, but not enough process documentation to verify robust open review.",
+        "references": [
+          {
+            "label": "Climate TRACE coalition description",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE is “Built by a global not-for-profit coalition of over 100 universities, scientists, and AI experts.”",
+            "relevance": "Supports evidence of a broad expert community behind the project."
+          },
+          {
+            "label": "Climate TRACE feedback and participation invitation",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says: “We need your feedback. Fill out the survey!” and “You can get involved with Climate TRACE by contributing data, helping to fund our mission, or joining one of our teams.”",
+            "relevance": "Shows channels for feedback and participation, though not a transparent review record."
+          },
+          {
+            "label": "Climate TRACE public response to study",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "A news item is titled “Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy” and says Climate TRACE responds to a recent study from Northern Arizona University researchers.",
+            "relevance": "Evidence that public criticism or external research can trigger a visible response."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 68,
+        "score_derivation": "The homepage is openly accessible and communicates the project’s environmental claims, data scope, use cases, update news, and public-facing explanations. It clearly states that Climate TRACE tracks global emissions and pollutants, supports emissions-reduction estimates, publishes news and insights, and provides open data. The score is fairly high because the public communication is understandable and includes current release information and explanatory material. It is not higher because the supplied evidence does not show formal reports or papers with detailed citations to supporting artifacts, publication licenses such as Creative Commons, full methodology documentation, archived version history, or review status for communications and dashboards.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage is strong public communication evidence, but the bundle does not include the deeper reports, documentation pages, or licenses that may exist elsewhere.",
+        "references": [
+          {
+            "label": "Climate TRACE public claim and purpose",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page describes “Independent Greenhouse gas Emissions Tracking” and says Climate TRACE helps users “Track Global Emissions from 745 million sources of greenhouse gases and air pollutants worldwide.”",
+            "relevance": "Shows clear public communication of the project’s core environmental claim."
+          },
+          {
+            "label": "Climate TRACE explanatory materials",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page includes sections such as “How it Works,” “Measure Global Emissions,” “Reduce Your Footprint,” and “News & Insights.”",
+            "relevance": "Supports accessibility and explanatory communication for public scrutiny."
+          },
+          {
+            "label": "Climate TRACE update communication",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The homepage lists news items including “Climate TRACE Releases March 2026 Emissions Data” and “Early signs that the EU carbon border adjustment mechanism is reshaping EU–India steel trade.”",
+            "relevance": "Shows active public communication of releases and applications of the data."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 36,
+        "score_derivation": "The evidence provides some broad linkage between the public claims, the open data product, data coverage, release timing, and general methods: the homepage connects emissions-tracking claims to asset-scale data, sectors, pollutants, years, satellite/remote-sensing/AI methods, and a named release. The score is not lower because these elements provide a visible high-level evidence chain from claim to data product. It is not higher because the supplied evidence does not link specific environmental claims to exact dataset versions, source measurements, code versions, model configurations, workflow runs, uncertainty records, review records, or archived publications. The chain is therefore inspectable only at a summary level, not at the explicit, versioned, externally verifiable level required for high open traceability.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "Only high-level homepage linkage is available; exact artifact-to-claim links may exist elsewhere but are not in the bundle.",
+        "references": [
+          {
+            "label": "Climate TRACE claim-to-data scale linkage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page links the claim to “Track Global Emissions from 745 million sources” with “Open Data” and asset-level examination of “744,678,997 emitting assets.”",
+            "relevance": "Provides a high-level link between the environmental claim and the public data product."
+          },
+          {
+            "label": "Climate TRACE claim-to-method linkage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE uses “satellites, other remote sensing techniques, and artificial intelligence” to deliver a detailed look at global emissions.",
+            "relevance": "Links the emissions-tracking claim to broad methodological categories."
+          },
+          {
+            "label": "Climate TRACE release linkage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states “May release 5.7.0 includes monthly emissions data through March 2026.”",
+            "relevance": "Shows some versioned release linkage between current outputs and their temporal coverage."
+          }
+        ]
+      }
+    ],
+    "total_score": 44,
+    "total_score_derivation": "Computed locally as round(mean([55, 24, 28, 52, 68, 36])) = 44.",
+    "single_paragraph_summary": "Based only on the supplied homepage evidence, Climate TRACE shows substantial public-facing openness around its emissions data product: it advertises open data at asset and aggregate levels, broad sector and pollutant coverage, monthly updates, a named release, clear public communications, and a large expert coalition with some feedback and response mechanisms. However, the evidence bundle does not include the deeper artifacts needed for high Open Traceability: primary-data provenance, metadata, uncertainty and quality-control records, explicit licenses, open-source code, model configurations, executable workflows, reproducibility instructions, review archives, or precise claim-to-artifact links. As a result, the project scores strongest on publication/communication and input-data visibility, moderately on community/review, and lower on software openness, reproducibility, and explicit linkage.",
+    "limitations": [
+      "The evidence bundle contains only text extracted from the Climate TRACE homepage; no linked open-data portal contents, downloadable datasets, documentation pages, methodology reports, repositories, licenses, or APIs were supplied.",
+      "Scores do not assess whether Climate TRACE’s emissions estimates are scientifically correct; they assess only the public traceability evidence provided.",
+      "Where the homepage mentions “Open Data,” the assessment cannot verify data format, license, metadata completeness, primary-data lineage, uncertainty quantification, or reuse conditions from the supplied evidence.",
+      "No direct evidence was supplied for open-source code, model implementations, dependencies, computational environments, workflow runs, or reproducibility instructions.",
+      "No detailed evidence was supplied for public peer review, issue tracking, governance records, correction logs, or systematic handling of external criticism beyond one visible response item.",
+      "The assessment cannot determine whether stronger linkage exists inside the Climate TRACE data portal or documentation because those artifacts were not included in the evidence bundle."
+    ],
+    "model_name": "gpt-5.5"
+  },
+  {
+    "run_number": 5,
+    "project_name": "Climate TRACE",
+    "project_url": "https://climatetrace.org/",
+    "stages": [
+      {
+        "stage": 1,
+        "stage_name": "Open Input Data and Measurement Evidence",
+        "score": 46,
+        "score_derivation": "The homepage provides moderate public evidence that Climate TRACE exposes input/output data at large scale: it describes 'Open Data,' hundreds of millions of emitting assets, 10+ years of data, monthly data, multiple gases and pollutants, and aggregation by geography and sector. It also gives high-level indications of measurement origins, including satellites, remote sensing, and AI. However, the supplied evidence does not include inspectable dataset files, data dictionaries, primary-data provenance, measurement protocols, quantified uncertainties, quality-control procedures, transformation records, or licensing terms. The score is therefore above minimal because public data scope and access are clearly claimed, but not higher because the evidence bundle does not demonstrate externally verifiable, versioned, reusable input-data traceability back to primary measurements.",
+        "uncertainty": "high",
+        "uncertainty_reason": "Only the homepage extraction is available, so potentially relevant data-download, methodology, and licensing pages are not evidenced in the bundle.",
+        "references": [
+          {
+            "label": "Homepage open-data and scope claims",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states 'Open Data' and says users can 'Examine 744,678,997 emitting assets individually or aggregated by city, state, country, etc.'",
+            "relevance": "Supports the existence of publicly accessible data and detailed asset-level emissions information."
+          },
+          {
+            "label": "Homepage temporal, sectoral, and pollutant coverage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE covers '10 industrial sectors broken into 67 sub-sectors,' '10+ years of data (2015-2025) with monthly data available from 2021,' and '3 GHGs and 8 non-GHG air pollutants.'",
+            "relevance": "Shows some documented scope and structure of the data, relevant to input-data identifiability."
+          },
+          {
+            "label": "Homepage measurement-method summary",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The 'How it Works' section says Climate TRACE uses 'satellites, other remote sensing techniques, and artificial intelligence' to track emissions.",
+            "relevance": "Provides only high-level evidence of measurement and estimation sources, while leaving primary data provenance, uncertainty, and QC undocumented in the supplied bundle."
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "stage_name": "Open-Source Models, Methods, and Software",
+        "score": 16,
+        "score_derivation": "The evidence shows that Climate TRACE uses analytical technology, specifically satellites, remote sensing, and artificial intelligence, and that it is built by a coalition including scientists and AI experts. However, the bundle contains no evidence of open-source repositories, inspectable model code, methods specifications, dependencies, configuration files, software licences, infrastructure documentation, or independently operable front ends. The score is not zero because the public page identifies broad methodological categories, but it remains low because open-source model and software traceability is not demonstrated.",
+        "uncertainty": "high",
+        "uncertainty_reason": "The supplied evidence does not include any methodology repository, documentation page, or software artefact that might exist outside the homepage.",
+        "references": [
+          {
+            "label": "Homepage method categories",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page states that Climate TRACE uses 'satellites, other remote sensing techniques, and artificial intelligence.'",
+            "relevance": "Shows the broad type of methods used, but not inspectable open-source models or software."
+          },
+          {
+            "label": "Homepage coalition description",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE is 'Built by a global not-for-profit coalition of over 100 universities, scientists, and AI experts.'",
+            "relevance": "Indicates technical capacity and institutional participation, but does not provide code, licences, or dependencies."
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "stage_name": "Open Execution and Reproducibility",
+        "score": 22,
+        "score_derivation": "There is limited evidence of operational execution traceability: the homepage references a specific release, 'May release 5.7.0,' and states that it includes monthly emissions data through March 2026. The page also gives current data-loading counts and time coverage, suggesting a maintained data pipeline. However, the supplied evidence does not include workflow scripts, run manifests, parameters, computational environments, containers, notebooks, provenance logs, archived outputs, or instructions that would allow an external actor to reproduce the path from inputs to reported emissions. The score is slightly above very low because release/version language and update coverage are visible, but it remains low because the actual execution chain is not inspectable or re-executable from the evidence bundle.",
+        "uncertainty": "high",
+        "uncertainty_reason": "The homepage gives only release-level signals, with no run-level reproducibility artefacts in the supplied evidence.",
+        "references": [
+          {
+            "label": "Homepage release note",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "A news item states: 'Climate TRACE Releases March 2026 Emissions Data' and 'May release 5.7.0 includes monthly emissions data through March 2026.'",
+            "relevance": "Provides evidence of a versioned public release and update cycle, relevant but insufficient for reproducible execution."
+          },
+          {
+            "label": "Homepage data loading statement",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says it is 'Loading data from 2,765,771 emissions sources summarized from 744,678,997 assets.'",
+            "relevance": "Suggests an active computational data product, but not the workflow, parameters, or environment used to produce it."
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "stage_name": "Open Community and Review",
+        "score": 43,
+        "score_derivation": "The evidence indicates some public review and feedback mechanisms: Climate TRACE describes itself as a coalition of over 100 universities, scientists, and AI experts; invites feedback through a survey and contact; and publicly notes a response to a recent study challenging city-level road transportation emissions accuracy. These are meaningful signs that critique and correction may be visible. However, the bundle does not include public issue trackers, governance records, peer-review files, methodological discussion threads, correction logs, response details, replication records, or community forum archives. The score is moderate-low rather than low because there is evidence of public response to criticism and an expert coalition, but it is not higher because the review process itself is not inspectable in the supplied evidence.",
+        "uncertainty": "high",
+        "uncertainty_reason": "The evidence bundle references review-related activity but does not include the underlying response, review records, or discussion channels.",
+        "references": [
+          {
+            "label": "Homepage public response to critique",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "A news item is titled 'Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy' and says Climate TRACE responds to a recent study from Northern Arizona University regarding city-level road transportation emissions.",
+            "relevance": "Shows at least one public interaction with external critique, relevant to review traceability."
+          },
+          {
+            "label": "Homepage coalition description",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says Climate TRACE is built by 'a global not-for-profit coalition of over 100 universities, scientists, and AI experts.'",
+            "relevance": "Indicates a potentially broad expert community, though not a transparent review record by itself."
+          },
+          {
+            "label": "Homepage feedback invitation",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page says 'We need your feedback. Fill out the survey!' and invites users to contact Climate TRACE to contribute data, fund the mission, or join teams.",
+            "relevance": "Shows public feedback/contact pathways, but not an inspectable issue-tracking or correction process."
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "stage_name": "Open Publications and Communication",
+        "score": 64,
+        "score_derivation": "The homepage is publicly accessible and communicates the project's environmental claim and data product clearly: it states that Climate TRACE tracks global greenhouse-gas emissions and air pollutants, gives asset counts, sector coverage, temporal coverage, current emissions information, and news items about data releases and studies using Climate TRACE data. This is relatively strong public communication evidence. However, the supplied bundle does not show open licences for publications, detailed methods reports, citations to exact supporting artefacts, dashboard version history beyond a single release note, full indicator definitions, or review status of publications. The score is therefore in the strong-but-limited range: public communication is clear and current, but publication traceability is incomplete from the available evidence.",
+        "uncertainty": "medium",
+        "uncertainty_reason": "The homepage provides direct publication and communication evidence, but supporting pages and reports are absent from the evidence bundle.",
+        "references": [
+          {
+            "label": "Homepage project description",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page describes Climate TRACE as 'Independent Greenhouse gas Emissions Tracking' and says it helps users 'Track Global Emissions from 745 million sources of greenhouse gases and air pollutants worldwide.'",
+            "relevance": "Shows a clear public-facing statement of the claim and purpose."
+          },
+          {
+            "label": "Homepage data-scope communication",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page communicates asset, sector, temporal, and pollutant coverage, including '744,678,997 emitting assets,' '10 industrial sectors,' and '10+ years of data.'",
+            "relevance": "Supports clear public documentation of the scope of the output."
+          },
+          {
+            "label": "Homepage news and release communication",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The homepage lists recent news including a March 2026 emissions data release, a CBAM steel-trade study using Climate TRACE data, and a response to an NAU study.",
+            "relevance": "Shows ongoing public communication about releases, applications, and controversies."
+          }
+        ]
+      },
+      {
+        "stage": 6,
+        "stage_name": "Open Linkage",
+        "score": 29,
+        "score_derivation": "The evidence provides some high-level linkage among claims, data product, and communications: the homepage connects Climate TRACE's emissions-tracking claims to open data, asset counts, sectors, years, a release number, and broad methods using satellites, remote sensing, and AI. However, it does not provide explicit, specific links from a claim to exact datasets, primary measurements, code versions, model configurations, workflow runs, uncertainty estimates, review records, or publication artefacts. The score is above zero because there are visible public connections between the claim, data product scope, method categories, and a named release, but it remains low because the chain is not externally inspectable or versioned end-to-end in the supplied evidence.",
+        "uncertainty": "high",
+        "uncertainty_reason": "The supplied homepage evidence is too high-level to verify claim-to-evidence linkage beyond broad project assertions.",
+        "references": [
+          {
+            "label": "Homepage claim-data linkage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The page links the claim of tracking global emissions to 'Open Data' and to examination of hundreds of millions of emitting assets by city, state, country, sector, and subsector.",
+            "relevance": "Provides broad linkage between the public claim and the data product, but not exact evidence-chain linkage."
+          },
+          {
+            "label": "Homepage method-data linkage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The 'How it Works' section says satellites, remote sensing, and AI are used to deliver a detailed look at global emissions.",
+            "relevance": "Links the product to broad methodological categories, but not to specific datasets, code versions, or model runs."
+          },
+          {
+            "label": "Homepage release linkage",
+            "url": "https://climatetrace.org/",
+            "quote_or_finding": "The homepage states that 'May release 5.7.0 includes monthly emissions data through March 2026.'",
+            "relevance": "Provides one versioned release reference, but not a full traceable chain from inputs through computations to claims."
+          }
+        ]
+      }
+    ],
+    "total_score": 37,
+    "total_score_derivation": "Computed locally as round(mean([46, 16, 22, 43, 64, 29])) = 37.",
+    "single_paragraph_summary": "Based only on the supplied homepage extraction, Climate TRACE shows meaningful public openness as a large, current, public emissions-data product: it advertises open data, hundreds of millions of emitting assets, sectoral and temporal coverage, monthly releases, broad use of satellites/remote sensing/AI, a large expert coalition, public news, and at least one public response to external critique. However, the evidence bundle does not include the actual datasets, licences, data dictionaries, uncertainty and quality-control documentation, open-source code, model specifications, reproducible workflows, execution environments, issue trackers, governance records, peer-review materials, or explicit claim-to-run provenance links. As a result, the assessment gives moderate credit for public data scope and communication, but conservative scores for open-source methods, reproducibility, and end-to-end linkage.",
+    "limitations": [
+      "The assessment is based only on the supplied evidence bundle, which consists of a text extraction from the Climate TRACE homepage; no linked data portal pages, downloads, methods documents, repositories, or reports were available for inspection.",
+      "The homepage claims 'Open Data,' but the bundle does not evidence data licences, file formats, API terms, persistent identifiers, archival/versioning practices, or direct access to underlying primary data.",
+      "No supplied evidence demonstrates open-source software, model code, dependencies, configuration, or infrastructure documentation.",
+      "No supplied evidence demonstrates reproducible execution artefacts such as workflow scripts, notebooks, containers, run logs, parameters, or archived computational outputs.",
+      "Review evidence is limited to homepage-level references to a coalition, feedback, and a response to an external study; the underlying review records or correction processes were not included.",
+      "The linkage score is constrained because the evidence does not connect specific environmental claims to exact datasets, code versions, model runs, review events, and publications."
+    ],
+    "model_name": "gpt-5.5"
+  }
+]

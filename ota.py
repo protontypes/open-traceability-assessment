@@ -689,6 +689,14 @@ def make_final_summary(runs: list[AssessmentRun], include_total: bool) -> str:
     )
 
 
+def host_of(url: str) -> str:
+    """Return a lowercased hostname for grouping followed sources, or '' if unparseable."""
+    try:
+        return urlparse(url).netloc.lower()
+    except Exception:
+        return ""
+
+
 def write_markdown_report(
     runs: list[AssessmentRun],
     *,
@@ -696,9 +704,10 @@ def write_markdown_report(
     project_url: str,
     definition_url: str,
     include_total: bool,
-    evidence_urls: set[str],
+    evidence_items: list[EvidenceItem],
 ) -> None:
     model_runs = models_with_runs(runs)
+    evidence_urls = {normalize_url(item.url) for item in evidence_items}
 
     lines: list[str] = []
     lines.append("# Open Traceability Assessment Report")
@@ -776,6 +785,47 @@ def write_markdown_report(
             lines.append("")
             lines.append(f"Average total score: **{avg:.1f}**; population standard deviation: **{std:.1f}**.")
             lines.append("")
+
+    lines.append("## Sources followed during the assessment")
+    lines.append("")
+    lines.append(
+        "Every URL that was actually fetched and supplied to the model as evidence. This "
+        "covers the project repository, its GitHub namespace, and each individual file, "
+        "documentation page, or linked resource that was followed. Scores and references "
+        "below are derived only from these sources."
+    )
+    lines.append("")
+    lines.append(f"- Project/report URL followed: [{md_escape(project_url)}]({md_escape(project_url)})")
+    lines.append(
+        f"- Assessment definition URL followed: "
+        f"[{md_escape(definition_url)}]({md_escape(definition_url)})"
+    )
+    lines.append("")
+
+    # Group the fetched evidence artifacts by host so repositories, raw-content hosts,
+    # GitHub namespaces, and any external linked data are clearly separated.
+    by_host: dict[str, list[EvidenceItem]] = {}
+    host_order: list[str] = []
+    for item in evidence_items:
+        host = host_of(item.url) or "other"
+        if host not in by_host:
+            by_host[host] = []
+            host_order.append(host)
+        by_host[host].append(item)
+
+    lines.append(
+        f"A total of {len(evidence_items)} source artifact(s) were followed across "
+        f"{len(host_order)} host(s)."
+    )
+    lines.append("")
+    for host in host_order:
+        lines.append(f"### {host}")
+        lines.append("")
+        for item in by_host[host]:
+            label = md_escape(item.label)
+            url = md_escape(item.url)
+            lines.append(f"- [{label}]({url})")
+        lines.append("")
 
     lines.append("## Consolidated references by stage")
     lines.append("")
@@ -925,7 +975,6 @@ def main() -> None:
 
     print(f"Collecting evidence from: {args.project_url}")
     evidence_bundle, evidence_items = collect_evidence(args)
-    evidence_urls = {normalize_url(item.url) for item in evidence_items}
 
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
 
@@ -992,7 +1041,7 @@ def main() -> None:
         project_url=args.project_url,
         definition_url=args.definition_url,
         include_total=args.include_total,
-        evidence_urls=evidence_urls,
+        evidence_items=evidence_items,
     )
 
     print(f"Wrote structured run data ({len(runs)} run(s)): {json_path}")
