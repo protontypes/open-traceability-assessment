@@ -365,7 +365,7 @@ The six stages are:
 3. Open Execution and Reproducibility.
 4. Open Community and Review.
 5. Open Publications and Communication.
-6. Open Verifiability.
+6. Open Linkage.
 
 For every stage:
 - Give an integer score from 0 to 100.

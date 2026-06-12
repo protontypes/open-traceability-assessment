@@ -58,7 +58,7 @@ Assesses whether critique, issue tracking, review, correction processes, and res
 
 Assesses whether reports, papers, dashboards, policy outputs, or explanatory materials are accessible and clearly documented. Strong publication traceability means public outputs state the claim clearly, describe the methods and evidence base, cite supporting artifacts, and preserve enough context for external scrutiny.
 
-### 6. Open Verifiability / Linkage Quality
+### 6. Open Linkage
 
 Assesses whether the full chain across data, methods, execution, review, and publications is explicit, specific, versioned, and externally verifiable. This dimension is critical because openness without linkage does not produce traceability. Public artifacts are not enough if they cannot be connected to the claim they support.
 
