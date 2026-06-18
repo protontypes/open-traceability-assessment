@@ -82,24 +82,7 @@ This runner implements the LLM-assisted part of that architecture. It collects a
 
 ## Installation
 
-Create a virtual environment and install the dependencies:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Example `requirements.txt`:
-
-```txt
-openai>=1.99.0
-anthropic>=0.69.0
-requests>=2.32.0
-beautifulsoup4>=4.12.0
-pydantic>=2.8.0
-pypdf>=4.3.0
-```
+This project can be run with [UV](https://docs.astral.sh/uv/), as all dependencies are specified in the header of the `open_traceability_assessment.py` file.
 
 The provider SDKs are imported lazily, so you only need the one(s) you actually use: `openai` for `--provider openai`, `anthropic` for `--provider anthropic`, or both for `--provider both`.
 
@@ -128,7 +111,7 @@ export GITHUB_TOKEN="your_github_token_here"
 Run the assessment against the default example repository:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 5 \
   --include-total \
@@ -138,7 +121,7 @@ python ota.py \
 Run the assessment against another project, report, or web page:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://example.org/report.pdf \
   --runs 3 \
   --include-total \
@@ -148,7 +131,7 @@ python ota.py \
 Omit the overall total score while still scoring the six dimensions:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 5 \
   --no-include-total
@@ -157,7 +140,7 @@ python ota.py \
 Use a different OpenAI model:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 3 \
   --model gpt-5.5 \
@@ -167,7 +150,7 @@ python ota.py \
 Assess with Anthropic (Claude) instead of OpenAI:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 3 \
   --provider anthropic \
@@ -177,7 +160,7 @@ python ota.py \
 Assess with both providers at once and compare them in one report:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 3 \
   --provider both \

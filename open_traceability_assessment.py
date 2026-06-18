@@ -1,13 +1,20 @@
-#!/usr/bin/env python3
+# /// script
+# dependencies = [
+# openai>=1.99.0
+# requests>=2.32.0
+# beautifulsoup4>=4.12.0
+# pydantic>=2.8.0
+# pypdf>=4.3.0
+# ]
+# ///
 """
 Run an Open Traceability Assessment multiple times against an open project,
 open-science project, or report URL, then produce JSON and Markdown reports.
 
 Example:
   export OPENAI_API_KEY="sk-..."
-  pip install openai requests beautifulsoup4 pydantic pypdf
 
-  python open_traceability_assessment.py \
+  uv run open_traceability_assessment.py \
     --project-url https://github.com/natcap/invest \
     --runs 5 \
     --include-total \
@@ -27,10 +34,9 @@ import json
 import os
 import re
 import statistics
-import textwrap
 import time
-from datetime import datetime
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Literal, Optional
 from urllib.parse import quote, urlparse
@@ -51,12 +57,19 @@ DEFAULT_PROJECT_URL = "https://github.com/natcap/invest"
 # Structured output schema
 # -----------------------------
 
+
 class EvidenceReference(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    label: str = Field(description="Short human-readable label for the referenced artifact.")
-    url: str = Field(description="URL of the artifact, page, repository file, issue tracker, paper, docs page, etc.")
-    quote_or_finding: str = Field(description="Brief quote, paraphrase, or concrete observed finding.")
+    label: str = Field(
+        description="Short human-readable label for the referenced artifact."
+    )
+    url: str = Field(
+        description="URL of the artifact, page, repository file, issue tracker, paper, docs page, etc."
+    )
+    quote_or_finding: str = Field(
+        description="Brief quote, paraphrase, or concrete observed finding."
+    )
     relevance: str = Field(description="Why this reference supports the score.")
 
 
@@ -75,7 +88,9 @@ class StageAssessment(BaseModel):
     uncertainty: Literal["low", "medium", "high"] = Field(
         description="Overall confidence in this stage's score given the available evidence."
     )
-    uncertainty_reason: str = Field(description="One sentence explaining the uncertainty level.")
+    uncertainty_reason: str = Field(
+        description="One sentence explaining the uncertainty level."
+    )
     references: list[EvidenceReference]
 
 
@@ -107,6 +122,7 @@ class AssessmentRun(BaseModel):
 # -----------------------------
 # Evidence collection
 # -----------------------------
+
 
 @dataclass
 class EvidenceItem:
@@ -156,7 +172,9 @@ def extract_text_from_response(response: requests.Response, source_url: str) -> 
         pages = []
         for i, page in enumerate(reader.pages):
             try:
-                pages.append(f"\n\n--- PDF page {i + 1} ---\n{page.extract_text() or ''}")
+                pages.append(
+                    f"\n\n--- PDF page {i + 1} ---\n{page.extract_text() or ''}"
+                )
             except Exception:
                 pages.append(f"\n\n--- PDF page {i + 1} ---\n[Could not extract text]")
         return "\n".join(pages)
@@ -329,12 +347,16 @@ def collect_github_evidence(
     ]
 
     for i, item in enumerate(items, start=1):
-        bundle_lines.append(f"\n\n### Evidence {i}: {item.label}\nURL: {item.url}\n{item.text}")
+        bundle_lines.append(
+            f"\n\n### Evidence {i}: {item.label}\nURL: {item.url}\n{item.text}"
+        )
 
     return "\n".join(bundle_lines), items
 
 
-def collect_generic_evidence(project_url: str, max_chars: int) -> tuple[str, list[EvidenceItem]]:
+def collect_generic_evidence(
+    project_url: str, max_chars: int
+) -> tuple[str, list[EvidenceItem]]:
     text = fetch_url_text(project_url, max_chars=max_chars)
     item = EvidenceItem(label="Input URL text extraction", url=project_url, text=text)
     bundle = f"PROJECT OR REPORT URL: {project_url}\n\n### Evidence 1: {item.label}\nURL: {item.url}\n{text}"
@@ -437,6 +459,7 @@ Output requirements:
 # -----------------------------
 # Model calls
 # -----------------------------
+
 
 def finalize_run(
     parsed: AssessmentRun,
@@ -592,6 +615,7 @@ def run_assessment(
 # Reporting
 # -----------------------------
 
+
 def slugify(value: str, fallback: str = "project") -> str:
     """Turn an arbitrary string into a lowercase, filesystem-safe slug."""
     slug = re.sub(r"[^a-zA-Z0-9]+", "-", value).strip("-").lower()
@@ -671,7 +695,9 @@ def consolidate_references(
     return items
 
 
-def uncertainty_distribution(runs: list[AssessmentRun], stage_number: int) -> tuple[str, dict[str, int]]:
+def uncertainty_distribution(
+    runs: list[AssessmentRun], stage_number: int
+) -> tuple[str, dict[str, int]]:
     """Return the modal uncertainty level and the level counts for a stage across runs."""
     counts = {"low": 0, "medium": 0, "high": 0}
     for run in runs:
@@ -788,7 +814,8 @@ def write_markdown_report(
         lines.append(f"- Model: {model_runs[0][0]}")
     else:
         joined = "; ".join(
-            f"{model} (runs {format_run_numbers(numbers)})" for model, numbers in model_runs
+            f"{model} (runs {format_run_numbers(numbers)})"
+            for model, numbers in model_runs
         )
         lines.append(f"- Models: {joined}")
     lines.append(f"- Number of runs: {len(runs)}")
@@ -802,7 +829,11 @@ def write_markdown_report(
     lines.append("## Score table across runs")
     lines.append("")
 
-    header = ["Stage", "Stage name"] + [f"Run {run.run_number}" for run in runs] + ["Average", "Std dev"]
+    header = (
+        ["Stage", "Stage name"]
+        + [f"Run {run.run_number}" for run in runs]
+        + ["Average", "Std dev"]
+    )
     lines.append("| " + " | ".join(header) + " |")
     lines.append("| " + " | ".join(["---"] * len(header)) + " |")
 
@@ -837,7 +868,9 @@ def write_markdown_report(
                     for run in runs
                     if (run.model_name or "unknown") == model
                 ]
-                row.append(f"{statistics.mean(model_scores):.1f}" if model_scores else "—")
+                row.append(
+                    f"{statistics.mean(model_scores):.1f}" if model_scores else "—"
+                )
             lines.append("| " + " | ".join(md_escape(cell) for cell in row) + " |")
 
     if include_total:
@@ -853,7 +886,9 @@ def write_markdown_report(
             for run in runs:
                 lines.append(f"| {run.run_number} | {run.total_score} |")
             lines.append("")
-            lines.append(f"Average total score: **{avg:.1f}**; population standard deviation: **{std:.1f}**.")
+            lines.append(
+                f"Average total score: **{avg:.1f}**; population standard deviation: **{std:.1f}**."
+            )
             lines.append("")
 
     lines.append("## Sources followed during the assessment")
@@ -865,7 +900,9 @@ def write_markdown_report(
         "below are derived only from these sources."
     )
     lines.append("")
-    lines.append(f"- Project/report URL followed: [{md_escape(project_url)}]({md_escape(project_url)})")
+    lines.append(
+        f"- Project/report URL followed: [{md_escape(project_url)}]({md_escape(project_url)})"
+    )
     lines.append(
         f"- Assessment definition URL followed: "
         f"[{md_escape(definition_url)}]({md_escape(definition_url)})"
@@ -912,7 +949,9 @@ def write_markdown_report(
         stages = [stage_by_number(run, stage_number) for run in runs]
         scores = [stage.score for stage in stages]
         avg = statistics.mean(scores)
-        modal_uncertainty, uncertainty_counts = uncertainty_distribution(runs, stage_number)
+        modal_uncertainty, uncertainty_counts = uncertainty_distribution(
+            runs, stage_number
+        )
         lines.append(f"### Stage {stage_number}: {stages[0].stage_name}")
         lines.append("")
         lines.append(
@@ -945,9 +984,7 @@ def write_markdown_report(
     lines.append("")
     limitations = consolidate_limitations(runs)
     if limitations:
-        lines.append(
-            "Distinct limitations raised by one or more runs (deduplicated):"
-        )
+        lines.append("Distinct limitations raised by one or more runs (deduplicated):")
         for limitation in limitations:
             lines.append(f"- {limitation}")
         lines.append("")
@@ -962,13 +999,16 @@ def write_markdown_report(
 # CLI
 # -----------------------------
 
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run an Open Traceability Assessment multiple times with the OpenAI and/or Anthropic API."
     )
     parser.add_argument("--project-url", default=DEFAULT_PROJECT_URL)
     parser.add_argument("--definition-url", default=DEFAULT_DEFINITION_URL)
-    parser.add_argument("--runs", type=int, default=3, help="Number of runs per selected provider.")
+    parser.add_argument(
+        "--runs", type=int, default=3, help="Number of runs per selected provider."
+    )
     parser.add_argument(
         "--provider",
         choices=["openai", "anthropic", "both"],
@@ -976,7 +1016,11 @@ def parse_args() -> argparse.Namespace:
         help="Which model provider(s) to assess with. 'both' runs the full set of runs with each.",
     )
     parser.add_argument("--model", default="gpt-5.5", help="OpenAI model id.")
-    parser.add_argument("--anthropic-model", default="claude-opus-4-8", help="Anthropic (Claude) model id.")
+    parser.add_argument(
+        "--anthropic-model",
+        default="claude-opus-4-8",
+        help="Anthropic (Claude) model id.",
+    )
     parser.add_argument(
         "--reasoning-effort",
         choices=["none", "low", "medium", "high", "xhigh"],
@@ -1041,7 +1085,9 @@ def main() -> None:
     openai_client, anthropic_client = build_clients(args.provider)
 
     print(f"Fetching Open Traceability definition from: {args.definition_url}")
-    definition_text = fetch_url_text(args.definition_url, max_chars=args.max_definition_chars)
+    definition_text = fetch_url_text(
+        args.definition_url, max_chars=args.max_definition_chars
+    )
 
     print(f"Collecting evidence from: {args.project_url}")
     evidence_bundle, evidence_items = collect_evidence(args)
@@ -1059,7 +1105,9 @@ def main() -> None:
     for provider, model in provider_models:
         for _ in range(args.runs):
             run_number += 1
-            print(f"Running assessment {run_number}/{total_runs} ({provider}: {model})...")
+            print(
+                f"Running assessment {run_number}/{total_runs} ({provider}: {model})..."
+            )
             try:
                 run = run_assessment(
                     provider=provider,
