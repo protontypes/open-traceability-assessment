@@ -1,4 +1,5 @@
 # /// script
+# requires-python = ">=3.13"
 # dependencies = [
 #   pydantic-ai>=0.60.0
 #   anthropic>=0.50.0
