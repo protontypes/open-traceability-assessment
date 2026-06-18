@@ -981,7 +981,7 @@ def build_agent(
 ) -> Agent[None, AssessmentRun]:
     """Construct Pydantic AI Agent for the selected provider and model."""
 
-    if provider in ("openai", "both"):
+    if provider == "openai":
         if not os.getenv("OPENAI_API_KEY"):
             raise RuntimeError("OPENAI_API_KEY is not set.")
         agent = Agent(
@@ -993,7 +993,7 @@ def build_agent(
             },
         )
 
-    if provider in ("anthropic", "both"):
+    elif provider == "anthropic":
         if not os.getenv("ANTHROPIC_API_KEY"):
             raise RuntimeError("ANTHROPIC_API_KEY is not set.")
         capabilities: list = []
@@ -1005,6 +1005,9 @@ def build_agent(
             instructions=SYSTEM_PROMPT,
             capabilities=capabilities or None,
         )
+
+    else:
+        raise ValueError(f"Unsupported provider: {model} ")
 
     return agent
 
@@ -1021,7 +1024,10 @@ def main() -> None:
     elif args.provider == "anthropic":
         provider_models = [("anthropic", args.anthropic_model)]
     else:
-        provider_models = [("openai", args.model), ("anthropic", args.anthropic_model)]
+        provider_models = [
+            ("openai", args.openai_model),
+            ("anthropic", args.anthropic_model),
+        ]
 
     print(f"Fetching Open Traceability definition from: {args.definition_url}")
     definition_text = fetch_url_text(
