@@ -20,7 +20,7 @@ Example:
     --include-total \
     --out-prefix invest_open_traceability
 
-  python open_traceability_assessment.py \
+  uv run open_traceability_assessment.py \
     --project-url https://example.org/report.pdf \
     --runs 3 \
     --no-include-total
