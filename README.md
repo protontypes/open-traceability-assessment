@@ -143,7 +143,7 @@ Use a different OpenAI model:
 uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 3 \
-  --model gpt-5.5 \
+  --openai-model gpt-5.5 \
   --reasoning-effort medium
 ```
 
@@ -164,7 +164,7 @@ uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 3 \
   --provider both \
-  --model gpt-5.5 \
+  --openai-model gpt-5.5 \
   --anthropic-model claude-opus-4-8
 ```
 

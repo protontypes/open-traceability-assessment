@@ -934,7 +934,7 @@ def parse_args() -> argparse.Namespace:
         default="openai",
         help="Which model provider(s) to assess with. 'both' runs the full set of runs with each.",
     )
-    parser.add_argument("--model", default="gpt-5.5", help="OpenAI model id.")
+    parser.add_argument("--openai-model", default="gpt-5.5", help="OpenAI model id.")
     parser.add_argument(
         "--anthropic-model",
         default="claude-opus-4-8",
@@ -1017,7 +1017,7 @@ def main() -> None:
 
     # (provider, model) pairs to assess with, in order. 'both' runs each provider.
     if args.provider == "openai":
-        provider_models = [("openai", args.model)]
+        provider_models = [("openai", args.openai_model)]
     elif args.provider == "anthropic":
         provider_models = [("anthropic", args.anthropic_model)]
     else:
