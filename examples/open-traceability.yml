@@ -1,0 +1,70 @@
+# Open Traceability manifest
+#
+# A curated, version-controllable description of the evidence behind an environmental
+# claim, grouped by the six Open Traceability dimensions. Commit this file next to the
+# claim it supports (recommended filename: open-traceability.yml).
+#
+# Run it with:
+#   python ota.py --manifest examples/open-traceability.yml --runs 3
+#
+# Why this exists: pinning the exact evidence set makes every assessment run use the
+# same bundle, so scores are reproducible across runs and across people, and it lets
+# you include artifacts that an automatic crawl of a single URL would never reach.
+#
+# Each dimension takes a list of URLs. An item may be a bare URL, or a mapping with a
+# `url` and an optional `note` explaining why it is relevant — the note is passed to
+# the model and improves scoring quality.
+#
+# Stage 6 (Open Linkage) has no section: this file *is* the linkage artifact, because
+# it explicitly connects the claim to evidence across every other dimension.
+#
+# This worked example traces a real, widely cited Global Forest Watch (GFW) claim.
+
+claim: >
+  The world's humid tropics lost 3.7 million hectares of primary rainforest in 2023,
+  measured from 30 m satellite-based tree-cover-loss analysis (UMD/GLAD), as reported
+  by World Resources Institute on Global Forest Watch.
+claim_url: https://www.globalforestwatch.org/blog/data-and-tools/2023-tree-cover-loss-data-explained/
+
+# Namespace: the organization / project home behind the claim. Its other repositories
+# and profile are general context for every dimension (governance, identity, scope).
+# A single URL or a list is accepted.
+namespace: https://github.com/wri
+
+# Stage 1 — Open Input Data and Measurement Evidence
+open_data:
+  - url: https://data.globalforestwatch.org/datasets/63f9425c45404c36a23495ed7bef1314
+    note: Tree Cover Loss dataset (Hansen/UMD/Google/USGS/NASA) on the GFW Open Data Portal.
+  - url: https://glad.umd.edu/dataset/glad-forest-alerts
+    note: UMD GLAD forest-change/alerts data, the upstream source for the loss product.
+  - url: https://storage.googleapis.com/earthenginepartners-hansen/GFC-2024-v1.12/download.html
+    note: Global Forest Change raw raster tiles, versioned (GFC-2024 v1.12), direct download.
+
+# Stage 2 — Open-Source Models, Methods, and Software
+open_software:
+  - url: https://github.com/wri/gfw
+    note: Global Forest Watch web application source (the dashboard presenting the claim).
+  - url: https://github.com/wri/gfw-data-api
+    note: GFW Data API serving the underlying datasets.
+  - url: https://github.com/wri/gfw_forest_loss_geotrellis
+    note: Geotrellis/Spark pipeline that computes tree-cover-loss statistics.
+
+# Stage 3 — Open Execution and Reproducibility
+open_execution:
+  - url: https://github.com/wri/gfw/blob/develop/.github/workflows/ci.yml
+    note: CI workflow for the GFW web app, showing the automated build/test pipeline.
+
+# Stage 4 — Open Community and Review
+open_community:
+  - url: https://github.com/wri/gfw/issues
+    note: Public issue tracker where the tool is questioned, corrected, and improved.
+
+# Stage 5 — Open Publications and Communication
+# (the "Open Access" heading from the original sketch is also accepted and maps here)
+open_publications:
+  - url: https://doi.org/10.1126/science.1244693
+    note: >
+      Hansen et al. 2013, Science — the peer-reviewed method behind the loss product.
+      Canonical reference but paywalled, which itself limits public inspectability.
+  - url: https://lcluc.umd.edu/announcements/mc-hansen-et-al-2013-high-resolution-global-maps-21st-century-forest-cover-change
+    note: NASA LCLUC announcement with the full open citation and summary of the paper.

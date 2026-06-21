@@ -29,6 +29,7 @@ This repository provides a reusable assessment runner that:
 
 - Fetches an Open Traceability definition and project evidence.
 - Supports GitHub repositories, web pages, and PDF reports.
+- Optionally takes a curated **Open Traceability manifest** (YAML) that pins the exact evidence URLs per dimension, for fully reproducible runs (see below).
 - Runs the assessment multiple independent times.
 - Works with OpenAI models, Anthropic (Claude) models, or both providers in one run.
 - Scores six Open Traceability dimensions from 0 to 100.
@@ -99,9 +100,10 @@ requests>=2.32.0
 beautifulsoup4>=4.12.0
 pydantic>=2.8.0
 pypdf>=4.3.0
+pyyaml>=6.0
 ```
 
-The provider SDKs are imported lazily, so you only need the one(s) you actually use: `openai` for `--provider openai`, `anthropic` for `--provider anthropic`, or both for `--provider both`.
+The provider SDKs are imported lazily, so you only need the one(s) you actually use: `openai` for `--provider openai`, `anthropic` for `--provider anthropic`, or both for `--provider both`. `pyyaml` is only needed when you use `--manifest`.
 
 ## API keys
 
@@ -187,10 +189,62 @@ python ota.py \
 
 With `--provider both`, `--runs` applies to each provider, so the example above produces 6 runs in total (3 per model). The report then includes an "Average score by model" table comparing the two.
 
+### Reproducible runs with an Open Traceability manifest
+
+By default the tool *discovers* evidence by crawling the target URL (the GitHub file tree, or the page text). That is convenient but non-deterministic, and it can miss relevant artifacts that are not linked from the starting URL. To make a run reproducible and complete, you can instead supply a **manifest**: a small YAML file that names, per Open Traceability dimension, the exact URLs that constitute the evidence for a claim.
+
+```bash
+python ota.py \
+  --manifest examples/open-traceability.yml \
+  --runs 3 \
+  --provider anthropic
+```
+
+When `--manifest` is given it replaces `--project-url` crawling: every run fetches the same curated set, grouped and labelled by dimension, so scores are reproducible across runs and across people. A worked example tracing a real Global Forest Watch claim is in [`examples/open-traceability.yml`](examples/open-traceability.yml).
+
+The format is:
+
+```yaml
+claim: One-sentence statement of the environmental claim being traced.
+claim_url: https://example.org/where-the-claim-is-made
+namespace: https://github.com/wri   # optional; org/project home (a URL or a list)
+
+open_data:          # Stage 1 — Open Input Data and Measurement Evidence
+  - url: https://...
+    note: Optional, human-written reason this URL is relevant (passed to the model).
+  - https://...     # a bare URL is also accepted
+open_software:      # Stage 2 — Open-Source Models, Methods, and Software
+  - url: https://...
+open_execution:     # Stage 3 — Open Execution and Reproducibility
+  - url: https://...
+open_community:     # Stage 4 — Open Community and Review
+  - url: https://...
+open_publications:  # Stage 5 — Open Publications and Communication ("open_access" is also accepted)
+  - url: https://...
+```
+
+The optional `namespace` is the organization or project home behind the claim — typically the GitHub namespace, e.g. `https://github.com/wri` for Global Forest Watch or `https://github.com/natcap` for InVEST. It is fetched once as general context for every dimension, because the organization's other repositories, profile, and governance signals inform the whole evidence chain rather than a single stage. It accepts a single URL or a list.
+
+There is no key for Stage 6 (Open Linkage) on purpose: the manifest file *is* the linkage artifact, because it explicitly connects the claim to evidence across every other dimension. Reading a manifest requires `pyyaml` (included in `requirements.txt`). The recommended filename is `open-traceability.yml`, committed next to the claim it supports.
+
+### Authoring a manifest with LLM assistance
+
+Writing a good manifest is itself research: you have to locate the data, code, execution, community, and publication artifacts behind a claim, and confirm they actually resolve. This is well suited to an LLM coding agent (e.g. Claude Code) working alongside a human, which is how the example manifests in this repository were produced. The workflow is:
+
+1. **Point the agent at the claim or project.** Give it the starting URL (a repository, dashboard, report, or claim page) and ask it to draft an Open Traceability manifest.
+2. **The agent investigates evidence per dimension.** It searches the web and the project's own links to find, for each of the five dimensions, the URLs that best evidence it — input data, source code and dependencies, execution/CI, community and review channels, and publications.
+3. **The agent verifies the URLs resolve.** Before writing them down it checks each URL is reachable and returns real content, swapping dead or placeholder links for canonical, fetchable ones, and noting where an authoritative source is paywalled or JavaScript-rendered (those are themselves traceability signals).
+4. **The agent writes the YAML** with a one-line `note` per URL explaining its relevance, grouped by dimension, and saves it (e.g. `open-traceability.yml`).
+5. **A human reviews and edits the manifest.** Curation is the point: confirm the URLs are the right evidence, add anything the agent missed, and remove anything off-target. The manifest is version-controlled, so this review is transparent and revisable.
+6. **Run the assessment** against the reviewed manifest with `--manifest`, then human-review the resulting report as usual (the report and JSON both carry an approval gate that starts unapproved).
+
+The two example manifests in [`examples/`](examples/) — [`open-traceability.yml`](examples/open-traceability.yml) (a Global Forest Watch claim) and [`invest-open-traceability.yml`](examples/invest-open-traceability.yml) (the InVEST toolset) — were created exactly this way. This keeps the LLM in the role the broader Open Traceability framework intends for it: an *assessment assistant* that surfaces and organises candidate evidence for human review, not an oracle that certifies claims.
+
 ### Model and reasoning options
 
 | Option | Default | Description |
 | --- | --- | --- |
+| `--manifest` | _(none)_ | Path or URL to an Open Traceability manifest (YAML). When set, replaces `--project-url` crawling with the curated evidence set for a reproducible run. |
 | `--provider` | `openai` | Which provider(s) to assess with: `openai`, `anthropic`, or `both`. |
 | `--model` | `gpt-5.5` | OpenAI model id (used for `openai` and `both`). |
 | `--anthropic-model` | `claude-opus-4-8` | Anthropic (Claude) model id (used for `anthropic` and `both`). |

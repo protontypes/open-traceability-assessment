@@ -354,6 +354,195 @@ def collect_evidence(args: argparse.Namespace) -> tuple[str, list[EvidenceItem]]
 
 
 # -----------------------------
+# Open Traceability manifest
+# -----------------------------
+
+# Canonical manifest keys, in stage order. Stage 6 (Open Linkage) has no key of its
+# own: the manifest file *is* the linkage artifact, since it explicitly connects a
+# claim to evidence across every other dimension.
+MANIFEST_DIMENSIONS: list[tuple[str, int, str]] = [
+    ("open_data", 1, "Open Input Data and Measurement Evidence"),
+    ("open_software", 2, "Open-Source Models, Methods, and Software"),
+    ("open_execution", 3, "Open Execution and Reproducibility"),
+    ("open_community", 4, "Open Community and Review"),
+    ("open_publications", 5, "Open Publications and Communication"),
+]
+
+# Friendly aliases accepted in the manifest and normalized to a canonical key above,
+# so the headings from the original sketch (e.g. "Open Access") still parse.
+MANIFEST_KEY_ALIASES: dict[str, str] = {
+    "opendata": "open_data",
+    "open_input_data": "open_data",
+    "data": "open_data",
+    "software": "open_software",
+    "open_source": "open_software",
+    "open_models": "open_software",
+    "execution": "open_execution",
+    "reproducibility": "open_execution",
+    "community": "open_community",
+    "review": "open_community",
+    "open_access": "open_publications",
+    "publications": "open_publications",
+    "open_publication": "open_publications",
+}
+
+
+def normalize_manifest_key(key: str) -> Optional[str]:
+    """Map a user-written section heading to its canonical dimension key, or None."""
+    norm = re.sub(r"[^a-z0-9]+", "_", key.strip().lower()).strip("_")
+    if norm in {k for k, _, _ in MANIFEST_DIMENSIONS}:
+        return norm
+    return MANIFEST_KEY_ALIASES.get(norm)
+
+
+@dataclass
+class ManifestEntry:
+    url: str
+    note: str = ""
+
+
+@dataclass
+class Manifest:
+    claim: str
+    claim_url: str
+    namespaces: list[ManifestEntry]
+    source: str
+    dimensions: dict[str, list[ManifestEntry]]
+
+
+def _coerce_entries(raw: object) -> list[ManifestEntry]:
+    """Accept either a bare URL string or a mapping with url/note per list item."""
+    if isinstance(raw, (str, dict)):
+        raw = [raw]
+    entries: list[ManifestEntry] = []
+    for item in raw or []:
+        if isinstance(item, str):
+            url, note = item.strip(), ""
+        elif isinstance(item, dict):
+            url = str(item.get("url", "")).strip()
+            note = str(item.get("note", "") or "").strip()
+        else:
+            continue
+        if url:
+            entries.append(ManifestEntry(url=url, note=note))
+    return entries
+
+
+def load_manifest(source: str) -> Manifest:
+    """Load an Open Traceability manifest from a local path or URL.
+
+    The manifest is a small YAML file that names, per dimension, the URLs a curator
+    considers relevant evidence for a claim. Pinning the evidence set like this makes
+    every run use the same bundle, which is the whole point: reproducibility.
+    """
+    try:
+        import yaml
+    except ImportError as exc:
+        raise RuntimeError("Reading a manifest requires: pip install pyyaml") from exc
+
+    path = Path(source)
+    text = path.read_text(encoding="utf-8") if path.exists() else http_get(source).text
+
+    data = yaml.safe_load(text)
+    if not isinstance(data, dict):
+        raise ValueError(f"Manifest {source} is not a YAML mapping")
+
+    dimensions: dict[str, list[ManifestEntry]] = {}
+    for raw_key, raw_value in data.items():
+        canonical = normalize_manifest_key(str(raw_key))
+        if canonical is not None:
+            dimensions.setdefault(canonical, []).extend(_coerce_entries(raw_value))
+
+    if not any(dimensions.values()):
+        recognized = ", ".join(k for k, _, _ in MANIFEST_DIMENSIONS)
+        raise ValueError(
+            f"Manifest {source} contains no URLs under any recognized dimension ({recognized})."
+        )
+
+    return Manifest(
+        claim=str(data.get("claim", "") or "").strip(),
+        claim_url=str(data.get("claim_url", "") or "").strip(),
+        namespaces=_coerce_entries(data.get("namespace") or data.get("namespaces")),
+        source=source,
+        dimensions=dimensions,
+    )
+
+
+def collect_manifest_evidence(
+    manifest: Manifest,
+    *,
+    max_file_chars: int,
+    max_total_chars: int,
+) -> tuple[str, list[EvidenceItem]]:
+    """Fetch every URL named in the manifest, grouped and labelled by dimension."""
+    items: list[EvidenceItem] = []
+
+    bundle_lines = [
+        "OPEN TRACEABILITY MANIFEST (curated evidence set)",
+        f"CLAIM: {manifest.claim or '(not stated)'}",
+        f"CLAIM URL: {manifest.claim_url or '(not stated)'}",
+        f"MANIFEST SOURCE: {manifest.source}",
+        "",
+        "The evidence below was curated by a human and grouped by the dimension it was "
+        "nominated for. Score each stage independently; a URL listed under one dimension "
+        "may still inform another.",
+    ]
+
+    total_chars = 0
+    evidence_index = 0
+
+    # The namespace (e.g. the GitHub organization home) is general context for every
+    # dimension: it shows the organization behind the claim, its other repositories,
+    # and governance signals, so it is fetched once up front rather than per stage.
+    if manifest.namespaces:
+        bundle_lines.append("\n\n## Namespace (organization / project home)")
+        for entry in manifest.namespaces:
+            if total_chars >= max_total_chars:
+                break
+            try:
+                text = fetch_url_text(entry.url, max_chars=max_file_chars)
+            except Exception as exc:
+                text = f"[Could not fetch: {exc}]"
+            text = compact_text(text, min(max_file_chars, max_total_chars - total_chars))
+
+            evidence_index += 1
+            label = "Namespace" + (f" · {entry.note}" if entry.note else "")
+            items.append(EvidenceItem(label=label, url=entry.url, text=text))
+            total_chars += len(text)
+
+            note_line = f" (curator note: {entry.note})" if entry.note else ""
+            bundle_lines.append(f"\n### Evidence {evidence_index}: {entry.url}{note_line}\n{text}")
+
+    for key, stage_number, stage_name in MANIFEST_DIMENSIONS:
+        entries = manifest.dimensions.get(key, [])
+        bundle_lines.append(f"\n\n## Stage {stage_number}: {stage_name} ({key})")
+        if not entries:
+            bundle_lines.append("(no sources nominated for this dimension)")
+            continue
+
+        for entry in entries:
+            if total_chars >= max_total_chars:
+                break
+            try:
+                text = fetch_url_text(entry.url, max_chars=max_file_chars)
+            except Exception as exc:
+                text = f"[Could not fetch: {exc}]"
+
+            remaining = max_total_chars - total_chars
+            text = compact_text(text, min(max_file_chars, remaining))
+
+            evidence_index += 1
+            label = f"Stage {stage_number} · {key}" + (f" · {entry.note}" if entry.note else "")
+            items.append(EvidenceItem(label=label, url=entry.url, text=text))
+            total_chars += len(text)
+
+            note_line = f" (curator note: {entry.note})" if entry.note else ""
+            bundle_lines.append(f"\n### Evidence {evidence_index}: {entry.url}{note_line}\n{text}")
+
+    return "\n".join(bundle_lines), items
+
+
+# -----------------------------
 # Prompting
 # -----------------------------
 
@@ -967,6 +1156,15 @@ def parse_args() -> argparse.Namespace:
         description="Run an Open Traceability Assessment multiple times with the OpenAI and/or Anthropic API."
     )
     parser.add_argument("--project-url", default=DEFAULT_PROJECT_URL)
+    parser.add_argument(
+        "--manifest",
+        default=None,
+        help=(
+            "Path or URL to an Open Traceability manifest (YAML) that pins the evidence "
+            "set per dimension. When set, it replaces --project-url crawling so every run "
+            "uses the same curated bundle. See examples/open-traceability.yml."
+        ),
+    )
     parser.add_argument("--definition-url", default=DEFAULT_DEFINITION_URL)
     parser.add_argument("--runs", type=int, default=3, help="Number of runs per selected provider.")
     parser.add_argument(
@@ -1043,8 +1241,20 @@ def main() -> None:
     print(f"Fetching Open Traceability definition from: {args.definition_url}")
     definition_text = fetch_url_text(args.definition_url, max_chars=args.max_definition_chars)
 
-    print(f"Collecting evidence from: {args.project_url}")
-    evidence_bundle, evidence_items = collect_evidence(args)
+    if args.manifest:
+        print(f"Loading Open Traceability manifest from: {args.manifest}")
+        manifest = load_manifest(args.manifest)
+        project_url = manifest.claim_url or args.manifest
+        print(f"Collecting curated evidence for claim: {project_url}")
+        evidence_bundle, evidence_items = collect_manifest_evidence(
+            manifest,
+            max_file_chars=args.max_file_chars,
+            max_total_chars=args.max_evidence_chars,
+        )
+    else:
+        project_url = args.project_url
+        print(f"Collecting evidence from: {project_url}")
+        evidence_bundle, evidence_items = collect_evidence(args)
 
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
 
@@ -1069,7 +1279,7 @@ def main() -> None:
                     reasoning_effort=args.reasoning_effort,
                     run_number=run_number,
                     runs=total_runs,
-                    project_url=args.project_url,
+                    project_url=project_url,
                     definition_url=args.definition_url,
                     definition_text=definition_text,
                     evidence_bundle=evidence_bundle,
@@ -1108,7 +1318,7 @@ def main() -> None:
     write_markdown_report(
         runs,
         output_path=md_path,
-        project_url=args.project_url,
+        project_url=project_url,
         definition_url=args.definition_url,
         include_total=args.include_total,
         evidence_items=evidence_items,
