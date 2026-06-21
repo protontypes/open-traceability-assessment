@@ -4,13 +4,14 @@ A Python command-line tool for running repeated **Open Traceability Assessments*
 
 The tool uses the OpenAI API and/or the Anthropic (Claude) API to assess how externally inspectable the evidence chain behind a project or claim is. It can run the same assessment multiple times, capture score variation across runs, preserve references used for scoring, show derivations for each score, and produce both structured JSON and a Markdown report. You can run against a single provider or against both at once to compare how different models score the same project.
 
-⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. In its current state, this tool requires a large number of tokens. The cost of a single assessment can be up to €1, depending on how many LLMs are run per assessment. Please also be aware of the significant energy and environmental impact that this can create on a large scale. We are currently trying to reduce token consumption. ⚠️
-
-⚠️In its current state, this tool requires a large number of tokens. The cost of a single assessment can be as much as €1, depending on how many LLMs are run per assessment. Please also be aware of the significant energy and environmental impact this could have on a large scale. We are currently trying to reduce token consumption.⚠️
 
 <p align="center">
   <img src="opentraceability-evidence-chain.png" width="700"  />
 </p>
+
+⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. In its current state, this tool requires a large number of tokens. The cost of a single assessment can be up to €1, depending on how many LLMs are run per assessment. Please also be aware of the significant energy and environmental impact that this can create on a large scale. We are currently trying to reduce token consumption. 
+
+In its current state, this tool requires a large number of tokens. The cost of a single assessment can be as much as €1, depending on how many LLMs are run per assessment. Please also be aware of the significant energy and environmental impact this could have on a large scale. We are currently trying to reduce token consumption.⚠️
 
 ## Background
 
