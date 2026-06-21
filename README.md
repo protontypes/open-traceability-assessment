@@ -4,11 +4,14 @@ A Python command-line tool for running repeated **Open Traceability Assessments*
 
 The tool uses the OpenAI API and/or the Anthropic (Claude) API to assess how externally inspectable the evidence chain behind a project or claim is. It can run the same assessment multiple times, capture score variation across runs, preserve references used for scoring, show derivations for each score, and produce both structured JSON and a Markdown report. You can run against a single provider or against both at once to compare how different models score the same project.
 
-⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. ⚠️
 
 <p align="center">
   <img src="opentraceability-evidence-chain.png" width="700"  />
 </p>
+
+⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. In its current state, this tool requires a large number of tokens. The cost of a single assessment can be up to €1, depending on how many LLMs are run per assessment. Please also be aware of the significant energy and environmental impact that this can create on a large scale. We are currently trying to reduce token consumption. 
+
+In its current state, this tool requires a large number of tokens. The cost of a single assessment can be as much as €1, depending on how many LLMs are run per assessment. Please also be aware of the significant energy and environmental impact this could have on a large scale. We are currently trying to reduce token consumption.⚠️
 
 ## Background
 
@@ -83,6 +86,7 @@ This runner implements the LLM-assisted part of that architecture. It collects a
 
 ## Installation
 
+<<<<<<< HEAD
 Create a virtual environment and install the dependencies:
 
 ```bash
@@ -102,6 +106,9 @@ pydantic>=2.8.0
 pypdf>=4.3.0
 pyyaml>=6.0
 ```
+=======
+This project can be run with [UV](https://docs.astral.sh/uv/), as all dependencies are specified in the header of the `open_traceability_assessment.py` file.
+>>>>>>> 96f765f7556bb9d6cab5a53a335d20a3886c50e7
 
 The provider SDKs are imported lazily, so you only need the one(s) you actually use: `openai` for `--provider openai`, `anthropic` for `--provider anthropic`, or both for `--provider both`. `pyyaml` is only needed when you use `--manifest`.
 
@@ -130,7 +137,7 @@ export GITHUB_TOKEN="your_github_token_here"
 Run the assessment against the default example repository:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 5 \
   --include-total \
@@ -140,7 +147,7 @@ python ota.py \
 Run the assessment against another project, report, or web page:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://example.org/report.pdf \
   --runs 3 \
   --include-total \
@@ -150,7 +157,7 @@ python ota.py \
 Omit the overall total score while still scoring the six dimensions:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 5 \
   --no-include-total
@@ -159,17 +166,17 @@ python ota.py \
 Use a different OpenAI model:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 3 \
-  --model gpt-5.5 \
+  --openai-model gpt-5.5 \
   --reasoning-effort medium
 ```
 
 Assess with Anthropic (Claude) instead of OpenAI:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 3 \
   --provider anthropic \
@@ -179,11 +186,11 @@ python ota.py \
 Assess with both providers at once and compare them in one report:
 
 ```bash
-python ota.py \
+uv run open_traceability_assessment.py \
   --project-url https://github.com/natcap/invest \
   --runs 3 \
   --provider both \
-  --model gpt-5.5 \
+  --openai-model gpt-5.5 \
   --anthropic-model claude-opus-4-8
 ```
 

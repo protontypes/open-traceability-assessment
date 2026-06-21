@@ -1,19 +1,30 @@
-#!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#   pydantic-ai>=0.60.0
+#   anthropic>=0.50.0
+#   requests>=2.32.0
+#   beautifulsoup4>=4.12.0
+#   pydantic>=2.8.0
+#   pypdf>=4.3.0
+# ]
+# ///
 """
 Run an Open Traceability Assessment multiple times against an open project,
 open-science project, or report URL, then produce JSON and Markdown reports.
 
+Uses Pydantic AI for structured LLM calls with Pydantic model validation.
+
 Example:
   export OPENAI_API_KEY="sk-..."
-  pip install openai requests beautifulsoup4 pydantic pypdf
 
-  python open_traceability_assessment.py \
+  uv run open_traceability_assessment.py \
     --project-url https://github.com/natcap/invest \
     --runs 5 \
     --include-total \
     --out-prefix invest_open_traceability
 
-  python open_traceability_assessment.py \
+  uv run open_traceability_assessment.py \
     --project-url https://example.org/report.pdf \
     --runs 3 \
     --no-include-total
@@ -27,10 +38,9 @@ import json
 import os
 import re
 import statistics
-import textwrap
 import time
-from datetime import datetime
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Literal, Optional
 from urllib.parse import quote, urlparse
@@ -38,10 +48,8 @@ from urllib.parse import quote, urlparse
 import requests
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, ConfigDict, Field
-
-# The provider SDKs (openai, anthropic) are imported lazily in build_clients() so
-# that running against a single provider does not require the other to be installed.
-
+from pydantic_ai import Agent
+from pydantic_ai.capabilities import Thinking
 
 DEFAULT_DEFINITION_URL = "https://raw.githubusercontent.com/protontypes/open-traceability/refs/heads/main/docs/definition.md"
 DEFAULT_PROJECT_URL = "https://github.com/natcap/invest"
@@ -51,12 +59,19 @@ DEFAULT_PROJECT_URL = "https://github.com/natcap/invest"
 # Structured output schema
 # -----------------------------
 
+
 class EvidenceReference(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    label: str = Field(description="Short human-readable label for the referenced artifact.")
-    url: str = Field(description="URL of the artifact, page, repository file, issue tracker, paper, docs page, etc.")
-    quote_or_finding: str = Field(description="Brief quote, paraphrase, or concrete observed finding.")
+    label: str = Field(
+        description="Short human-readable label for the referenced artifact."
+    )
+    url: str = Field(
+        description="URL of the artifact, page, repository file, issue tracker, paper, docs page, etc."
+    )
+    quote_or_finding: str = Field(
+        description="Brief quote, paraphrase, or concrete observed finding."
+    )
     relevance: str = Field(description="Why this reference supports the score.")
 
 
@@ -75,7 +90,9 @@ class StageAssessment(BaseModel):
     uncertainty: Literal["low", "medium", "high"] = Field(
         description="Overall confidence in this stage's score given the available evidence."
     )
-    uncertainty_reason: str = Field(description="One sentence explaining the uncertainty level.")
+    uncertainty_reason: str = Field(
+        description="One sentence explaining the uncertainty level."
+    )
     references: list[EvidenceReference]
 
 
@@ -107,6 +124,7 @@ class AssessmentRun(BaseModel):
 # -----------------------------
 # Evidence collection
 # -----------------------------
+
 
 @dataclass
 class EvidenceItem:
@@ -156,7 +174,9 @@ def extract_text_from_response(response: requests.Response, source_url: str) -> 
         pages = []
         for i, page in enumerate(reader.pages):
             try:
-                pages.append(f"\n\n--- PDF page {i + 1} ---\n{page.extract_text() or ''}")
+                pages.append(
+                    f"\n\n--- PDF page {i + 1} ---\n{page.extract_text() or ''}"
+                )
             except Exception:
                 pages.append(f"\n\n--- PDF page {i + 1} ---\n[Could not extract text]")
         return "\n".join(pages)
@@ -329,12 +349,16 @@ def collect_github_evidence(
     ]
 
     for i, item in enumerate(items, start=1):
-        bundle_lines.append(f"\n\n### Evidence {i}: {item.label}\nURL: {item.url}\n{item.text}")
+        bundle_lines.append(
+            f"\n\n### Evidence {i}: {item.label}\nURL: {item.url}\n{item.text}"
+        )
 
     return "\n".join(bundle_lines), items
 
 
-def collect_generic_evidence(project_url: str, max_chars: int) -> tuple[str, list[EvidenceItem]]:
+def collect_generic_evidence(
+    project_url: str, max_chars: int
+) -> tuple[str, list[EvidenceItem]]:
     text = fetch_url_text(project_url, max_chars=max_chars)
     item = EvidenceItem(label="Input URL text extraction", url=project_url, text=text)
     bundle = f"PROJECT OR REPORT URL: {project_url}\n\n### Evidence 1: {item.label}\nURL: {item.url}\n{text}"
@@ -627,6 +651,7 @@ Output requirements:
 # Model calls
 # -----------------------------
 
+
 def finalize_run(
     parsed: AssessmentRun,
     *,
@@ -658,82 +683,9 @@ def finalize_run(
     return parsed
 
 
-def run_assessment_openai(
-    client: "OpenAI",
-    *,
-    model: str,
-    reasoning_effort: str,
-    static_prefix: str,
-    dynamic_suffix: str,
-) -> AssessmentRun:
-    # The system prompt and static prefix are identical across every run, so OpenAI's
-    # automatic prefix caching reuses them; the per-run suffix is kept last so it
-    # never invalidates that cached prefix.
-    kwargs = {
-        "model": model,
-        "input": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f"{static_prefix}\n\n{dynamic_suffix}"},
-        ],
-        "text_format": AssessmentRun,
-    }
-    if reasoning_effort != "none":
-        kwargs["reasoning"] = {"effort": reasoning_effort}
-
-    response = client.responses.parse(**kwargs)
-    return response.output_parsed
-
-
-def run_assessment_anthropic(
-    client,
-    *,
-    model: str,
-    reasoning_effort: str,
-    static_prefix: str,
-    dynamic_suffix: str,
-) -> AssessmentRun:
-    # Caching is a prefix match in render order tools -> system -> messages, so the
-    # cache_control breakpoint on the static prefix block caches the system prompt and
-    # the (large) evidence bundle together. Cache reads bill at ~0.1x, so every run
-    # after the first reuses that prefix for ~90% less input cost. The per-run suffix
-    # is a separate, uncached block placed after the breakpoint. The evidence bundle is
-    # well above Opus's 4096-token minimum cacheable prefix.
-    kwargs = {
-        "model": model,
-        "max_tokens": 16000,
-        "system": SYSTEM_PROMPT,
-        "messages": [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": static_prefix,
-                        "cache_control": {"type": "ephemeral"},
-                    },
-                    {"type": "text", "text": dynamic_suffix},
-                ],
-            }
-        ],
-        "output_format": AssessmentRun,
-    }
-    # The Anthropic equivalent of OpenAI's reasoning effort is adaptive thinking
-    # combined with the effort parameter.
-    if reasoning_effort != "none":
-        kwargs["thinking"] = {"type": "adaptive"}
-        kwargs["output_config"] = {"effort": reasoning_effort}
-
-    response = client.messages.parse(**kwargs)
-    return response.parsed_output
-
-
 def run_assessment(
     *,
-    provider: str,
-    openai_client,
-    anthropic_client,
-    model: str,
-    reasoning_effort: str,
+    agent: Agent[None, AssessmentRun],
     run_number: int,
     runs: int,
     project_url: str,
@@ -742,6 +694,7 @@ def run_assessment(
     evidence_bundle: str,
     include_total: bool,
 ) -> AssessmentRun:
+    """Run a single assessment via a pre-configured Pydantic AI agent."""
     static_prefix, dynamic_suffix = build_user_prompt(
         run_number=run_number,
         runs=runs,
@@ -751,28 +704,17 @@ def run_assessment(
         evidence_bundle=evidence_bundle,
     )
 
-    if provider == "anthropic":
-        parsed = run_assessment_anthropic(
-            anthropic_client,
-            model=model,
-            reasoning_effort=reasoning_effort,
-            static_prefix=static_prefix,
-            dynamic_suffix=dynamic_suffix,
-        )
-    else:
-        parsed = run_assessment_openai(
-            openai_client,
-            model=model,
-            reasoning_effort=reasoning_effort,
-            static_prefix=static_prefix,
-            dynamic_suffix=dynamic_suffix,
-        )
+    user_prompt = f"{static_prefix}\n\n{dynamic_suffix}"
+    result = agent.run_sync(user_prompt)
+    parsed = result.output
 
     return finalize_run(
         parsed,
         run_number=run_number,
         project_url=project_url,
-        model=model,
+        model=agent.model.model_name
+        if hasattr(agent.model, "model_name")
+        else str(agent.model),
         include_total=include_total,
     )
 
@@ -780,6 +722,7 @@ def run_assessment(
 # -----------------------------
 # Reporting
 # -----------------------------
+
 
 def slugify(value: str, fallback: str = "project") -> str:
     """Turn an arbitrary string into a lowercase, filesystem-safe slug."""
@@ -860,7 +803,9 @@ def consolidate_references(
     return items
 
 
-def uncertainty_distribution(runs: list[AssessmentRun], stage_number: int) -> tuple[str, dict[str, int]]:
+def uncertainty_distribution(
+    runs: list[AssessmentRun], stage_number: int
+) -> tuple[str, dict[str, int]]:
     """Return the modal uncertainty level and the level counts for a stage across runs."""
     counts = {"low": 0, "medium": 0, "high": 0}
     for run in runs:
@@ -977,7 +922,8 @@ def write_markdown_report(
         lines.append(f"- Model: {model_runs[0][0]}")
     else:
         joined = "; ".join(
-            f"{model} (runs {format_run_numbers(numbers)})" for model, numbers in model_runs
+            f"{model} (runs {format_run_numbers(numbers)})"
+            for model, numbers in model_runs
         )
         lines.append(f"- Models: {joined}")
     lines.append(f"- Number of runs: {len(runs)}")
@@ -991,7 +937,11 @@ def write_markdown_report(
     lines.append("## Score table across runs")
     lines.append("")
 
-    header = ["Stage", "Stage name"] + [f"Run {run.run_number}" for run in runs] + ["Average", "Std dev"]
+    header = (
+        ["Stage", "Stage name"]
+        + [f"Run {run.run_number}" for run in runs]
+        + ["Average", "Std dev"]
+    )
     lines.append("| " + " | ".join(header) + " |")
     lines.append("| " + " | ".join(["---"] * len(header)) + " |")
 
@@ -1026,7 +976,9 @@ def write_markdown_report(
                     for run in runs
                     if (run.model_name or "unknown") == model
                 ]
-                row.append(f"{statistics.mean(model_scores):.1f}" if model_scores else "—")
+                row.append(
+                    f"{statistics.mean(model_scores):.1f}" if model_scores else "—"
+                )
             lines.append("| " + " | ".join(md_escape(cell) for cell in row) + " |")
 
     if include_total:
@@ -1042,7 +994,9 @@ def write_markdown_report(
             for run in runs:
                 lines.append(f"| {run.run_number} | {run.total_score} |")
             lines.append("")
-            lines.append(f"Average total score: **{avg:.1f}**; population standard deviation: **{std:.1f}**.")
+            lines.append(
+                f"Average total score: **{avg:.1f}**; population standard deviation: **{std:.1f}**."
+            )
             lines.append("")
 
     lines.append("## Sources followed during the assessment")
@@ -1054,7 +1008,9 @@ def write_markdown_report(
         "below are derived only from these sources."
     )
     lines.append("")
-    lines.append(f"- Project/report URL followed: [{md_escape(project_url)}]({md_escape(project_url)})")
+    lines.append(
+        f"- Project/report URL followed: [{md_escape(project_url)}]({md_escape(project_url)})"
+    )
     lines.append(
         f"- Assessment definition URL followed: "
         f"[{md_escape(definition_url)}]({md_escape(definition_url)})"
@@ -1101,7 +1057,9 @@ def write_markdown_report(
         stages = [stage_by_number(run, stage_number) for run in runs]
         scores = [stage.score for stage in stages]
         avg = statistics.mean(scores)
-        modal_uncertainty, uncertainty_counts = uncertainty_distribution(runs, stage_number)
+        modal_uncertainty, uncertainty_counts = uncertainty_distribution(
+            runs, stage_number
+        )
         lines.append(f"### Stage {stage_number}: {stages[0].stage_name}")
         lines.append("")
         lines.append(
@@ -1134,9 +1092,7 @@ def write_markdown_report(
     lines.append("")
     limitations = consolidate_limitations(runs)
     if limitations:
-        lines.append(
-            "Distinct limitations raised by one or more runs (deduplicated):"
-        )
+        lines.append("Distinct limitations raised by one or more runs (deduplicated):")
         for limitation in limitations:
             lines.append(f"- {limitation}")
         lines.append("")
@@ -1151,9 +1107,10 @@ def write_markdown_report(
 # CLI
 # -----------------------------
 
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run an Open Traceability Assessment multiple times with the OpenAI and/or Anthropic API."
+        description="Run an Open Traceability Assessment multiple times via Pydantic AI."
     )
     parser.add_argument("--project-url", default=DEFAULT_PROJECT_URL)
     parser.add_argument(
@@ -1166,22 +1123,28 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument("--definition-url", default=DEFAULT_DEFINITION_URL)
-    parser.add_argument("--runs", type=int, default=3, help="Number of runs per selected provider.")
+    parser.add_argument(
+        "--runs", type=int, default=3, help="Number of runs per selected provider."
+    )
     parser.add_argument(
         "--provider",
         choices=["openai", "anthropic", "both"],
         default="openai",
         help="Which model provider(s) to assess with. 'both' runs the full set of runs with each.",
     )
-    parser.add_argument("--model", default="gpt-5.5", help="OpenAI model id.")
-    parser.add_argument("--anthropic-model", default="claude-opus-4-8", help="Anthropic (Claude) model id.")
+    parser.add_argument("--openai-model", default="gpt-5.5", help="OpenAI model id.")
+    parser.add_argument(
+        "--anthropic-model",
+        default="claude-opus-4-8",
+        help="Anthropic (Claude) model id.",
+    )
     parser.add_argument(
         "--reasoning-effort",
         choices=["none", "low", "medium", "high", "xhigh"],
         default="medium",
         help=(
-            "Reasoning effort. For OpenAI this maps to the reasoning parameter; for Anthropic it maps to "
-            "adaptive thinking plus the effort parameter. Use 'none' to disable."
+            "Reasoning effort. For OpenAI this maps to openai_reasoning_effort (xhigh → high). "
+            "For Anthropic, enables the Thinking capability. Use 'none' to disable."
         ),
     )
     parser.add_argument(
@@ -1200,26 +1163,51 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def build_clients(provider: str) -> tuple[object, object]:
-    """Construct the API client(s) needed for the selected provider, importing lazily."""
-    openai_client = None
-    anthropic_client = None
+def _map_reasoning_effort(effort: str) -> str:
+    """Map CLI reasoning effort choices to Pydantic AI's openai_reasoning_effort values.
 
-    if provider in ("openai", "both"):
+    Pydantic AI only supports low/medium/high; xhigh is mapped to high.
+    """
+    mapping = {"low": "low", "medium": "medium", "high": "high", "xhigh": "high"}
+    return mapping.get(effort, "medium")
+
+
+def build_agent(
+    provider: str,
+    model: str,
+    reasoning_effort: str,
+) -> Agent[None, AssessmentRun]:
+    """Construct Pydantic AI Agent for the selected provider and model."""
+
+    if provider == "openai":
         if not os.getenv("OPENAI_API_KEY"):
             raise RuntimeError("OPENAI_API_KEY is not set.")
-        from openai import OpenAI
+        agent = Agent(
+            f"openai:{model}",
+            output_type=AssessmentRun,
+            instructions=SYSTEM_PROMPT,
+            model_settings={
+                "openai_reasoning_effort": _map_reasoning_effort(reasoning_effort)
+            },
+        )
 
-        openai_client = OpenAI()
-
-    if provider in ("anthropic", "both"):
+    elif provider == "anthropic":
         if not os.getenv("ANTHROPIC_API_KEY"):
             raise RuntimeError("ANTHROPIC_API_KEY is not set.")
-        import anthropic
+        capabilities: list = []
+        if reasoning_effort != "none":
+            capabilities.append(Thinking())
+        agent = Agent(
+            f"anthropic:{model}",
+            output_type=AssessmentRun,
+            instructions=SYSTEM_PROMPT,
+            capabilities=capabilities or None,
+        )
 
-        anthropic_client = anthropic.Anthropic()
+    else:
+        raise ValueError(f"Unsupported provider: {model} ")
 
-    return openai_client, anthropic_client
+    return agent
 
 
 def main() -> None:
@@ -1230,16 +1218,19 @@ def main() -> None:
 
     # (provider, model) pairs to assess with, in order. 'both' runs each provider.
     if args.provider == "openai":
-        provider_models = [("openai", args.model)]
+        provider_models = [("openai", args.openai_model)]
     elif args.provider == "anthropic":
         provider_models = [("anthropic", args.anthropic_model)]
     else:
-        provider_models = [("openai", args.model), ("anthropic", args.anthropic_model)]
-
-    openai_client, anthropic_client = build_clients(args.provider)
+        provider_models = [
+            ("openai", args.openai_model),
+            ("anthropic", args.anthropic_model),
+        ]
 
     print(f"Fetching Open Traceability definition from: {args.definition_url}")
-    definition_text = fetch_url_text(args.definition_url, max_chars=args.max_definition_chars)
+    definition_text = fetch_url_text(
+        args.definition_url, max_chars=args.max_definition_chars
+    )
 
     if args.manifest:
         print(f"Loading Open Traceability manifest from: {args.manifest}")
@@ -1269,14 +1260,17 @@ def main() -> None:
     for provider, model in provider_models:
         for _ in range(args.runs):
             run_number += 1
-            print(f"Running assessment {run_number}/{total_runs} ({provider}: {model})...")
+            print(
+                f"Running assessment {run_number}/{total_runs} ({provider}: {model})..."
+            )
+            agent = build_agent(
+                provider,
+                model=model,
+                reasoning_effort=args.reasoning_effort,
+            )
             try:
                 run = run_assessment(
-                    provider=provider,
-                    openai_client=openai_client,
-                    anthropic_client=anthropic_client,
-                    model=model,
-                    reasoning_effort=args.reasoning_effort,
+                    agent=agent,
                     run_number=run_number,
                     runs=total_runs,
                     project_url=project_url,
