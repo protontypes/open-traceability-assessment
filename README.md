@@ -9,9 +9,7 @@ The tool uses the OpenAI API and/or the Anthropic (Claude) API to assess how ext
   <img src="opentraceability-evidence-chain.png" width="700"  />
 </p>
 
-⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. In its current state, this tool requires a large number of tokens. The cost of a single assessment can be up to €1, depending on how many LLMs are run per assessment. Please also be aware of the significant energy and environmental impact that this can create on a large scale. We are currently trying to reduce token consumption. 
-
-In its current state, this tool requires a large number of tokens. The cost of a single assessment can be as much as €1, depending on how many LLMs are run per assessment. Please also be aware of the significant energy and environmental impact this could have on a large scale. We are currently trying to reduce token consumption.⚠️
+⚠️ This is a prototype that is still in development and currently relies heavily on LLM-only assessments. The implementation of a more structured, verifiable assessment using standardised data platforms is in development. In its current state, this tool requires a large number of tokens. The cost of a single assessment can be as much as €1, depending on how many LLMs are run per assessment. Please also be aware of the significant energy and environmental impact this could have on a large scale. We are currently trying to reduce token consumption.⚠️
 
 ## Background
 
