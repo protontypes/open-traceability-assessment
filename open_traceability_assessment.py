@@ -1,19 +1,17 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#   pydantic-ai>=0.60.0
-#   anthropic>=0.50.0
+#   openai>=1.99.0
 #   requests>=2.32.0
 #   beautifulsoup4>=4.12.0
 #   pydantic>=2.8.0
 #   pypdf>=4.3.0
+#   pyyaml>=6.0
 # ]
 # ///
 """
 Run an Open Traceability Assessment multiple times against an open project,
 open-science project, or report URL, then produce JSON and Markdown reports.
-
-Uses Pydantic AI for structured LLM calls with Pydantic model validation.
 
 Example:
   export OPENAI_API_KEY="sk-..."
@@ -48,8 +46,9 @@ from urllib.parse import quote, urlparse
 import requests
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, ConfigDict, Field
-from pydantic_ai import Agent
-from pydantic_ai.capabilities import Thinking
+
+# The provider SDKs (openai, anthropic) are imported lazily in build_clients() so
+# that running against a single provider does not require the other to be installed.
 
 DEFAULT_DEFINITION_URL = "https://raw.githubusercontent.com/protontypes/open-traceability/refs/heads/main/docs/definition.md"
 DEFAULT_PROJECT_URL = "https://github.com/natcap/invest"
@@ -683,9 +682,82 @@ def finalize_run(
     return parsed
 
 
+def run_assessment_openai(
+    client: "OpenAI",
+    *,
+    model: str,
+    reasoning_effort: str,
+    static_prefix: str,
+    dynamic_suffix: str,
+) -> AssessmentRun:
+    # The system prompt and static prefix are identical across every run, so OpenAI's
+    # automatic prefix caching reuses them; the per-run suffix is kept last so it
+    # never invalidates that cached prefix.
+    kwargs = {
+        "model": model,
+        "input": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"{static_prefix}\n\n{dynamic_suffix}"},
+        ],
+        "text_format": AssessmentRun,
+    }
+    if reasoning_effort != "none":
+        kwargs["reasoning"] = {"effort": reasoning_effort}
+
+    response = client.responses.parse(**kwargs)
+    return response.output_parsed
+
+
+def run_assessment_anthropic(
+    client,
+    *,
+    model: str,
+    reasoning_effort: str,
+    static_prefix: str,
+    dynamic_suffix: str,
+) -> AssessmentRun:
+    # Caching is a prefix match in render order tools -> system -> messages, so the
+    # cache_control breakpoint on the static prefix block caches the system prompt and
+    # the (large) evidence bundle together. Cache reads bill at ~0.1x, so every run
+    # after the first reuses that prefix for ~90% less input cost. The per-run suffix
+    # is a separate, uncached block placed after the breakpoint. The evidence bundle is
+    # well above Opus's 4096-token minimum cacheable prefix.
+    kwargs = {
+        "model": model,
+        "max_tokens": 16000,
+        "system": SYSTEM_PROMPT,
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": static_prefix,
+                        "cache_control": {"type": "ephemeral"},
+                    },
+                    {"type": "text", "text": dynamic_suffix},
+                ],
+            }
+        ],
+        "output_format": AssessmentRun,
+    }
+    # The Anthropic equivalent of OpenAI's reasoning effort is adaptive thinking
+    # combined with the effort parameter.
+    if reasoning_effort != "none":
+        kwargs["thinking"] = {"type": "adaptive"}
+        kwargs["output_config"] = {"effort": reasoning_effort}
+
+    response = client.messages.parse(**kwargs)
+    return response.parsed_output
+
+
 def run_assessment(
     *,
-    agent: Agent[None, AssessmentRun],
+    provider: str,
+    openai_client,
+    anthropic_client,
+    model: str,
+    reasoning_effort: str,
     run_number: int,
     runs: int,
     project_url: str,
@@ -694,7 +766,6 @@ def run_assessment(
     evidence_bundle: str,
     include_total: bool,
 ) -> AssessmentRun:
-    """Run a single assessment via a pre-configured Pydantic AI agent."""
     static_prefix, dynamic_suffix = build_user_prompt(
         run_number=run_number,
         runs=runs,
@@ -704,17 +775,28 @@ def run_assessment(
         evidence_bundle=evidence_bundle,
     )
 
-    user_prompt = f"{static_prefix}\n\n{dynamic_suffix}"
-    result = agent.run_sync(user_prompt)
-    parsed = result.output
+    if provider == "anthropic":
+        parsed = run_assessment_anthropic(
+            anthropic_client,
+            model=model,
+            reasoning_effort=reasoning_effort,
+            static_prefix=static_prefix,
+            dynamic_suffix=dynamic_suffix,
+        )
+    else:
+        parsed = run_assessment_openai(
+            openai_client,
+            model=model,
+            reasoning_effort=reasoning_effort,
+            static_prefix=static_prefix,
+            dynamic_suffix=dynamic_suffix,
+        )
 
     return finalize_run(
         parsed,
         run_number=run_number,
         project_url=project_url,
-        model=agent.model.model_name
-        if hasattr(agent.model, "model_name")
-        else str(agent.model),
+        model=model,
         include_total=include_total,
     )
 
@@ -1110,7 +1192,7 @@ def write_markdown_report(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run an Open Traceability Assessment multiple times via Pydantic AI."
+        description="Run an Open Traceability Assessment multiple times with the OpenAI and/or Anthropic API."
     )
     parser.add_argument("--project-url", default=DEFAULT_PROJECT_URL)
     parser.add_argument(
@@ -1143,8 +1225,8 @@ def parse_args() -> argparse.Namespace:
         choices=["none", "low", "medium", "high", "xhigh"],
         default="medium",
         help=(
-            "Reasoning effort. For OpenAI this maps to openai_reasoning_effort (xhigh → high). "
-            "For Anthropic, enables the Thinking capability. Use 'none' to disable."
+            "Reasoning effort. For OpenAI this maps to the reasoning parameter; for Anthropic it maps to "
+            "adaptive thinking plus the effort parameter. Use 'none' to disable."
         ),
     )
     parser.add_argument(
@@ -1163,51 +1245,26 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def _map_reasoning_effort(effort: str) -> str:
-    """Map CLI reasoning effort choices to Pydantic AI's openai_reasoning_effort values.
+def build_clients(provider: str) -> tuple[object, object]:
+    """Construct the API client(s) needed for the selected provider, importing lazily."""
+    openai_client = None
+    anthropic_client = None
 
-    Pydantic AI only supports low/medium/high; xhigh is mapped to high.
-    """
-    mapping = {"low": "low", "medium": "medium", "high": "high", "xhigh": "high"}
-    return mapping.get(effort, "medium")
-
-
-def build_agent(
-    provider: str,
-    model: str,
-    reasoning_effort: str,
-) -> Agent[None, AssessmentRun]:
-    """Construct Pydantic AI Agent for the selected provider and model."""
-
-    if provider == "openai":
+    if provider in ("openai", "both"):
         if not os.getenv("OPENAI_API_KEY"):
             raise RuntimeError("OPENAI_API_KEY is not set.")
-        agent = Agent(
-            f"openai:{model}",
-            output_type=AssessmentRun,
-            instructions=SYSTEM_PROMPT,
-            model_settings={
-                "openai_reasoning_effort": _map_reasoning_effort(reasoning_effort)
-            },
-        )
+        from openai import OpenAI
 
-    elif provider == "anthropic":
+        openai_client = OpenAI()
+
+    if provider in ("anthropic", "both"):
         if not os.getenv("ANTHROPIC_API_KEY"):
             raise RuntimeError("ANTHROPIC_API_KEY is not set.")
-        capabilities: list = []
-        if reasoning_effort != "none":
-            capabilities.append(Thinking())
-        agent = Agent(
-            f"anthropic:{model}",
-            output_type=AssessmentRun,
-            instructions=SYSTEM_PROMPT,
-            capabilities=capabilities or None,
-        )
+        import anthropic
 
-    else:
-        raise ValueError(f"Unsupported provider: {model} ")
+        anthropic_client = anthropic.Anthropic()
 
-    return agent
+    return openai_client, anthropic_client
 
 
 def main() -> None:
@@ -1226,6 +1283,8 @@ def main() -> None:
             ("openai", args.openai_model),
             ("anthropic", args.anthropic_model),
         ]
+
+    openai_client, anthropic_client = build_clients(args.provider)
 
     print(f"Fetching Open Traceability definition from: {args.definition_url}")
     definition_text = fetch_url_text(
@@ -1263,14 +1322,13 @@ def main() -> None:
             print(
                 f"Running assessment {run_number}/{total_runs} ({provider}: {model})..."
             )
-            agent = build_agent(
-                provider,
-                model=model,
-                reasoning_effort=args.reasoning_effort,
-            )
             try:
                 run = run_assessment(
-                    agent=agent,
+                    provider=provider,
+                    openai_client=openai_client,
+                    anthropic_client=anthropic_client,
+                    model=model,
+                    reasoning_effort=args.reasoning_effort,
                     run_number=run_number,
                     runs=total_runs,
                     project_url=project_url,

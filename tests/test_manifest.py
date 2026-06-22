@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-import ota
+import open_traceability_assessment as ota
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES = REPO_ROOT / "examples"
