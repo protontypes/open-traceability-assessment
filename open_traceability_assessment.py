@@ -120,6 +120,37 @@ class AssessmentRun(BaseModel):
     )
 
 
+# Schema for the optional manifest-expansion step (--suggest-references). The model is
+# asked to propose ADDITIONAL evidence URLs, grounded in the curated bundle, that a
+# curator could add to the manifest. The dimension literals mirror MANIFEST_DIMENSIONS
+# (defined further down); keep the two in sync if the canonical keys ever change.
+class SuggestedReference(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    dimension: Literal[
+        "open_data",
+        "open_software",
+        "open_execution",
+        "open_community",
+        "open_publications",
+    ] = Field(
+        description="Which Open Traceability dimension (stages 1-5) this URL would strengthen."
+    )
+    url: str = Field(
+        description="A concrete public URL NOT already in the manifest that adds evidence for this dimension."
+    )
+    title: str = Field(description="Short human-readable title for the suggested artifact.")
+    rationale: str = Field(
+        description="Why this URL strengthens the dimension's evidence chain and what it is expected to contain."
+    )
+
+
+class ReferenceSuggestions(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    suggestions: list[SuggestedReference]
+
+
 # -----------------------------
 # Evidence collection
 # -----------------------------
@@ -802,6 +833,201 @@ def run_assessment(
 
 
 # -----------------------------
+# Manifest expansion (--suggest-references)
+# -----------------------------
+
+SUGGESTION_SYSTEM_PROMPT = """You are an expert research librarian for open science, \
+open-source software, and environmental evidence chains.
+
+You are given a curated Open Traceability manifest (a human-nominated set of evidence \
+URLs grouped by dimension) and the fetched text of those sources. Propose ADDITIONAL \
+public references that a curator could add to strengthen the evidence chain.
+
+Rules:
+- Only suggest URLs that are NOT already present in the manifest.
+- Ground every suggestion in what the supplied evidence references, links to, or \
+implies; do not invent URLs you are not confident actually exist.
+- Prefer concrete, durable, directly-citable artifacts: datasets and data portals, \
+source repositories, CI/workflow configs, peer-reviewed papers and DOIs, documentation \
+pages, release pages, and public issue trackers.
+- Assign each suggestion to exactly one dimension: the one it most strengthens.
+- If you cannot responsibly suggest anything for a dimension, suggest nothing for it \
+rather than guessing.
+- A human will review and verify every suggestion, so be precise about what each URL \
+is expected to contain and why it matters.
+"""
+
+
+def build_suggestion_prompt(
+    *,
+    manifest: "Manifest",
+    definition_url: str,
+    definition_text: str,
+    evidence_bundle: str,
+) -> str:
+    """Prompt for the expansion step: lists what is already pinned, then asks for more."""
+    existing_lines = []
+    for key, stage_number, stage_name in MANIFEST_DIMENSIONS:
+        entries = manifest.dimensions.get(key, [])
+        urls = "\n".join(f"  - {e.url}" for e in entries) or "  (none nominated yet)"
+        existing_lines.append(f"Stage {stage_number} — {stage_name} ({key}):\n{urls}")
+    existing = "\n".join(existing_lines)
+
+    return f"""
+Suggest additional Open Traceability evidence URLs for the claim below.
+
+Definition source URL:
+{definition_url}
+
+Open Traceability definition text:
+{definition_text}
+
+CLAIM: {manifest.claim or '(not stated)'}
+CLAIM URL: {manifest.claim_url or '(not stated)'}
+
+URLs already pinned in the manifest (do NOT repeat these):
+{existing}
+
+Evidence bundle (fetched text of the pinned URLs):
+{evidence_bundle}
+
+Return only genuinely new, concrete, publicly reachable URLs, each assigned to the one
+dimension it most strengthens, with a short title and a rationale.
+""".strip()
+
+
+def suggest_references(
+    *,
+    provider: str,
+    openai_client,
+    anthropic_client,
+    model: str,
+    reasoning_effort: str,
+    manifest: "Manifest",
+    definition_url: str,
+    definition_text: str,
+    evidence_bundle: str,
+) -> ReferenceSuggestions:
+    """Ask one model for additional evidence URLs, validated against ReferenceSuggestions."""
+    prompt = build_suggestion_prompt(
+        manifest=manifest,
+        definition_url=definition_url,
+        definition_text=definition_text,
+        evidence_bundle=evidence_bundle,
+    )
+
+    if provider == "anthropic":
+        kwargs = {
+            "model": model,
+            "max_tokens": 8000,
+            "system": SUGGESTION_SYSTEM_PROMPT,
+            "messages": [{"role": "user", "content": prompt}],
+            "output_format": ReferenceSuggestions,
+        }
+        if reasoning_effort != "none":
+            kwargs["thinking"] = {"type": "adaptive"}
+            kwargs["output_config"] = {"effort": reasoning_effort}
+        return anthropic_client.messages.parse(**kwargs).parsed_output
+
+    kwargs = {
+        "model": model,
+        "input": [
+            {"role": "system", "content": SUGGESTION_SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ],
+        "text_format": ReferenceSuggestions,
+    }
+    if reasoning_effort != "none":
+        kwargs["reasoning"] = {"effort": reasoning_effort}
+    return openai_client.responses.parse(**kwargs).output_parsed
+
+
+def check_url_reachable(url: str) -> bool:
+    """Best-effort liveness probe; http_get raises on 4xx/5xx, so success means reachable."""
+    try:
+        http_get(url, timeout=15)
+        return True
+    except Exception:
+        return False
+
+
+def _entry_to_yaml(url: str, note: str) -> object:
+    """A manifest item is a bare URL when it has no note, else a {url, note} mapping."""
+    return {"url": url, "note": note} if note else url
+
+
+def write_expanded_manifest(
+    *,
+    manifest: "Manifest",
+    suggestions: ReferenceSuggestions,
+    model: str,
+    run_dir: Path,
+    verify: bool = True,
+) -> Path:
+    """Write a runnable manifest that merges the curated set with AI-suggested URLs.
+
+    The original entries are preserved verbatim; each suggested entry is appended to its
+    dimension with a note that unmistakably attributes it to the model and marks it
+    UNVERIFIED, so a human reviewer can see at a glance what the AI added. The producing
+    model is also encoded in the filename and an ``ai_expansion`` provenance block.
+    """
+    import yaml
+
+    by_dim: dict[str, list[SuggestedReference]] = {}
+    for s in suggestions.suggestions:
+        by_dim.setdefault(s.dimension, []).append(s)
+
+    reachable: dict[str, bool] = {}
+    if verify:
+        for s in suggestions.suggestions:
+            if s.url not in reachable:
+                print(f"  Checking suggested URL: {s.url}")
+                reachable[s.url] = check_url_reachable(s.url)
+
+    body: dict[str, object] = {}
+    if manifest.claim:
+        body["claim"] = manifest.claim
+    if manifest.claim_url:
+        body["claim_url"] = manifest.claim_url
+    body["ai_expansion"] = {
+        "model": model,
+        "generated_from": manifest.source,
+        "disclaimer": (
+            "Entries whose note begins with [AI-SUGGESTED] were proposed by an LLM and "
+            "are UNVERIFIED. Review each one before relying on it."
+        ),
+    }
+    if manifest.namespaces:
+        ns = [_entry_to_yaml(e.url, e.note) for e in manifest.namespaces]
+        body["namespace"] = ns[0] if len(ns) == 1 else ns
+
+    for key, _stage_number, _stage_name in MANIFEST_DIMENSIONS:
+        out = [_entry_to_yaml(e.url, e.note) for e in manifest.dimensions.get(key, [])]
+        for s in by_dim.get(key, []):
+            reach = "yes" if reachable.get(s.url, True) else "no"
+            note = (
+                f"[AI-SUGGESTED · {model} · UNVERIFIED · reachable={reach}] "
+                f"{s.title}: {s.rationale}"
+            )
+            out.append({"url": s.url, "note": note})
+        if out:
+            body[key] = out
+
+    header = (
+        "# Open Traceability manifest — AI-EXPANDED\n"
+        f"# Generated from: {manifest.source}\n"
+        f"# Suggestion model: {model}\n"
+        "# Entries marked [AI-SUGGESTED] are UNVERIFIED LLM proposals; review before use.\n\n"
+    )
+    dumped = yaml.safe_dump(body, sort_keys=False, allow_unicode=True, default_flow_style=False)
+
+    stem = Path(manifest.source).name.rsplit(".", 1)[0] or "manifest"
+    out_path = run_dir / f"{slugify(stem)}.ai-expanded.{slugify(model)}.yml"
+    out_path.write_text(header + dumped, encoding="utf-8")
+    return out_path
+
+
+# -----------------------------
 # Reporting
 # -----------------------------
 
@@ -1204,6 +1430,34 @@ def parse_args() -> argparse.Namespace:
             "uses the same curated bundle. See examples/open-traceability.yml."
         ),
     )
+    parser.add_argument(
+        "--suggest-references",
+        action="store_true",
+        help=(
+            "After collecting evidence, ask one model (the first selected provider) to "
+            "propose ADDITIONAL evidence URLs and write a runnable, AI-attributed expanded "
+            "manifest (<stem>.ai-expanded.<model>.yml) into the report folder. Requires "
+            "--manifest. Suggestions are marked UNVERIFIED for human review."
+        ),
+    )
+    parser.add_argument(
+        "--suggest-references-provider",
+        choices=["openai", "anthropic"],
+        default=None,
+        help=(
+            "Provider for the --suggest-references step. Defaults to the first selected "
+            "assessment provider. May differ from --provider (its SDK/key must be available)."
+        ),
+    )
+    parser.add_argument(
+        "--suggest-references-model",
+        default=None,
+        help=(
+            "Model id for the --suggest-references step. Defaults to the suggestion "
+            "provider's assessment model, so you can expand with a different model than "
+            "you score with."
+        ),
+    )
     parser.add_argument("--definition-url", default=DEFAULT_DEFINITION_URL)
     parser.add_argument(
         "--runs", type=int, default=3, help="Number of runs per selected provider."
@@ -1245,19 +1499,19 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def build_clients(provider: str) -> tuple[object, object]:
-    """Construct the API client(s) needed for the selected provider, importing lazily."""
+def build_clients(providers: set[str]) -> tuple[object, object]:
+    """Construct the API client(s) for the given providers, importing each SDK lazily."""
     openai_client = None
     anthropic_client = None
 
-    if provider in ("openai", "both"):
+    if "openai" in providers:
         if not os.getenv("OPENAI_API_KEY"):
             raise RuntimeError("OPENAI_API_KEY is not set.")
         from openai import OpenAI
 
         openai_client = OpenAI()
 
-    if provider in ("anthropic", "both"):
+    if "anthropic" in providers:
         if not os.getenv("ANTHROPIC_API_KEY"):
             raise RuntimeError("ANTHROPIC_API_KEY is not set.")
         import anthropic
@@ -1273,6 +1527,11 @@ def main() -> None:
     if args.runs < 1:
         raise ValueError("--runs must be at least 1")
 
+    if args.suggest_references and not args.manifest:
+        raise ValueError(
+            "--suggest-references expands a curated manifest, so it requires --manifest."
+        )
+
     # (provider, model) pairs to assess with, in order. 'both' runs each provider.
     if args.provider == "openai":
         provider_models = [("openai", args.openai_model)]
@@ -1284,7 +1543,19 @@ def main() -> None:
             ("anthropic", args.anthropic_model),
         ]
 
-    openai_client, anthropic_client = build_clients(args.provider)
+    # The suggestion step may use a different provider/model than the assessment, so
+    # resolve it up front and make sure both providers' clients (and keys) are available.
+    needed_providers = {provider for provider, _ in provider_models}
+    sugg_provider = sugg_model = None
+    if args.suggest_references:
+        sugg_provider = args.suggest_references_provider or provider_models[0][0]
+        default_sugg_model = (
+            args.anthropic_model if sugg_provider == "anthropic" else args.openai_model
+        )
+        sugg_model = args.suggest_references_model or default_sugg_model
+        needed_providers.add(sugg_provider)
+
+    openai_client, anthropic_client = build_clients(needed_providers)
 
     print(f"Fetching Open Traceability definition from: {args.definition_url}")
     definition_text = fetch_url_text(
@@ -1360,6 +1631,45 @@ def main() -> None:
 
             if run_number < total_runs and args.sleep_seconds > 0:
                 time.sleep(args.sleep_seconds)
+
+    # Optional manifest expansion: ask one model for additional evidence URLs and write
+    # an AI-attributed, human-reviewable manifest. Done independently of assessment
+    # success so the suggestions survive even if every assessment run failed.
+    if args.suggest_references:
+        print(f"Suggesting additional references ({sugg_provider}: {sugg_model})...")
+        try:
+            suggestions = suggest_references(
+                provider=sugg_provider,
+                openai_client=openai_client,
+                anthropic_client=anthropic_client,
+                model=sugg_model,
+                reasoning_effort=args.reasoning_effort,
+                manifest=manifest,
+                definition_url=args.definition_url,
+                definition_text=definition_text,
+                evidence_bundle=evidence_bundle,
+            )
+        except Exception as exc:  # noqa: BLE001 - suggestion failure must not lose the report
+            print(f"  Reference suggestion failed: {exc}")
+            suggestions = None
+
+        if suggestions is not None and suggestions.suggestions:
+            if run_dir is None:
+                name_prefix = f"{slugify(manifest.claim or 'project')}_{args.out_prefix}"
+                run_dir = Path(args.output_dir) / f"{timestamp}_{name_prefix}"
+                run_dir.mkdir(parents=True, exist_ok=True)
+            expanded_path = write_expanded_manifest(
+                manifest=manifest,
+                suggestions=suggestions,
+                model=sugg_model,
+                run_dir=run_dir,
+            )
+            print(
+                f"  {len(suggestions.suggestions)} suggestion(s); "
+                f"wrote AI-expanded manifest: {expanded_path}"
+            )
+        elif suggestions is not None:
+            print("  Model suggested no additional references.")
 
     if not runs:
         raise RuntimeError(

@@ -247,11 +247,36 @@ Writing a good manifest is itself research: you have to locate the data, code, e
 
 The two example manifests in [`examples/`](examples/) — [`open-traceability.yml`](examples/open-traceability.yml) (a Global Forest Watch claim) and [`invest-open-traceability.yml`](examples/invest-open-traceability.yml) (the InVEST toolset) — were created exactly this way. This keeps the LLM in the role the broader Open Traceability framework intends for it: an *assessment assistant* that surfaces and organises candidate evidence for human review, not an oracle that certifies claims.
 
+### Expanding a manifest with `--suggest-references`
+
+Steps 2–4 above can be partly automated against an *existing* manifest. With `--suggest-references`, after the curated evidence is collected the tool asks one model to propose **additional** evidence URLs — grounded in the bundle it was given — and writes a runnable, AI-attributed **expanded manifest** into the report folder:
+
+```bash
+python open_traceability_assessment.py \
+  --manifest examples/open-traceability.yml \
+  --runs 1 --provider anthropic \
+  --suggest-references
+# → reports/<timestamp>_<slug>/open-traceability.ai-expanded.claude-opus-4-8.yml
+```
+
+The expansion is **clearly attributed to the AI**, in three places, so a reviewer can see exactly what the model added:
+
+- **Filename** — `<stem>.ai-expanded.<model>.yml`, with the producing model in the name.
+- **In-file provenance** — an `ai_expansion:` block records the `model`, the `generated_from` source, and a disclaimer. (The manifest loader ignores this block, so the file stays loadable.)
+- **Per-entry note** — every suggested URL is appended to its dimension with a note of the form `[AI-SUGGESTED · <model> · UNVERIFIED · reachable=yes/no] <title>: <rationale>`. Original curated entries are preserved verbatim. The `reachable` flag is a best-effort liveness probe of the suggested URL.
+
+Because the original entries are kept and the suggestions are merged into their dimensions, the output is itself a valid manifest. The intended flow is human-in-the-loop: **review** the `[AI-SUGGESTED]` entries, delete or correct what you don't want, then re-run with `--manifest <expanded>.yml`. Suggestions are marked `UNVERIFIED` by design — this step proposes candidates, it does not certify them.
+
+By default the suggestion step uses the first selected assessment provider and its model. To expand with a *different* model than you score with — for example, score with OpenAI but brainstorm references with Claude — use `--suggest-references-provider` and `--suggest-references-model` (the chosen provider's SDK and API key must be available). `--suggest-references` requires `--manifest`.
+
 ### Model and reasoning options
 
 | Option | Default | Description |
 | --- | --- | --- |
 | `--manifest` | _(none)_ | Path or URL to an Open Traceability manifest (YAML). When set, replaces `--project-url` crawling with the curated evidence set for a reproducible run. |
+| `--suggest-references` | _(off)_ | After collecting evidence, ask one model to propose additional evidence URLs and write a runnable, AI-attributed expanded manifest (`<stem>.ai-expanded.<model>.yml`) into the report folder. Requires `--manifest`. |
+| `--suggest-references-provider` | _(first assessment provider)_ | Provider for the suggestion step (`openai` or `anthropic`); may differ from `--provider`. |
+| `--suggest-references-model` | _(that provider's model)_ | Model id for the suggestion step, so you can expand with a different model than you score with. |
 | `--provider` | `openai` | Which provider(s) to assess with: `openai`, `anthropic`, or `both`. |
 | `--model` | `gpt-5.5` | OpenAI model id (used for `openai` and `both`). |
 | `--anthropic-model` | `claude-opus-4-8` | Anthropic (Claude) model id (used for `anthropic` and `both`). |
