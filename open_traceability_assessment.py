@@ -1,12 +1,11 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#   pydantic-ai>=0.60.0
-#   anthropic>=0.50.0
-#   requests>=2.32.0
-#   beautifulsoup4>=4.12.0
-#   pydantic>=2.8.0
-#   pypdf>=4.3.0
+#   "requests>=2.32.0",
+#   "beautifulsoup4>=4.12.0",
+#   "pydantic>=2.8.0",
+#   "pypdf>=4.3.0",
+#   "pydantic-ai-slim[anthropic,openai]>=1.107.0",
 # ]
 # ///
 """
