@@ -84,7 +84,11 @@ This runner implements the LLM-assisted part of that architecture. It collects a
 
 ## Installation
 
-<<<<<<< HEAD
+This project can be run with [UV](https://docs.astral.sh/uv/), as all dependencies are specified in the header of the `open_traceability_assessment.py` file.
+
+--- 
+
+You don't want to go with UV and just go the classical PIP way, please check out the following workflow.
 Create a virtual environment and install the dependencies:
 
 ```bash
@@ -104,9 +108,6 @@ pydantic>=2.8.0
 pypdf>=4.3.0
 pyyaml>=6.0
 ```
-=======
-This project can be run with [UV](https://docs.astral.sh/uv/), as all dependencies are specified in the header of the `open_traceability_assessment.py` file.
->>>>>>> 96f765f7556bb9d6cab5a53a335d20a3886c50e7
 
 The provider SDKs are imported lazily, so you only need the one(s) you actually use: `openai` for `--provider openai`, `anthropic` for `--provider anthropic`, or both for `--provider both`. `pyyaml` is only needed when you use `--manifest`.
 
