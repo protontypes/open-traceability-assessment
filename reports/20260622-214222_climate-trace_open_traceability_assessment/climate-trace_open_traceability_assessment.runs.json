@@ -1,0 +1,975 @@
+{
+  "human_review": {
+    "approved": false,
+    "instructions": "Validate all claims in this report against the references provided, then review, edit, and approve its contents. Set approved to true once done."
+  },
+  "runs": [
+    {
+      "run_number": 1,
+      "project_name": "Climate TRACE",
+      "project_url": "https://climatetrace.org",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 68,
+          "score_derivation": "Climate TRACE provides strong public access to its emissions inventory: bulk downloads, country/sector/source-level CSV packages, a beta API, schema/data-guide materials, licensing information, and previous versions on Zenodo are explicitly described. The data portal also reports large-scale coverage and includes monthly source-level confidence fields, which supports external reuse and inspection of reported emissions outputs. The score is not higher because the supplied evidence does not show that the underlying primary measurement inputs—satellite observations, remote-sensing products, ownership sources, training data, or other upstream datasets—are individually identifiable, versioned, licensed, and traceable back to their origins. Uncertainty estimates are said to exist for all sectors but are available only on request, not openly downloadable in the supplied evidence. Therefore, input-data traceability is strong for the published inventory but incomplete for the primary measurement and uncertainty evidence behind it.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The data portal evidence is detailed, but the bundle does not include the linked data guide, sector files, Zenodo records, or raw-input source documentation.",
+          "references": [
+            {
+              "label": "Climate TRACE data downloads portal",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "States that Climate TRACE emissions data are free and publicly available for download and via API, with bulk packages for countries or sectors containing annual country-level emissions, monthly source-level emissions, confidence, and ownership where available.",
+              "relevance": "Shows public availability, reuse pathways, coverage, and some quality/confidence fields for the emissions inventory."
+            },
+            {
+              "label": "Climate TRACE data licensing, schema, versions, and uncertainty note",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "States that data are licensed Creative Commons 4.0; packages include a data guide and detailed data schema; previous versions are on Zenodo; changelog is available via GitHub; uncertainty estimates are available for all sectors on request.",
+              "relevance": "Supports licensing, documentation, versioning, and uncertainty evidence, while also showing that uncertainty is not openly accessible in the supplied evidence."
+            },
+            {
+              "label": "Climate TRACE public API reference",
+              "url": "https://api.climatetrace.org/v6/swagger/index.html",
+              "quote_or_finding": "Evidence bundle identifies this as the v6 API Reference exposing the emissions data programmatically.",
+              "relevance": "Supports machine-accessible public access to the inventory data."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 55,
+          "score_derivation": "There is moderate public evidence for open methods: Climate TRACE maintains a public GitHub repository with detailed sector-specific methodology documents, year folders, and substantial commit history. This makes analytical assumptions and methods partly inspectable and version-controlled. The score is not lower because these methodology documents are directly relevant to how sector emissions are estimated and are publicly maintained. The score is not higher because the supplied evidence does not show open-source implementation code for the AI models, emissions-estimation pipelines, training/inference systems, dependency specifications, model configurations, or an open-source licence for the methodology repository. The GitHub organization lists a small climate-trace-tools repository and public-api-examples repository, but the evidence does not establish that these contain the production models or software needed to independently operate or reproduce the inventory.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The repository listing confirms public methodology documentation, but the evidence bundle does not include file contents, licences, or code/pipeline details.",
+          "references": [
+            {
+              "label": "Climate TRACE methodology-documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "Public GitHub repository described as 'Detailed, sector specific methodology documents' with README stating that the 2025 folder contains the most up-to-date methodologies and previous years are available in respective folders.",
+              "relevance": "Provides version-controlled public documentation of methods by sector and over time."
+            },
+            {
+              "label": "Methodology repository activity",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "Repository page shows 636 commits, 91 stars, 12 forks, no releases published, and public branch/file history.",
+              "relevance": "Supports version-control and public inspectability, while the absence of releases limits citable/versioned software-method artifacts."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "Organization lists public repositories including methodology-documents, climate-trace-tools, peer-reviewed-publications, and public-api-examples.",
+              "relevance": "Shows some public software/documentation presence, but does not demonstrate that core production models or AI pipelines are open source."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 24,
+          "score_derivation": "The supplied evidence provides some ingredients for understanding or consuming outputs—public data downloads, API access, schemas, changelog references, and methodology documents—but there is little direct evidence of open execution. No evidence is provided for workflow scripts, run manifests, parameters, computational environments, containers, notebooks, CI jobs, model weights, or exact production runs linking specific input datasets to reported Climate TRACE outputs. The score is above zero because the public inventory, API, and versioned methodology repository allow partial inspection of outputs and high-level methods, but the computational path from primary observations through AI/model processing to released emissions estimates is not externally re-executable from the supplied evidence.",
+          "uncertainty": "high",
+          "uncertainty_reason": "No sources were nominated for this dimension, so the assessment relies only on indirect evidence from data and methodology pages.",
+          "references": [
+            {
+              "label": "No nominated execution evidence",
+              "url": "https://climatetrace.org",
+              "quote_or_finding": "The evidence bundle explicitly lists '(no sources nominated for this dimension)' under Stage 3: Open Execution and Reproducibility.",
+              "relevance": "Directly indicates absence of curated evidence for workflows, run records, or reproducible execution."
+            },
+            {
+              "label": "Climate TRACE data downloads portal",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "Download packages include CSVs, data guide, detailed data schema, and the page refers users to a GitHub changelog for changes from the last release.",
+              "relevance": "Provides inspectable outputs and some release context, but not executable workflows or exact run provenance."
+            },
+            {
+              "label": "Climate TRACE methodology-documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "README directs users to year-specific sector methodologies and previous years' methodologies.",
+              "relevance": "Provides methodological context that can support partial understanding, but not reproducible execution."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 37,
+          "score_derivation": "There is limited-to-moderate public evidence of review and community scrutiny. Climate TRACE has a public GitHub issue tracker for methodology documents and public-facing news that includes a response to an external city-level accuracy study, and the organization lists a peer-reviewed-publications repository. This shows some visible channels for critique, publication tracking, and response to challenges. The score is not higher because the issue tracker evidence shows issue creation is restricted, the open-issues search has no results, and the supplied evidence does not show closed issue discussions, pull-request review, public governance, open methodological debates, correction notices with audit trails, peer-review records, or active community participation. The score is not lower because there is at least a public repository structure, visible issue area, and public communication responding to critique.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The evidence shows possible review channels but does not include the substance of issue discussions, peer-review artifacts, or governance records.",
+          "references": [
+            {
+              "label": "Methodology documents issue tracker",
+              "url": "https://github.com/climatetracecoalition/methodology-documents/issues",
+              "quote_or_finding": "Public GitHub issues page is visible, but shows 'Issue creation is restricted in this repository' and the open-issues search shows no results.",
+              "relevance": "Shows a public issue-tracking surface, but with restricted participation and no visible open discussion in the supplied evidence."
+            },
+            {
+              "label": "News item responding to external accuracy critique",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "News listing includes 'Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy,' described as a response to a recent study from Northern Arizona University researchers.",
+              "relevance": "Supports evidence of public response to external scrutiny."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "Organization lists a public 'peer-reviewed-publications' repository.",
+              "relevance": "Indicates an attempt to collect peer-reviewed publications or mentions, though the supplied evidence does not show the content or review status of individual items."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 74,
+          "score_derivation": "Climate TRACE communicates its claim and outputs through an openly accessible website, data portal, news/insights page, API reference, sector methodology documents, and release announcements. The data page clearly describes what is downloadable, units/coverage guidance through FAQs and data guides, licensing, API access, changelogs, and prior-version access. The news page provides ongoing release communication and explanatory articles, including monthly emissions-data releases and applied examples. The score is not higher because the supplied evidence does not show a stable, citable report for the central claim, a complete public data guide, explicit open licences for publications/news pages, full review status for each publication, or detailed version history embedded in each dashboard/publication output. The score is not lower because the public communication is broad, current, and tied to data access and methodology references.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The bundle includes strong publication-facing pages but not the full text of linked FAQs, data guides, sector pages, or publication repository entries.",
+          "references": [
+            {
+              "label": "Climate TRACE project home",
+              "url": "https://climatetrace.org",
+              "quote_or_finding": "The evidence bundle identifies the main claim URL as the Climate TRACE homepage for an independent, openly available global inventory of greenhouse-gas emissions.",
+              "relevance": "Provides the central public communication endpoint for the project claim."
+            },
+            {
+              "label": "Climate TRACE data downloads portal",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "States that the page offers bulk download packages, beta API information, FAQs/resources/guidance, sector methodological summaries, data schema, licensing, citations, Zenodo previous versions, and a GitHub changelog.",
+              "relevance": "Shows that public outputs are accompanied by explanatory and access documentation."
+            },
+            {
+              "label": "Climate TRACE news and insights",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "Lists release and explanatory items such as 'Climate TRACE Releases March 2026 Emissions Data,' 'Climate TRACE Releases February 2026 Emissions Data,' ownership-data guidance, and articles applying the data.",
+              "relevance": "Shows ongoing public communication, release announcements, and explanatory material."
+            },
+            {
+              "label": "Climate TRACE methodology-documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "README says the repository contains sector-specific methodology documents and directs users to the most up-to-date 2025 folder and previous-year folders.",
+              "relevance": "Connects public communication to inspectable methodology documentation."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 49,
+          "score_derivation": "Climate TRACE has a partial evidence chain linking claim, data access, methods, versions, and communications: the website points users to data downloads and API access; the data page points to FAQs, sector methodology, schema, citations, Zenodo previous versions, and a GitHub changelog; the methodology repository is organized by year and sector; and news posts announce specific data releases. This supports moderate inspectability across publications, outputs, and methods. The score is not higher because the supplied evidence does not show explicit, versioned links from a specific environmental claim or dashboard value to exact primary input datasets, satellite products, model/code versions, parameter sets, run IDs, workflow executions, uncertainty files, review records, and release artifacts. The underlying AI/model pipeline and production execution are not linked in an externally verifiable way. The score is not lower because the public data portal, GitHub methodology repository, API reference, changelog reference, prior-version reference, and release communications create a usable but incomplete chain from publication to output data and high-level methods.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The evidence chain is visible at a high level, but exact artifact-to-artifact provenance is not provided in the bundle.",
+          "references": [
+            {
+              "label": "Data portal linkage to methods, schema, versions, and changelog",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The data page directs users to FAQs, resources, sector methodological details, a data guide, detailed data schema, Zenodo previous versions, and a GitHub changelog.",
+              "relevance": "Provides the strongest explicit cross-linking evidence from data outputs to documentation and version history."
+            },
+            {
+              "label": "Methodology-documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "README states that 2025 contains the most up-to-date methodologies and previous years' methodologies are available in their respective folders.",
+              "relevance": "Supports temporal linkage between data-release years and methodology documentation, though not exact run provenance."
+            },
+            {
+              "label": "Public API reference",
+              "url": "https://api.climatetrace.org/v6/swagger/index.html",
+              "quote_or_finding": "Evidence bundle identifies this as the v6 API Reference for programmatic access to Climate TRACE emissions data.",
+              "relevance": "Adds a machine-readable access point that can be linked to outputs, but does not itself identify model runs or inputs."
+            },
+            {
+              "label": "News release communications",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "News page lists release-specific announcements such as May release 5.7.0 including monthly emissions data through March 2026 and April release 5.6.0 including data through February 2026.",
+              "relevance": "Shows some versioned public communication of releases, but not full provenance from raw inputs through computations to each claim."
+            }
+          ]
+        }
+      ],
+      "total_score": 51,
+      "total_score_derivation": "Computed locally as round(mean([68, 55, 24, 37, 74, 49])) = 51.",
+      "single_paragraph_summary": "Climate TRACE has a relatively strong public-facing traceability layer for its greenhouse-gas inventory: emissions data are openly downloadable and available through an API, the data portal describes schemas, licensing, changelogs and prior versions, sector methodology documents are maintained in a public GitHub repository, and the project communicates releases and critiques through a public website. The main traceability weakness is that the supplied evidence does not expose the full upstream and computational chain behind the claim: primary satellite/remote-sensing inputs, AI/model code, dependencies, parameters, workflow runs, model configurations, uncertainty files, and exact run-to-output provenance are not publicly demonstrated. As a result, the project is strong on open outputs and public explanation, moderate on methods and linkage, and weak on execution reproducibility and fully inspectable primary evidence.",
+      "limitations": [
+        "The assessment uses only the supplied evidence bundle and definition text; linked resources such as the full data guide, FAQs, sector methodology PDFs, Zenodo records, changelog files, and API details were not independently inspected beyond the provided excerpts.",
+        "The evidence bundle does not include raw primary data sources, satellite product identifiers, training data, model weights, production code, workflow scripts, containers, parameter files, or run logs.",
+        "The existence of repositories such as climate-trace-tools, public-api-examples, and peer-reviewed-publications is visible in the bundle, but their contents, licences, and relevance to production methods are not established by the supplied evidence.",
+        "Uncertainty estimates are reported as available on request, but the supplied evidence does not show openly downloadable uncertainty datasets or detailed uncertainty methodology.",
+        "Community and review evidence is incomplete: the issue tracker is visible but restricted, and no closed-issue discussions, pull-request reviews, governance records, or peer-review documents are included.",
+        "Scores are conservative where evidence is referenced by the website but not actually included in the evidence bundle."
+      ],
+      "model_name": "gpt-5.5"
+    },
+    {
+      "run_number": 2,
+      "project_name": "Climate TRACE",
+      "project_url": "https://climatetrace.org",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 66,
+          "score_derivation": "Climate TRACE provides strong public access to its resulting emissions inventory: bulk CSV download packages, country/sector/asset-level coverage, an API, schema/data-guide materials, licensing information, confidence fields, a changelog, and prior versions on Zenodo. This supports reuse and external inspection of the published emissions data. The score is not higher because the evidence bundle does not show that the underlying primary measurement inputs behind the claim—satellite observations, other remote-sensing data, asset datasets, AI training data, calibration/validation measurements, and transformations from raw observations to emissions estimates—are fully identifiable, versioned, licensed, or traceable back to primary sources. It is also a limitation that uncertainty estimates are described as available only on request rather than openly included for all sectors in the downloaded inventory. The score is not lower because the public data portal is substantial, documented, downloadable, API-accessible, licensed, and at least partly versioned.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The evidence clearly documents openness of the published emissions inventory, but provides limited detail on the openness of underlying primary measurement evidence.",
+          "references": [
+            {
+              "label": "Climate TRACE data downloads",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The page states that Climate TRACE emissions data are free and publicly available for download and via API, with bulk packages containing annual country-level emissions, monthly source-level emissions, confidence, and ownership where available.",
+              "relevance": "Shows public availability, structure, reuse pathways, and some quality/confidence information for the inventory data."
+            },
+            {
+              "label": "Data licensing, schema, versioning, and uncertainty note",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The page states the data are licensed Creative Commons 4.0, that guidance on schema/licensing/citation is in the data guide and detailed data schema, that previous versions are on Zenodo, and that uncertainty estimates are available for all sectors on request.",
+              "relevance": "Supports data reuse, documentation, and versioning, while also showing that uncertainty is not fully openly distributed in the cited evidence."
+            },
+            {
+              "label": "Climate TRACE API reference",
+              "url": "https://api.climatetrace.org/v6/swagger/index.html",
+              "quote_or_finding": "The supplied artifact is the v6 API Reference for programmatic access to Climate TRACE data.",
+              "relevance": "Supports machine-accessible public access to the published data, although not necessarily to the underlying raw measurement inputs."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 48,
+          "score_derivation": "Climate TRACE has a public GitHub organization and a public methodology-documents repository with detailed sector-specific methodology documents, year folders, and a substantial commit history. This provides meaningful openness for methods and assumptions at a documentary level. The score is not higher because the evidence does not show that the AI models, emissions-estimation code, data-processing pipelines, dependencies, trained model artifacts, configuration files, infrastructure code, or a recognized open-source license are available for inspection and independent operation. The GitHub organization lists repositories such as climate-trace-tools and public-api-examples, but the bundle does not provide enough concrete evidence about their scope, licensing, or whether they reproduce the core inventory. The score is not lower because sector methods are publicly version-controlled and appear to be actively maintained.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "There is good evidence for open methodology documents, but limited evidence about the actual source code, models, dependencies, and licenses behind the inventory production system.",
+          "references": [
+            {
+              "label": "Climate TRACE methodology repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository is public, described as containing detailed sector-specific methodology documents, has folders for 2022 through 2026, and the README directs users to the 2025 folder for the most up-to-date methodologies.",
+              "relevance": "Supports public, version-controlled access to methods and sector-specific analytical documentation."
+            },
+            {
+              "label": "Methodology repository activity",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository page shows 636 commits, 91 stars, and 12 forks, with no releases published.",
+              "relevance": "Shows a public version-control history, while the absence of releases limits precise versioned software/method package traceability."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The organization lists public repositories including methodology-documents, climate-trace-tools, peer-reviewed-publications, and public-api-examples.",
+              "relevance": "Shows some open project infrastructure, but the supplied evidence does not demonstrate that the core AI/model/software stack is open source or independently runnable."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 24,
+          "score_derivation": "There is limited execution traceability. Public downloads, API access, schemas, changelog references, and methodology documents help users understand and inspect outputs and broad methods, but the bundle provides no nominated execution evidence and no specific workflow runs, scripts, parameters, computational environments, containers, notebooks, provenance records, or run logs connecting exact input datasets to exact published emissions outputs. The evidence also does not show that an external actor can re-execute the Climate TRACE production process. The score is not lower because the inventory outputs and methods are available in a structured way and previous versions are mentioned, which gives some basis for comparing releases. It is not higher because reproducibility of the actual estimation pipeline is not demonstrated.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The evidence bundle explicitly contains no sources nominated for execution, and the available artifacts do not demonstrate re-executable workflows.",
+          "references": [
+            {
+              "label": "Data downloads and changelog reference",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The data page says packages include CSVs, a data guide, and detailed data schema, and refers users to a GitHub changelog for changes from the last release.",
+              "relevance": "Provides some output inspection and release-change context, but not enough to reproduce the computations."
+            },
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The README says the repository contains methodologies explaining how each Climate TRACE sector estimates emissions, with previous years' methodologies available in their respective folders.",
+              "relevance": "Provides conceptual method documentation across years, but not executable workflows or exact run provenance."
+            },
+            {
+              "label": "API reference",
+              "url": "https://api.climatetrace.org/v6/swagger/index.html",
+              "quote_or_finding": "The v6 API Reference exposes Climate TRACE data programmatically.",
+              "relevance": "Supports repeatable data retrieval from published outputs, but not reproduction of the upstream emissions-estimation run."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 34,
+          "score_derivation": "The evidence shows some public-facing channels and review signals: a public GitHub repository exists, a peer-reviewed-publications repository is listed in the organization, and the news page includes methodological communications and responses to external studies. However, the strongest nominated review artifact—the methodology-documents issue tracker—shows issue creation is restricted and no issue results are visible in the supplied evidence. The evidence does not show active public issue discussions, open pull-request review, governance minutes, public correction workflows, peer-review reports, or systematic responses to community challenges. The score is not lower because there are at least public repositories, visible news responses, and a named repository for peer-reviewed publications. It is not higher because the inspectable record of critique and correction is sparse and partly closed/restricted.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The bundle contains some review-related signals, but little concrete evidence of active, public, inspectable review processes.",
+          "references": [
+            {
+              "label": "Methodology issue tracker",
+              "url": "https://github.com/climatetracecoalition/methodology-documents/issues",
+              "quote_or_finding": "The issues page states that issue creation is restricted in this repository and shows no issue search results in the supplied artifact.",
+              "relevance": "Indicates limited public issue-based review and correction traceability for methodology documents."
+            },
+            {
+              "label": "Climate TRACE news page",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news list includes an item titled 'Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy' responding to a recent Northern Arizona University study.",
+              "relevance": "Shows some public response to external critique, although the bundle does not provide full review records."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The organization lists a public repository named peer-reviewed-publications and mentions repositories for methodology documents and tools.",
+              "relevance": "Suggests some public organization of review/publication materials, but the supplied evidence does not document peer-review contents or processes."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 74,
+          "score_derivation": "Climate TRACE communicates its inventory through an open website, data-download portal, API reference, sector methodology links, news/insights updates, release announcements, and explanatory materials such as FAQs, resources, guidance, data guide, schema, and methodology PDFs. The data page clearly states coverage, download contents, units/schema guidance, licensing, prior versions, and update latency; the news page shows ongoing release communication and contextual articles. The score is not higher because the bundle does not demonstrate that all publications are under standardized open licenses, does not provide full publication/version histories for dynamic web outputs, and does not show formal review status for each public claim. The score is not lower because the public communication and documentation around data access, methods, releases, and use are substantial.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The evidence directly documents multiple public communication channels, although publication licensing and review status are incomplete.",
+          "references": [
+            {
+              "label": "Climate TRACE data portal",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The data page explains the inventory, download packages, API, data schema, licensing, citation guidance, previous versions, sector methodology PDFs, and release changelog reference.",
+              "relevance": "Strong evidence that public outputs are documented enough to support user scrutiny of data products."
+            },
+            {
+              "label": "Climate TRACE news and insights",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news page lists frequent updates, including monthly emissions data releases such as release 5.7.0 with March 2026 data and release 5.6.0 with February 2026 data.",
+              "relevance": "Shows public communication of update cycles and release announcements."
+            },
+            {
+              "label": "Methodology repository README",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The README points users to current and previous-year methodology folders and to the Climate TRACE website for emissions data.",
+              "relevance": "Supports communication of methods and linkage from methodological documents to the public data product."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 46,
+          "score_derivation": "Climate TRACE has a partial evidence chain: the public claim is connected to a data portal, the data portal connects users to sector methodology PDFs, data guides, schemas, a GitHub changelog, previous versions on Zenodo, and an API, and the methodology repository is public and organized by year. This makes broad movement from claim to published inventory and high-level methodology inspectable. The score is not higher because the chain is not explicit and specific enough to connect individual claims, assets, countries, sectors, or releases to exact raw input datasets, exact code/model versions, trained AI artifacts, parameters, workflow runs, review records, and publication versions. Core links from primary measurement evidence to model execution to output are missing or not externally verifiable in the supplied evidence. The score is not lower because there are meaningful cross-links among the website, data downloads/API, methodology documents, changelog/version references, and news releases.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The public artifacts are linked at a high level, but the bundle lacks exact provenance links across data, software, execution, review, and publications.",
+          "references": [
+            {
+              "label": "Data portal links to data, methodology, versions, and changelog",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The page links data downloads by sector/country, methodology PDFs by sector, API access, data guide/schema, previous versions on Zenodo, and a GitHub changelog.",
+              "relevance": "Provides the main public linkage from Climate TRACE outputs to documentation and version-related artifacts."
+            },
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository README says current methodologies are in the 2025 folder and previous years' methodologies are available in their respective folders.",
+              "relevance": "Supports temporal linkage between methods and inventory years, though not exact run-level provenance."
+            },
+            {
+              "label": "News release communication",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news page identifies specific monthly data releases such as 5.7.0 and 5.6.0 and describes the latest months included.",
+              "relevance": "Helps link public communications to data release versions, but does not link to exact input data, code commits, or workflow runs."
+            }
+          ]
+        }
+      ],
+      "total_score": 49,
+      "total_score_derivation": "Computed locally as round(mean([66, 48, 24, 34, 74, 46])) = 49.",
+      "single_paragraph_summary": "Climate TRACE has a relatively strong public-facing traceability layer for its published emissions inventory: bulk downloads, API access, data schema and guide references, Creative Commons licensing for data, sector methodology documents in a public GitHub repository, release/news communications, and some versioning references through changelogs and Zenodo. However, the evidence chain is much weaker for the upstream production system behind the claim that the inventory is derived from satellite observations, remote sensing, and AI: the supplied evidence does not expose the raw primary measurement inputs, AI/model code, dependencies, workflow runs, parameters, computational environments, or exact provenance links connecting inputs to outputs. Review traceability is also limited because the public issue tracker appears restricted and inactive in the supplied evidence, despite some public responses to critique and a peer-reviewed-publications repository being listed. Overall, Climate TRACE is open and reusable as a data publication, but only partially traceable as a fully inspectable environmental evidence chain.",
+      "limitations": [
+        "The evidence bundle does not include the full contents of methodology PDFs, data guides, schemas, Zenodo records, or changelog files, so their depth could not be fully assessed.",
+        "No direct evidence was supplied for executable workflows, workflow runs, containers, notebooks, parameters, or computational environments.",
+        "No direct evidence was supplied that the core AI models, trained model artifacts, emissions-estimation code, or infrastructure software are open source or independently runnable.",
+        "The underlying primary measurement evidence, including satellite/remote-sensing inputs and asset data sources, is not documented in the supplied evidence at the level required for full external verification.",
+        "Uncertainty estimates are described as available on request, but the bundle does not show that they are openly downloadable for all sectors and releases.",
+        "The issue tracker evidence shows restricted issue creation and no visible issue results, limiting assessment of public critique and correction processes.",
+        "The assessment relies only on the curated evidence bundle and linked artifacts described there; inaccessible or truncated page content may omit relevant details."
+      ],
+      "model_name": "gpt-5.5"
+    },
+    {
+      "run_number": 3,
+      "project_name": "Climate TRACE",
+      "project_url": "https://climatetrace.org",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 72,
+          "score_derivation": "Climate TRACE provides strong public access to derived emissions inventory data: bulk CSV downloads by country and sector, a public beta API, source-level monthly emissions, country-level annual emissions, ownership data where available, schemas, a data guide, confidence fields, Creative Commons 4.0 licensing, a changelog, and prior versions on Zenodo. This is substantially better than a closed dashboard because external users can download and inspect large portions of the inventory. The score is not higher because the evidence bundle does not show public access to the underlying primary satellite observations, remote-sensing inputs, training data, asset-detection evidence, or full measurement provenance behind individual estimates; uncertainty estimates are described as available only on request rather than openly included for all sectors; and the transformations from primary observations to final emissions values are not fully traceable from the cited evidence.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The public data portal is well evidenced, but the bundle does not expose the underlying primary measurement datasets or full uncertainty documentation.",
+          "references": [
+            {
+              "label": "Climate TRACE data downloads",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "Climate TRACE says its emissions data are free and publicly available for download and via API, with bulk packages including annual country-level emissions, monthly source-level emissions, confidence, ownership where available, data guide, detailed data schema, Creative Commons 4.0 licensing, changelog, and previous versions on Zenodo.",
+              "relevance": "Directly supports openness, reuse, documentation, licensing, versioning, and programmatic access for the derived emissions inventory."
+            },
+            {
+              "label": "Climate TRACE API reference",
+              "url": "https://api.climatetrace.org/v6/swagger/index.html",
+              "quote_or_finding": "The evidence bundle identifies a public v6 REST API Swagger reference exposing Climate TRACE emissions data programmatically.",
+              "relevance": "Supports machine-readable access and external inspection of inventory outputs."
+            },
+            {
+              "label": "Climate TRACE methodology repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository is described as containing detailed, sector-specific methodology documents, with folders for prior years and a 2025 folder for current methodologies.",
+              "relevance": "Helps document how input evidence is interpreted, although it does not by itself provide primary measurements or full data provenance."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 46,
+          "score_derivation": "There is moderate public evidence for open methods: Climate TRACE maintains a public GitHub repository of sector-specific methodology documents with a visible commit history and year-specific methodology folders. The organization also has public repositories including climate-trace-tools, public-api-examples, and peer-reviewed-publications. However, the evidence does not show that the core AI models, remote-sensing pipelines, emissions estimation code, training procedures, infrastructure, model configurations, or dependencies used to produce the inventory are open source. No recognized open-source license for the methodology repository or production code is visible in the supplied evidence, and the GitHub page reports no releases for the methodology repository. The score is therefore in the moderate range for open methods but below strong because the analytical logic appears mainly documented rather than fully inspectable and runnable as open software.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The public repositories are visible, but the evidence bundle provides little detail about repository contents, licensing, or whether production models and pipelines are included.",
+          "references": [
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "Public repository titled 'Detailed, sector specific methodology documents'; README says to refer to the 2025 folder for the most up-to-date methodologies and that previous years' methodologies are available in their respective folder; 636 commits are shown; no releases are published.",
+              "relevance": "Shows version-controlled public methodological documentation, but also indicates limits in formal release packaging."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The organization lists four public repositories: methodology-documents, climate-trace-tools, peer-reviewed-publications, and public-api-examples.",
+              "relevance": "Shows some open project infrastructure, but the evidence does not demonstrate that the full emissions-estimation software stack or AI models are public."
+            },
+            {
+              "label": "Climate TRACE data page",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The data portal directs users to sector pages, methodology PDFs, FAQs, resources, guidance, and API reference for understanding how Climate TRACE data are created and structured.",
+              "relevance": "Supports availability of methodological explanation, while not establishing open-source implementation of the underlying models."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 28,
+          "score_derivation": "Climate TRACE provides reusable outputs, schemas, a changelog, prior data versions, methodology documents, and an API, which gives some ability to inspect released results and compare versions. However, the evidence bundle contains no nominated execution evidence and does not show workflow scripts, run manifests, parameters, computational environments, containers, notebooks, CI jobs, provenance logs, or exact production runs connecting specific input observations to specific published emissions values. The core path from satellite/remote-sensing inputs and AI inference to final inventory outputs is therefore not independently re-executable from the supplied evidence. The score is above minimal because versioned data products and methodology documentation help external users understand outputs, but it remains low because reproducibility of the actual computation is not demonstrated.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The absence of direct workflow evidence is clear in the bundle, but related repositories might contain more execution details than are shown here.",
+          "references": [
+            {
+              "label": "Climate TRACE data downloads",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "Download packages include CSV outputs, a data guide, detailed data schema, changelog information, and prior versions on Zenodo.",
+              "relevance": "Provides reusable outputs and version context, which partially support reproducibility at the data-product level."
+            },
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The public methodology repository has year-organized methodology documents and a visible commit history, but the supplied page does not show execution workflows, containers, run parameters, or reproducible pipelines.",
+              "relevance": "Documents methods but does not demonstrate re-executable production runs."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The organization lists public repositories including climate-trace-tools and public-api-examples, but the evidence bundle does not provide details showing that these reproduce the published inventory.",
+              "relevance": "Indicates some tooling may exist, but insufficient evidence of end-to-end reproducibility."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 43,
+          "score_derivation": "There is some public evidence of review and scrutiny: Climate TRACE has a public methodology repository, a public peer-reviewed-publications repository is listed, and its news page includes a response correcting the record on a study questioning city-level road transportation accuracy. These artifacts show that at least some critique, publications, and public communication around methodological disputes are visible. The score is not higher because the cited GitHub issues page shows issue creation is restricted and no open issues are visible; the bundle does not show active public discussion threads, open correction workflows, governance records, reviewer reports, public comment processes, or how external challenges are systematically resolved. It is not lower because there is still evidence of public repositories and at least one public response to criticism.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The evidence shows some review-related channels but gives limited detail on peer review records or ongoing community processes.",
+          "references": [
+            {
+              "label": "Methodology repository issue tracker",
+              "url": "https://github.com/climatetracecoalition/methodology-documents/issues",
+              "quote_or_finding": "The issues page shows 'Issue creation is restricted in this repository' and no open issues are visible under the open-issues search.",
+              "relevance": "Directly limits evidence for open community issue tracking and external correction processes."
+            },
+            {
+              "label": "Climate TRACE news page",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news list includes 'Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy,' described as a response to a recent study from Northern Arizona University researchers regarding city-level road transportation emissions.",
+              "relevance": "Shows public response to external methodological criticism."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The organization lists a public 'peer-reviewed-publications' repository and a public methodology repository.",
+              "relevance": "Suggests some public record of publications and methods, although the supplied evidence does not show the review contents themselves."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 74,
+          "score_derivation": "Climate TRACE communicates its claim and outputs through an open website, data-download portal, sector methodology links, API reference, news and release announcements, and public GitHub repositories. The data page clearly describes coverage, formats, units-related guidance, data schema, citation/licensing guidance, release changes, and previous versions. The news page provides frequent update announcements and explanatory articles, including release notes for monthly emissions data and responses to external scrutiny. The score is not higher because the evidence does not show that all publications or methodology documents are released under standard open publication licenses, does not provide full peer-review artifacts, and does not demonstrate a completely versioned publication-to-data-to-method citation chain for every claim. It is nevertheless strong because the core outputs and explanations are publicly accessible and reasonably well documented.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The public communication materials are visible, but the bundle only excerpts high-level pages rather than full reports, licenses, or publication metadata.",
+          "references": [
+            {
+              "label": "Climate TRACE homepage / project claim",
+              "url": "https://climatetrace.org",
+              "quote_or_finding": "The manifest states the claim that Climate TRACE publishes an independent, openly available global greenhouse-gas emissions inventory covering every country and major source, derived from satellite observations and other remote sensing combined with AI.",
+              "relevance": "Identifies the public environmental claim being communicated."
+            },
+            {
+              "label": "Climate TRACE data page",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The page provides download packages, API information, data schema and guide references, sector methodology links, licensing and citation guidance, changelog reference, and prior-version information.",
+              "relevance": "Shows that core outputs are accessible and documented for scrutiny."
+            },
+            {
+              "label": "Climate TRACE news page",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news page lists release announcements such as 'Climate TRACE Releases March 2026 Emissions Data' and explanatory posts on ownership data, city-level accuracy, and use cases.",
+              "relevance": "Supports ongoing public communication of updates, interpretations, and corrections."
+            },
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository README points users to current and prior-year methodology folders and to the Climate TRACE website for emissions data.",
+              "relevance": "Provides public methodological documentation connected to the published outputs."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 50,
+          "score_derivation": "Climate TRACE has a partial open evidence chain: the public claim links to a data portal and API; the data portal links users to FAQs, sector methodology pages/PDFs, schema, data guide, changelog, and prior versions on Zenodo; the methodology repository is version-controlled and organized by year; and public news posts communicate releases and some methodological responses. This creates inspectable linkage at the level of product, sector, release, and documentation. The score is not higher because the evidence does not show explicit, versioned links from each published emissions estimate or asset record to the exact primary observations, source datasets, AI model versions, code commits, parameters, workflow runs, uncertainty calculations, review records, and publication artifacts that produced it. The execution stage is the main break in the chain. The score is not lower because several major artifacts are publicly connected and versioned enough for users to navigate from published data to general methods and release information.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The bundle supports a clear high-level linkage chain but not item-level or run-level provenance.",
+          "references": [
+            {
+              "label": "Climate TRACE data page",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The data page states that packages include a data guide and detailed schema; it points to sector methodologies, a GitHub changelog, previous versions on Zenodo, and the API reference.",
+              "relevance": "Provides the strongest evidence of linkage between outputs, documentation, versions, and methods."
+            },
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository contains current and prior-year sector methodology documents in a public GitHub repository with commit history.",
+              "relevance": "Supports versioned linkage from data products to sector-level methodological explanations."
+            },
+            {
+              "label": "Climate TRACE API reference",
+              "url": "https://api.climatetrace.org/v6/swagger/index.html",
+              "quote_or_finding": "The public v6 Swagger reference exposes programmatic access to Climate TRACE data.",
+              "relevance": "Supports linkage and verification through structured access to published inventory records."
+            },
+            {
+              "label": "Climate TRACE news page",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news page includes recurring monthly release announcements and explanatory articles on data use and methodological issues.",
+              "relevance": "Links public communication to data-release cycles and interpretive context."
+            }
+          ]
+        }
+      ],
+      "total_score": 52,
+      "total_score_derivation": "Computed locally as round(mean([72, 46, 28, 43, 74, 50])) = 52.",
+      "single_paragraph_summary": "Climate TRACE has a relatively strong open publication and data-access posture: its emissions inventory is publicly downloadable, exposed through an API, accompanied by schemas, data guides, sector methodology documents, a changelog, prior versions, and regular release communications. The main traceability weakness is that the evidence chain is not fully inspectable from primary satellite or remote-sensing measurements through AI/model execution to individual emissions estimates: the supplied evidence does not show open production code, model weights or configurations, workflow runs, computational environments, or run-level provenance. Public review evidence is also mixed, with some visible response to critique and publication infrastructure but restricted GitHub issue creation and little evidence of open correction workflows. Overall, the project is meaningfully open at the level of derived data, documentation, and communication, but only partially traceable end-to-end.",
+      "limitations": [
+        "The assessment uses only the supplied evidence bundle; it does not verify the contents of linked PDFs, Zenodo records, changelog files, API endpoints, or repository files beyond the excerpts provided.",
+        "No direct evidence was supplied for Stage 3 execution and reproducibility, so scoring is necessarily conservative.",
+        "The bundle does not show whether the core AI models, training data, model weights, emissions-estimation pipelines, or production infrastructure are open source.",
+        "The bundle does not provide primary satellite/remote-sensing datasets or asset-level provenance linking individual estimates to specific observations.",
+        "Uncertainty estimates are described as available on request, but the evidence does not show open, downloadable uncertainty data for all sectors.",
+        "The evidence mentions peer-reviewed publications but does not include the publication list, papers, review reports, or replication records.",
+        "Licensing is clear for the data as Creative Commons 4.0, but the evidence does not establish licenses for all methodology documents, software repositories, or publications."
+      ],
+      "model_name": "gpt-5.5"
+    },
+    {
+      "run_number": 4,
+      "project_name": "Climate TRACE",
+      "project_url": "https://climatetrace.org",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 64,
+          "score_derivation": "Climate TRACE provides substantial public access to its emissions inventory outputs: the data portal states that emissions data are free, downloadable in bulk, available via API, include country-, sector-, source-, gas-, ownership-, schema-, and guide files, and are licensed under Creative Commons 4.0. It also states that previous versions are on Zenodo and that monthly source-level emissions include confidence. This supports a score well above moderate. However, the evidence bundle does not show the underlying primary measurement inputs in an externally inspectable way: the claim says estimates are derived from satellite observations, other remote sensing, and AI, but the supplied evidence does not identify exact satellite products, raw observations, training data, measurement provenance, calibration/quality-control procedures, or transformations back to primary data. Uncertainty estimates are said to be available only “on request,” not directly downloadable. Therefore the project has strong openness for inventory outputs but incomplete traceability to primary input and measurement evidence, so the score is not higher.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The public data portal is clear, but the bundle lacks direct examples of download package contents, Zenodo records, data guide details, or primary measurement sources.",
+          "references": [
+            {
+              "label": "Climate TRACE data downloads",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The page says Climate TRACE emissions data are “free and publicly available for download and via API,” with bulk packages by country or sector, CSVs for annual country-level and monthly source-level emissions, confidence, ownership where available, data guide, detailed schema, Creative Commons 4.0 licensing, previous versions on Zenodo, and uncertainty estimates available on request.",
+              "relevance": "Shows broad public availability, reuse terms, schema documentation, some confidence information, and versioning for emissions inventory outputs, while also showing that uncertainty is not fully self-serve."
+            },
+            {
+              "label": "Climate TRACE API reference",
+              "url": "https://api.climatetrace.org/v6/swagger/index.html",
+              "quote_or_finding": "The evidence identifies a public v6 API reference exposing Climate TRACE data programmatically.",
+              "relevance": "Supports programmatic verifiability and reuse of the published emissions data."
+            },
+            {
+              "label": "Climate TRACE project claim/home",
+              "url": "https://climatetrace.org",
+              "quote_or_finding": "The curated claim describes an independent global greenhouse-gas emissions inventory derived from satellite observations and other remote sensing combined with AI.",
+              "relevance": "Identifies the claimed primary evidence types, but the evidence bundle does not provide traceable access to those primary observations or AI input datasets."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 55,
+          "score_derivation": "There is a public GitHub organization and a public methodology-documents repository with sector-specific methodology documents, historical year folders, and hundreds of commits. This gives meaningful inspectability of methods and their evolution. The organization also lists public repositories for climate-trace-tools, public-api-examples, and peer-reviewed-publications. However, the evidence does not show that the actual AI models, emissions-estimation pipelines, training data, inference code, dependencies, model configurations, or infrastructure are open source. The methodology repository has no releases published in the captured evidence, and no license information is shown. Public methods documentation is therefore considerably stronger than open-source software traceability. The score is moderate because methods are version-controlled and public, but it is not in the strong range because the core analytical software and model implementation are not evidenced as open and reproducible.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The GitHub evidence confirms public repositories and methodology history, but the bundle does not expose repository file contents, licenses, or executable model code.",
+          "references": [
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The organization lists public repositories including methodology-documents, climate-trace-tools, peer-reviewed-publications, and public-api-examples.",
+              "relevance": "Shows an open-source/public repository namespace and some tooling/API examples, but does not by itself demonstrate that core emissions models are open."
+            },
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository is public, described as “Detailed, sector specific methodology documents,” has 636 commits, and its README says to refer to the 2025 folder for the most up-to-date sector methodologies, with previous years in their respective folders.",
+              "relevance": "Provides version-controlled, inspectable methodological documentation across sectors and years."
+            },
+            {
+              "label": "Methodology repository release/license evidence",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The captured repository page states “Releases: No releases published”; no license information is visible in the supplied evidence.",
+              "relevance": "Limits confidence that methods are formally versioned as releases or released under a recognized open-source license."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 18,
+          "score_derivation": "The evidence bundle contains no nominated execution/reproducibility source and does not show workflows, scripts, notebooks, workflow engines, run logs, parameter files, computational environments, containers, dependency locks, or re-executable pipelines connecting the input observations to the published emissions outputs. The public data portal and methodology documents help users understand outputs and general methods, and the API supports access to published results, so the score is above zero. But an external actor could not, from the supplied evidence, rerun the specific Climate TRACE computations or inspect the exact execution that generated a given data release. The score is therefore low.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The absence of execution artifacts is explicit in the evidence bundle, making the main limitation clear.",
+          "references": [
+            {
+              "label": "No nominated execution evidence",
+              "url": "https://climatetrace.org",
+              "quote_or_finding": "The evidence bundle lists “no sources nominated for this dimension” under Open Execution and Reproducibility.",
+              "relevance": "Directly supports a conservative score because no public execution chain is evidenced."
+            },
+            {
+              "label": "Data portal release artifacts",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "Download packages include CSV outputs, a data guide, detailed schema, and references to a GitHub changelog; the page describes monthly and annual emissions outputs.",
+              "relevance": "Provides inspectable outputs and documentation, but not the computational run or environment that produced them."
+            },
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository contains sector-specific methodology documents and historical methodology folders.",
+              "relevance": "Methods documentation helps understand execution conceptually, but it is not evidence of re-executable workflows or specific run provenance."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 43,
+          "score_derivation": "There is some public evidence of review and scrutiny: Climate TRACE maintains public GitHub repositories, a methodology issue tracker is visible, the organization has a peer-reviewed-publications repository, and the news page includes an item responding to a recent external study on city-level road transportation accuracy. These artifacts show that at least some critique, publications, and public responses are visible. However, the captured GitHub issue page shows zero open issues and says issue creation is restricted, and no closed issues, pull-request discussions, peer-review reports, governance records, correction notices, or open community forum archives are supplied. The public-members list is not visible. As a result, review traceability is partial: there are signs of public scrutiny and communication, but not a robust, open, inspectable correction and debate process.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The bundle points to review-related channels but provides little detail on actual discussions, closed issues, or peer-review contents.",
+          "references": [
+            {
+              "label": "Methodology issue tracker",
+              "url": "https://github.com/climatetracecoalition/methodology-documents/issues",
+              "quote_or_finding": "The issue tracker is public, but the captured page shows “Issue creation is restricted in this repository,” “Open 0,” and no search results for open issues.",
+              "relevance": "Shows a visible GitHub review channel but limited openness for external issue submission and no visible active issue record in the supplied evidence."
+            },
+            {
+              "label": "Climate TRACE news response to critique",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news page lists “Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy,” described as a response to a recent study from Northern Arizona University regarding city-level road transportation emissions.",
+              "relevance": "Provides evidence that Climate TRACE publicly responds to external methodological criticism."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The organization lists a public peer-reviewed-publications repository, but the organization page also says it has no public members visible to non-members.",
+              "relevance": "Supports some publication/review infrastructure while showing limited transparency of contributor/community participation."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 78,
+          "score_derivation": "Climate TRACE has strong public communication infrastructure. The main data page clearly states what data are available, how they can be downloaded or accessed by API, what the packages contain, where to find schema and guidance, licensing, prior versions, sector methodology PDFs, changelogs, and API reference. The news page provides frequent release updates and explanatory articles, including monthly emissions data release announcements and applied interpretation pieces. The GitHub organization also includes methodology and peer-reviewed-publications repositories. This is strong evidence that outputs and explanatory materials are accessible and designed for public use. The score is not higher because the supplied evidence does not show publication licenses for news/methodology documents, detailed citations from individual claims to exact datasets/code versions, or complete review status for publications; some pages are summarized/truncated in the bundle.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The public-facing communication is well evidenced, but the bundle does not include full publication texts, licenses, or citation details for individual claims.",
+          "references": [
+            {
+              "label": "Climate TRACE data downloads and guidance",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The data page says users can download country and sector packages; it points to FAQs, resources, guidance, sector pages, a data guide, detailed schema, terms of use, previous Zenodo versions, a GitHub changelog, and sector methodology PDFs.",
+              "relevance": "Shows accessible publication of data products and explanatory documentation sufficient for many external users to scrutinize outputs."
+            },
+            {
+              "label": "Climate TRACE news and release updates",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news page lists frequent updates, including “Climate TRACE Releases March 2026 Emissions Data,” “Climate TRACE Releases February 2026 Emissions Data,” explanatory pieces on ownership data, and responses to external studies.",
+              "relevance": "Demonstrates ongoing public communication, release announcements, and contextual interpretation of the inventory."
+            },
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The README directs users to the 2025 folder for current methodologies and previous year folders for earlier methodologies.",
+              "relevance": "Supports public methodological communication and historical context for reported data products."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 49,
+          "score_derivation": "Climate TRACE has a partially inspectable evidence chain: the public website presents the environmental claim and data products; the data portal links users to bulk downloads, API access, sector methodology PDFs, schema, data guide, terms, previous Zenodo versions, and a GitHub changelog; the methodology repository preserves sector methods over time; the news page documents releases and public explanations. This creates useful linkage from publication to outputs and general methods. However, the supplied evidence does not show explicit, exact, versioned links from a specific claim or dashboard value to the precise primary observations, datasets, AI model version, code commit, parameter configuration, workflow run, uncertainty file, review record, and publication version that produced it. Review linkage is also weak because public issue activity is absent/restricted. Therefore the chain is externally inspectable at a high level but not at the exact evidence-chain level required for strong Open Linkage.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The high-level links are visible, but the bundle lacks concrete examples of claim-level provenance or exact version identifiers across the full chain.",
+          "references": [
+            {
+              "label": "Data portal linkage to methods, schema, versions, and changelog",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The page says download packages include data guide and detailed schema; sector methodology PDFs are linked; previous versions are on Zenodo; changes are described in a GitHub changelog; API reference is available.",
+              "relevance": "Provides the strongest evidence of cross-artifact linkage among outputs, documentation, methods, and versions."
+            },
+            {
+              "label": "Methodology documents repository history",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository contains current and previous-year methodology folders and 636 commits.",
+              "relevance": "Supports versioned linkage to evolving sector methodology documents, though not to exact model runs or data releases."
+            },
+            {
+              "label": "Public API reference",
+              "url": "https://api.climatetrace.org/v6/swagger/index.html",
+              "quote_or_finding": "The API reference exposes Climate TRACE data programmatically as v6.",
+              "relevance": "Supports a versioned interface for accessing published data, but not end-to-end provenance for how values were generated."
+            },
+            {
+              "label": "Issue tracker limitation",
+              "url": "https://github.com/climatetracecoalition/methodology-documents/issues",
+              "quote_or_finding": "The captured issue tracker shows no open issue results and restricted issue creation.",
+              "relevance": "Limits linkage from claims and methods to public challenge, correction, or review records."
+            }
+          ]
+        }
+      ],
+      "total_score": 51,
+      "total_score_derivation": "Computed locally as round(mean([64, 55, 18, 43, 78, 49])) = 51.",
+      "single_paragraph_summary": "Climate TRACE is highly visible and relatively open at the level of published emissions inventory outputs: it provides free downloadable data, API access, schemas, data guides, sector methodology documents, version references, changelogs, and frequent public communications. Its strongest dimensions are publication/communication and open access to data products. The main traceability weaknesses are upstream and computational: the supplied evidence does not expose the primary satellite/remote-sensing inputs, AI training or inference datasets, core model code, executable workflows, parameterized runs, containers, or exact provenance links from a specific emissions value to exact observations, code versions, and review records. Community/review evidence is also limited by a restricted and apparently inactive public issue tracker, though there is some evidence of public response to external critique and peer-reviewed-publication infrastructure. Overall, the project provides a strong public inventory and methodological narrative, but not a fully reproducible or exact end-to-end open evidence chain.",
+      "limitations": [
+        "The assessment uses only the supplied evidence bundle; some relevant details may exist on linked pages or inside downloadable packages that were not included in the captured evidence.",
+        "The evidence bundle does not include the actual contents of data guides, schemas, Zenodo records, changelogs, methodology PDFs, or API endpoints, so their depth could not be fully evaluated.",
+        "No direct evidence was supplied for primary satellite/remote-sensing datasets, raw measurements, calibration, quality controls, training data, or transformation lineage.",
+        "No direct evidence was supplied for executable workflows, run logs, containers, dependency files, parameter files, or reproducibility instructions for generating the inventory.",
+        "The GitHub pages in the evidence show repository summaries but not license files, full code contents, pull-request discussions, or closed issues.",
+        "Publication and review evidence is mostly at the listing/announcement level; peer-review details, correction histories, and public governance records were not supplied."
+      ],
+      "model_name": "gpt-5.5"
+    },
+    {
+      "run_number": 5,
+      "project_name": "Climate TRACE",
+      "project_url": "https://climatetrace.org",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 64,
+          "score_derivation": "Climate TRACE provides strong public access to the resulting emissions inventory: bulk CSV downloads by country and sector, a beta API, data schema/data guide references, source-level monthly emissions with confidence, ownership data where available, Creative Commons 4.0 licensing, and previous versions on Zenodo. This is substantially better than fragmentary evidence because external users can obtain and inspect large portions of the inventory and its structure. The score is not higher because the supplied evidence does not show direct public access to the underlying primary satellite observations, remote-sensing products, training data, ground-truth measurements, quality-control records, or full uncertainty estimates; the data page says uncertainty estimates are available “on request,” which is weaker than open, versioned uncertainty publication. Secondary data are therefore only partially traceable back to primary measurement evidence.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The public data portal is well evidenced, but the bundle does not include the detailed data guide, Zenodo records, source datasets, or sector PDFs themselves, so primary-input traceability is only partly inspectable here.",
+          "references": [
+            {
+              "label": "Climate TRACE data downloads portal",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The page states that Climate TRACE emissions data are “free and publicly available for download and via API,” with bulk packages including annual country-level emissions, monthly source-level emissions, confidence, ownership where available, schema/data guide copies, Creative Commons 4.0 licensing, and previous versions on Zenodo.",
+              "relevance": "Shows open availability, documentation, licensing, programmatic access, and some versioning for the inventory outputs used to support the claim."
+            },
+            {
+              "label": "Uncertainty availability statement",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The page says: “Uncertainty estimates are available for all sectors, on request.”",
+              "relevance": "Supports partial treatment of uncertainty, but also shows that full uncertainty evidence is not directly open in the supplied evidence."
+            },
+            {
+              "label": "Climate TRACE v6 API reference",
+              "url": "https://api.climatetrace.org/v6/swagger/index.html",
+              "quote_or_finding": "The supplied artifact is a public “v6 API Reference.”",
+              "relevance": "Supports programmatic access to inventory data, although the evidence excerpt does not document provenance or primary measurement inputs."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 48,
+          "score_derivation": "There is moderate openness of methods: the public methodology-documents repository contains detailed sector-specific methodology documents, has hundreds of commits, and explicitly directs users to current and previous-year methodologies. The GitHub organization also lists public repositories for tools, API examples, and peer-reviewed publications. This prevents a low score because methodological logic is at least partly inspectable in a version-controlled public repository. The score is not higher because the evidence does not show that the actual AI models, production emissions-estimation code, model weights, training pipelines, infrastructure code, full dependencies, configurations, or reproducible software environments are open source. The methodology repository has no releases shown, and the evidence excerpt does not show an OSI-approved software license for the methods or code.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The existence of public repositories is clear, but the evidence excerpt does not expose repository file contents beyond the README summary or licensing details, limiting confidence about software openness.",
+          "references": [
+            {
+              "label": "Methodology documents repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository is public, described as “Detailed, sector specific methodology documents,” has 636 commits, and its README says to refer to the 2025 folder for the most up-to-date methodologies, with previous years in their respective folders.",
+              "relevance": "Shows public, version-controlled documentation of sector methods, supporting method transparency."
+            },
+            {
+              "label": "No releases in methodology repository",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The repository page states “Releases: No releases published.”",
+              "relevance": "Indicates weaker versioned software/method release practice than an externally citable released model or software package."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The organization lists public repositories including methodology-documents, climate-trace-tools, peer-reviewed-publications, and public-api-examples.",
+              "relevance": "Shows some public project infrastructure beyond the website, but the supplied evidence does not demonstrate that production models or AI code are open source."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 18,
+          "score_derivation": "The evidence shows some elements that could support execution traceability, such as versioned methodology documents, downloadable datasets, API access, and a changelog referenced from the data page. However, no evidence was nominated for this dimension, and the bundle does not provide public workflows, run scripts, parameters, model configurations, computational environments, containers, notebooks, provenance logs, or exact workflow-run records connecting raw inputs to published Climate TRACE outputs. Because the actual computational path from satellite/remote-sensing inputs and AI models to the reported inventory is not externally re-executable in the supplied evidence, the score remains low. It is not zero because some outputs and methods are public and versioned enough to allow limited inspection of what was produced and described, even if the production run cannot be repeated.",
+          "uncertainty": "high",
+          "uncertainty_reason": "No direct execution evidence was supplied, so the score relies on absence in the bundle and may miss execution materials not included here.",
+          "references": [
+            {
+              "label": "No nominated execution evidence",
+              "url": "https://climatetrace.org",
+              "quote_or_finding": "The evidence bundle states “Stage 3: Open Execution and Reproducibility (no sources nominated for this dimension).”",
+              "relevance": "Directly supports the finding that no workflow/run-level reproducibility evidence was provided."
+            },
+            {
+              "label": "Data downloads and changelog reference",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The data page states that download packages are available and says changes from the last release are described in a changelog available via GitHub.",
+              "relevance": "Provides limited release/output traceability, but not enough to reproduce the computation from inputs to outputs."
+            },
+            {
+              "label": "Methodology repository version history",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The public methodology repository shows 636 commits and year-specific methodology folders.",
+              "relevance": "Supports some methodological version history, but the artifact is documentation rather than executable workflows or run records."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 35,
+          "score_derivation": "There is some public-facing review and accountability evidence: Climate TRACE has public GitHub repositories with stars/forks, a public issues page for methodology documents, a repository named peer-reviewed-publications, and news posts that include a response to an external study questioning city-level road transportation accuracy. This supports a score above minimal because at least some critique and communication are publicly visible. The score is not higher because the methodology issue tracker excerpt shows zero open issues, no closed results in the displayed search, and issue creation is restricted; the bundle does not show active public methodological discussion, peer-review files, reviewer comments, correction logs, governance records, replication attempts, or detailed responses within issue threads. Public community review therefore appears limited and hard to verify from the supplied artifacts.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The evidence clearly shows limited GitHub issue activity and one public response to critique, but it does not include the contents of the publications repository or any formal review records.",
+          "references": [
+            {
+              "label": "Methodology repository issues page",
+              "url": "https://github.com/climatetracecoalition/methodology-documents/issues",
+              "quote_or_finding": "The issues page is public but shows “Issue creation is restricted in this repository” and no results for open issues in the supplied view.",
+              "relevance": "Shows a public issue-tracker surface exists, but with restricted participation and no visible issue discussions in the evidence."
+            },
+            {
+              "label": "Climate TRACE news page critique response",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news listing includes “Climate TRACE Road Transportation Emissions: Correcting the Record on City-Level Accuracy,” described as a response to a recent study from Northern Arizona University researchers.",
+              "relevance": "Provides evidence of public response to external scrutiny, although the supplied excerpt does not include the full response or review process."
+            },
+            {
+              "label": "Climate TRACE GitHub organization",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The organization lists public repositories and a peer-reviewed-publications repository, while also showing no public members visible in the organization excerpt.",
+              "relevance": "Supports some public research/repository presence, but does not establish open governance or active community review."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 73,
+          "score_derivation": "Climate TRACE communicates its claim and outputs through an open website, public data-download page, API reference, news and insights posts, sector methodology links, FAQs/resources references, release announcements, and public documentation pointers such as data guide, schema, changelog, and terms. The data page clearly states coverage, units/context pointers, API/download routes, license, prior versions, and download contents, which is strong publication traceability for a dynamic data product. The score is not higher because the supplied evidence does not include full publication texts, peer-reviewed paper metadata, persistent identifiers for all releases, explicit open licenses for news/methodology documents, full dashboard version history, or complete citation links from each public claim to exact data/code/run artifacts. Communication is strong, but not fully artifact-specific or completely review-preserved in the evidence bundle.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The website, data portal, and news page provide direct evidence of public communication, though some linked documentation is not included in the bundle.",
+          "references": [
+            {
+              "label": "Climate TRACE home/project claim",
+              "url": "https://climatetrace.org",
+              "quote_or_finding": "The manifest claim says Climate TRACE publishes an independent, openly available global greenhouse-gas emissions inventory derived from satellite observations and other remote sensing combined with AI.",
+              "relevance": "Identifies the central public environmental claim being communicated."
+            },
+            {
+              "label": "Data downloads communication",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The page explains download packages, API access, data schema, licensing/citation guidance, previous versions on Zenodo, and sector/country download routes.",
+              "relevance": "Shows that the data product is publicly explained with practical documentation for external users."
+            },
+            {
+              "label": "News and insights page",
+              "url": "https://climatetrace.org/news",
+              "quote_or_finding": "The news page lists release announcements such as “Climate TRACE Releases March 2026 Emissions Data,” explanatory posts on ownership data, and applied analyses using Climate TRACE data.",
+              "relevance": "Shows ongoing public communication about releases, use cases, corrections, and interpretation of the inventory."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 47,
+          "score_derivation": "There is a partial inspectable evidence chain: the public claim links to a data portal; the data portal links users to FAQs/resources, sector methodology PDFs, a data guide/schema, a GitHub changelog, previous Zenodo versions, and an API; the GitHub organization hosts methodology documents and related repositories. This makes the chain from publication to data and broad methods moderately inspectable. The score is not higher because the supplied evidence does not show explicit, versioned links from any specific published emissions estimate or news claim to exact raw input datasets, satellite scenes, remote-sensing products, AI model versions, code commits, parameters, workflow runs, uncertainty files, review records, and publication versions. The lack of execution evidence is the largest break in the chain. The score is not lower because several artifacts are public and cross-referenced enough for users to move between data, methods, API access, release notes, and communications at a general sector/release level.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "General cross-links are visible, but the bundle does not include the linked data guide, changelog, Zenodo records, or sector method PDFs needed to verify exact artifact-level linkage.",
+          "references": [
+            {
+              "label": "Data portal links to methods, schema, changelog, and Zenodo",
+              "url": "https://climatetrace.org/data",
+              "quote_or_finding": "The data page points users to FAQs/resources, sector methodological details, a data guide, detailed-data-schema files in download packages, a GitHub changelog, and previous versions on Zenodo.",
+              "relevance": "Shows the main explicit linkage from public data outputs to documentation, version history, and methods."
+            },
+            {
+              "label": "Methodology repository links current and previous methods to emissions data",
+              "url": "https://github.com/climatetracecoalition/methodology-documents",
+              "quote_or_finding": "The README says the 2025 folder contains the most up-to-date methodologies, previous years are available in year folders, and users should visit the Climate TRACE website to view emissions data.",
+              "relevance": "Shows linkage between version-controlled method documentation and the public emissions inventory, though not to exact runs or code versions."
+            },
+            {
+              "label": "Climate TRACE GitHub namespace",
+              "url": "https://github.com/climatetracecoalition",
+              "quote_or_finding": "The public GitHub organization aggregates methodology-documents, climate-trace-tools, peer-reviewed-publications, and public-api-examples under the Climate TRACE namespace.",
+              "relevance": "Supports discoverability of related artifacts, but does not by itself establish exact claim-to-input-to-run traceability."
+            }
+          ]
+        }
+      ],
+      "total_score": 48,
+      "total_score_derivation": "Computed locally as round(mean([64, 48, 18, 35, 73, 47])) = 48.",
+      "single_paragraph_summary": "Climate TRACE has a substantially open public-facing inventory: emissions data are freely downloadable and accessible via API, with schema/data-guide references, sector methodology links, prior-version references, and active communications about releases and use cases. Its strongest traceability dimensions are public data access and publication/communication, while its methodology transparency is moderate through a public, version-controlled methodology repository. The main weaknesses are the absence, in the supplied evidence, of open primary measurement provenance, full public uncertainty files, production AI/model code, executable workflows, run records, and exact artifact-level links from individual emissions claims to raw inputs, code versions, parameters, and review records. Community/review evidence is also limited: there is a public issue page, but issue creation is restricted and no issue discussions are visible in the provided excerpt, although the news page shows at least one public response to external critique.",
+      "limitations": [
+        "The assessment uses only the supplied evidence bundle and does not verify the contents of linked PDFs, data-guide files, Zenodo records, changelogs, API endpoints, or downloadable CSV packages beyond the provided excerpts.",
+        "No direct evidence was supplied for Stage 3 execution and reproducibility, so the score is conservative and based on missing workflow/run-level artifacts in the bundle.",
+        "The evidence does not show the underlying primary satellite observations, remote-sensing inputs, training data, ground measurements, or quality-control datasets used to produce the inventory.",
+        "The evidence does not show the production AI/model source code, model weights, dependencies, containers, infrastructure code, or OSI-approved licenses for software components.",
+        "The community/review assessment is limited because the peer-reviewed-publications repository contents and full critique-response articles were not included in the bundle.",
+        "The API reference excerpt only establishes the existence of a public v6 API reference; it does not provide detailed endpoint behavior, provenance metadata, or reproducibility guarantees in the supplied text."
+      ],
+      "model_name": "gpt-5.5"
+    }
+  ]
+}

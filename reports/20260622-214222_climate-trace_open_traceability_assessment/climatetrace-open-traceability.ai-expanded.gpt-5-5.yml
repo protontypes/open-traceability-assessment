@@ -1,0 +1,73 @@
+# Open Traceability manifest — AI-EXPANDED
+# Generated from: examples/climatetrace-open-traceability.yml
+# Suggestion model: gpt-5.5
+# Entries marked [AI-SUGGESTED] are UNVERIFIED LLM proposals; review before use.
+
+claim: Climate TRACE publishes an independent, openly available global inventory of
+  greenhouse-gas emissions covering every country and major source, derived from satellite
+  observations and other remote sensing combined with AI.
+claim_url: https://climatetrace.org
+ai_expansion:
+  model: gpt-5.5
+  generated_from: examples/climatetrace-open-traceability.yml
+  disclaimer: Entries whose note begins with [AI-SUGGESTED] were proposed by an LLM
+    and are UNVERIFIED. Review each one before relying on it.
+namespace:
+  url: https://github.com/climatetracecoalition
+  note: Climate TRACE coalition GitHub organization.
+open_data:
+- url: https://climatetrace.org/data
+  note: Emissions data portal — downloadable country/sector/asset-level inventory.
+- url: https://api.climatetrace.org/v6/swagger/index.html
+  note: Public REST API (Swagger) exposing the emissions data programmatically.
+- url: https://climatetrace.org/explore
+  note: '[AI-SUGGESTED · gpt-5.5 · UNVERIFIED · reachable=yes] Climate TRACE Explore
+    map and regional download interface: The data-download page explicitly refers
+    users to the Explore page for city and subnational inventories and source-level
+    downloads within selected regions. This would strengthen evidence that the inventory
+    is openly inspectable through a public interface beyond bulk country/sector packages.'
+open_software:
+- url: https://github.com/climatetracecoalition/methodology-documents
+  note: Public repository of per-sector methodology documents behind the estimates.
+- url: https://github.com/climatetracecoalition/climate-trace-tools
+  note: '[AI-SUGGESTED · gpt-5.5 · UNVERIFIED · reachable=yes] Climate TRACE tools
+    repository: The Climate TRACE GitHub organization lists this public Python repository.
+    It is expected to contain reusable code or utilities for working with Climate
+    TRACE data, strengthening the software/tooling evidence chain beyond methodology
+    documents alone.'
+- url: https://github.com/climatetracecoalition/methodology-documents/tree/main/2025
+  note: '[AI-SUGGESTED · gpt-5.5 · UNVERIFIED · reachable=yes] Current 2025 sector
+    methodology documents: The methodology repository README directs readers to the
+    2025 folder for the most up-to-date sector methodologies. Pinning the folder directly
+    would make the current methodological basis easier to cite and inspect.'
+open_execution:
+- url: https://github.com/climatetracecoalition/public-api-examples
+  note: '[AI-SUGGESTED · gpt-5.5 · UNVERIFIED · reachable=yes] Public Climate TRACE
+    API examples repository: The GitHub organization lists this public repository,
+    and the data page points expert users to the public API. Worked examples for querying
+    the API would help external users reproduce data-access steps and construct repeatable
+    data retrieval workflows.'
+open_community:
+- url: https://github.com/climatetracecoalition/methodology-documents/issues
+  note: Public issue tracker where the methodology is questioned and corrected.
+- url: https://github.com/climatetracecoalition/methodology-documents/pulls
+  note: '[AI-SUGGESTED · gpt-5.5 · UNVERIFIED · reachable=yes] Methodology documents
+    pull-request tracker: In addition to issues, the repository’s public pull-request
+    area can expose proposed methodology changes, review comments, and merged corrections.
+    This would strengthen visibility into how methodology documents are revised over
+    time.'
+open_publications:
+- url: https://climatetrace.org/news
+  note: News/press updates announcing releases and explaining the inventory.
+- url: https://github.com/climatetracecoalition/peer-reviewed-publications
+  note: '[AI-SUGGESTED · gpt-5.5 · UNVERIFIED · reachable=yes] Climate TRACE peer-reviewed
+    publications and mentions repository: The methodology repository README points
+    to this public repository for publications and mentions, and the GitHub organization
+    lists it. It should provide a curated bibliography of peer-reviewed papers and
+    external references using or evaluating Climate TRACE data.'
+- url: https://climatetrace.org/sectors
+  note: '[AI-SUGGESTED · gpt-5.5 · UNVERIFIED · reachable=yes] Climate TRACE sectors
+    methodology overview: The data-download page says the Sectors page summarizes
+    methodological details for dozens of subsectors. This public explanatory page
+    would strengthen communication of sector coverage, definitions, and high-level
+    methods supporting the global inventory claim.'

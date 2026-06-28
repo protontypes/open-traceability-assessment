@@ -1,0 +1,50 @@
+# Open Traceability manifest — Climate TRACE (small test fixture)
+#
+# A deliberately small, hand-curated manifest used to smoke-test the assessor and the
+# --suggest-references expansion. Every URL below was checked to resolve at authoring
+# time. It is intentionally sparse (one or two sources per dimension, and stage 3 left
+# empty) so runs are cheap and so the expansion step has obvious gaps to fill.
+#
+# Run it with:
+#   python open_traceability_assessment.py --manifest examples/climatetrace-open-traceability.yml --runs 1
+#
+# Try the AI expansion (writes <stem>.ai-expanded.<model>.yml into the report folder):
+#   python open_traceability_assessment.py --manifest examples/climatetrace-open-traceability.yml \
+#     --runs 1 --provider anthropic --suggest-references
+
+claim: >
+  Climate TRACE publishes an independent, openly available global inventory of
+  greenhouse-gas emissions covering every country and major source, derived from
+  satellite observations and other remote sensing combined with AI.
+claim_url: https://climatetrace.org
+
+# Namespace: the coalition's project home and code organization, general context for
+# every dimension (who is behind the claim, what else they publish).
+namespace:
+  - url: https://github.com/climatetracecoalition
+    note: Climate TRACE coalition GitHub organization.
+
+# Stage 1 — Open Input Data and Measurement Evidence
+open_data:
+  - url: https://climatetrace.org/data
+    note: Emissions data portal — downloadable country/sector/asset-level inventory.
+  - url: https://api.climatetrace.org/v6/swagger/index.html
+    note: Public REST API (Swagger) exposing the emissions data programmatically.
+
+# Stage 2 — Open-Source Models, Methods, and Software
+open_software:
+  - url: https://github.com/climatetracecoalition/methodology-documents
+    note: Public repository of per-sector methodology documents behind the estimates.
+
+# Stage 3 — Open Execution and Reproducibility
+# (intentionally left empty in this test fixture — a gap for --suggest-references to surface)
+
+# Stage 4 — Open Community and Review
+open_community:
+  - url: https://github.com/climatetracecoalition/methodology-documents/issues
+    note: Public issue tracker where the methodology is questioned and corrected.
+
+# Stage 5 — Open Publications and Communication
+open_publications:
+  - url: https://climatetrace.org/news
+    note: News/press updates announcing releases and explaining the inventory.

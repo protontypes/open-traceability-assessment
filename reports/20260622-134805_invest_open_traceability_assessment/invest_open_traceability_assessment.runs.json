@@ -1,0 +1,1104 @@
+{
+  "human_review": {
+    "approved": false,
+    "instructions": "Validate all claims in this report against the references provided, then review, edit, and approve its contents. Set approved to true once done."
+  },
+  "runs": [
+    {
+      "run_number": 1,
+      "project_name": "InVEST",
+      "project_url": "https://github.com/natcap/invest",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 64,
+          "score_derivation": "InVEST has moderate-to-strong public evidence for input-data traceability as a software toolset: the official downloads page links to individual sample datasets for the current release, data-source guidance, the Natural Capital Alliance Data Hub, and parameter/nutrient/sediment databases; the user guide also documents model-specific data needs and appendices with data sources. The curated manifest also identifies a versioned sample-data repository covering every model. This supports external inspection of example inputs and general data requirements. The score is not lower because data sources and sample inputs are explicitly discoverable from official project pages. It is not higher because the evidence bundle does not show detailed metadata for the sample datasets, primary-measurement provenance, quantified uncertainty/error for all inputs, quality-control procedures, licensing terms for datasets, or a traceable chain from secondary datasets back to primary measurements. InVEST also relies heavily on user-supplied datasets, so input traceability for actual environmental claims depends on each analysis, not only on the toolset.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The evidence clearly identifies official data resources, but the bundle does not expose the underlying dataset metadata or licenses in detail.",
+          "references": [
+            {
+              "label": "Official InVEST downloads and data sources page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page lists “Individual Sample Datasets for InVEST 3.20.0” and under “Data Sources” links to the Natural Capital Alliance Data Hub, Kc Calculator, Parameter Value Database, Nutrient Database, and Sediment Database.",
+              "relevance": "Shows that official sample inputs and data-source resources are publicly identified for users."
+            },
+            {
+              "label": "InVEST sample data repository",
+              "url": "https://bitbucket.org/natcap/invest-sample-data",
+              "quote_or_finding": "Curator note identifies this as “Versioned sample input datasets covering every InVEST model,” although the captured page content only shows a generic Bitbucket page.",
+              "relevance": "Supports the existence of versioned sample inputs, while also illustrating that the supplied evidence does not expose detailed dataset metadata."
+            },
+            {
+              "label": "InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The table of contents lists model sections with “Data Needs,” “Limitations and Simplifications,” “Appendix: Data Sources,” and “References” for multiple models such as Annual Water Yield, Carbon Storage, and Coastal Vulnerability.",
+              "relevance": "Shows that input requirements and sources are documented in public model documentation."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 86,
+          "score_derivation": "The software and analytical methods are strongly open. The main InVEST repository is public on GitHub and described as the source for models that map and value ecosystem services; the organization listing identifies it as Apache-2.0 licensed. Key dependencies and supporting libraries are also public, including PyGeoprocessing and TaskGraph, with PyGeoprocessing documenting its purpose, installation, and geospatial operations. The installation documentation lists distribution channels and dependencies, and the user guide documents model methods. The score is high because code, dependencies, issue/PR infrastructure, version control, and open licensing are publicly visible. It is not higher because the evidence bundle does not fully expose the main repository file tree, all model source files, full dependency lockfiles, frontend/infrastructure source details, or a complete independently operable deployment description for every user-facing component.",
+          "uncertainty": "low",
+          "uncertainty_reason": "Multiple public repositories, documentation pages, and license indicators provide direct evidence of open-source software infrastructure.",
+          "references": [
+            {
+              "label": "Main InVEST GitHub repository",
+              "url": "https://github.com/natcap/invest",
+              "quote_or_finding": "The repository is public and described as “InVEST®: models that map and value the goods and services from nature that sustain and fulfill human life,” with visible Code, Issues, Pull requests, Discussions, Actions, Projects, Wiki, and Security tabs.",
+              "relevance": "Primary public source repository for the toolset and its model implementations."
+            },
+            {
+              "label": "Natural Capital Alliance GitHub organization",
+              "url": "https://github.com/natcap",
+              "quote_or_finding": "The pinned repository list shows “invest Public” with language Python and license “Apache-2.0”; related repositories include pygeoprocessing, taskgraph, and invest.users-guide.",
+              "relevance": "Supports open licensing and the presence of related public repositories in the software ecosystem."
+            },
+            {
+              "label": "PyGeoprocessing repository",
+              "url": "https://github.com/natcap/pygeoprocessing",
+              "quote_or_finding": "PyGeoprocessing is described as a Python/Cython library providing raster, vector, and hydrological GIS operations, developed to support InVEST; files include LICENSE.txt, README.rst, requirements.txt, setup.py, tests, and docs.",
+              "relevance": "Shows that an important geospatial dependency is public, documented, version-controlled, and testable."
+            },
+            {
+              "label": "TaskGraph repository",
+              "url": "https://github.com/natcap/taskgraph",
+              "quote_or_finding": "The public repository has visible Issues, Pull requests, Actions, Projects, and Security tabs; the curator note identifies it as the workflow engine all InVEST models use to organize execution.",
+              "relevance": "Shows that a workflow dependency used by InVEST is also openly hosted."
+            },
+            {
+              "label": "Installation and dependency documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The documentation states that InVEST is installable from conda-forge, PyPI, or directly from the git source tree, and lists dependencies including GDAL, pygeoprocessing, taskgraph, pandas, numpy, scipy, geopandas, and others.",
+              "relevance": "Documents software dependencies and installation pathways needed to inspect and run the models."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 68,
+          "score_derivation": "Execution traceability is strong for software-level reproducibility but incomplete for exact environmental-result reproducibility. The project provides documented installation routes through conda-forge, pip, and source, exposes dependencies, and has a GitHub Actions build-and-test workflow identified by the curator as building and testing InVEST on every change. Releases are versioned and tied to commits, and release notes mention datastack behavior and command-line/reporting options that can help preserve runs. The score is not lower because an external actor can likely install the software and understand the computational environment. It is not higher because the supplied evidence does not show a complete executable workflow that connects a particular input dataset, model parameters, software commit, environment specification, and output artifact for a specific environmental claim. The CI workflow content itself is not visible in the captured evidence beyond the URL and curator note, and there is no container digest, reproducibility benchmark, or archived run record included.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "Installation and release evidence is strong, but exact run-level reproducibility evidence is mostly absent from the bundle.",
+          "references": [
+            {
+              "label": "InVEST build-and-test workflow",
+              "url": "https://github.com/natcap/invest/blob/main/.github/workflows/build-and-test.yml",
+              "quote_or_finding": "Curator note identifies this as a CI workflow that builds and tests InVEST on every change; the captured GitHub page confirms the workflow file URL in the public repository but does not expose workflow contents.",
+              "relevance": "Supports automated execution/testing infrastructure, though detailed workflow steps are not available in the evidence text."
+            },
+            {
+              "label": "InVEST installation documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The documentation gives commands for conda-forge installation, pip installation, and source installation from GitHub, and lists dependencies such as GDAL, pygeoprocessing, taskgraph, pandas, numpy, scipy, fiona, geopandas, and matplotlib.",
+              "relevance": "Provides reproducible environment information and standard installation paths for external users."
+            },
+            {
+              "label": "InVEST releases",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is shown as latest, dated 11 Jun, with commit fca8bf5 and a verified GitHub signature; release notes list model and infrastructure changes.",
+              "relevance": "Supports versioned execution by allowing users to identify the software version and changes used."
+            },
+            {
+              "label": "Release notes mentioning datastacks and CLI behavior",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "The 3.20.0 release notes state that when saving a datastack, CSVs are copied into argument-named subfolders to preserve original filenames and metadata compatibility, and that a --no-report CLI flag was added.",
+              "relevance": "Indicates features relevant to preserving model arguments and execution context, although no specific archived run is provided."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 78,
+          "score_derivation": "The project has strong open community and correction channels. The main repository has public issues, pull requests, discussions, and visible activity counts, and the issue tracker is specifically identified as where bugs are reported, discussed, and corrected. A public Discourse community forum is active with software-support and science/data questions, including recent posts about model validation, negative outputs, parameter databases, and release announcements. The user guide acknowledges a large contributor base and invites corrections to the contributor list. The score is not lower because public scrutiny channels are active and visible. It is not higher because the evidence bundle does not include formal peer-review records for individual model equations, governance minutes, correction notices linked to releases, systematic response-time metrics, or independent replication/review artifacts.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The public issue tracker and active forum provide direct evidence of visible community review and support mechanisms.",
+          "references": [
+            {
+              "label": "InVEST GitHub issues",
+              "url": "https://github.com/natcap/invest/issues",
+              "quote_or_finding": "The public repository interface shows Issues, Pull requests, Discussions, Actions, Projects, and Wiki tabs; the repository summary shows 207 issues and 6 pull requests in the captured page.",
+              "relevance": "Provides a visible channel for bug reporting, methodological discussion, and correction workflows."
+            },
+            {
+              "label": "Natural Capital Alliance community forum",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "The forum lists active categories and recent posts such as “Water Yield Models to support economic analysis,” “InVEST 3.20.0 Released!,” “Regarding validation of model,” and “Negative Values - SDR Output,” with replies and views shown.",
+              "relevance": "Shows an open support and discussion venue where users can ask questions and challenge outputs or methods."
+            },
+            {
+              "label": "InVEST User Guide contributor and correction note",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide lists many contributors and states that if someone is missing from the list and thinks they should be included, they should contact naturalcapitalalliance@stanford.edu.",
+              "relevance": "Shows public attribution and a channel for correction of documentation, though not a full review record."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 84,
+          "score_derivation": "Public communication is strong. The InVEST User Guide is openly accessible and functions as canonical documentation for models, data needs, limitations, interpretation, references, and attribution. It provides a suggested citation and DOI for InVEST 3.20.0. The official downloads page links to installers, source repository, user guides in multiple languages, plugins guide, data sources, and usage-data disclosure. GitHub releases provide versioned changelogs that communicate changes and fixes. The score is not lower because outputs and documentation are clearly public and richly documented. It is not higher because the evidence bundle does not show a standardized open content license such as Creative Commons for the user guide, complete publication peer-review status, archived immutable documentation versions beyond the current/latest pages, or explicit claim-by-claim citations from each dashboard/report output to exact inputs and runs.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The user guide, downloads page, and release notes give direct, public, and versioned communication evidence.",
+          "references": [
+            {
+              "label": "InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide provides a suggested citation, “Natural Capital Alliance, 2026. InVEST 3.20.0. https://doi.org/10.60793/natcap-invest-3.20.0,” and includes sections for model summaries, introductions, models, limitations, data needs, interpreting results, appendices, and references.",
+              "relevance": "Primary public publication/documentation artifact explaining the toolset and its methods."
+            },
+            {
+              "label": "Official downloads and user guide page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page links to InVEST 3.20.0 Workbench downloads for Windows and Mac, the GitHub repository, older/development versions, sample datasets, user guides in English/Spanish/Chinese, plugin developer guide, data sources, citation guidance, and a usage-data notice.",
+              "relevance": "Central communication hub connecting users to software, documentation, data sources, citation guidance, and disclosure."
+            },
+            {
+              "label": "Versioned GitHub releases",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 includes a date, commit identifier, verified signature, and detailed changelog sections covering general changes, Workbench changes, and model-specific changes such as Annual Water Yield and Carbon Storage.",
+              "relevance": "Supports transparent communication of software versions, changes, and fixes relevant to interpreting outputs."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 62,
+          "score_derivation": "The project has meaningful but incomplete cross-stage linkage. Official pages connect the software repository, downloads, user guides, sample datasets, data sources, and citation guidance. The user guide cites a DOI for a specific InVEST release, and GitHub releases connect version numbers to commit identifiers and changelog entries. Installation documentation links the software package to dependencies, and release notes indicate datastack features that can preserve model arguments and input files. This forms a partial evidence chain from documented inputs and data needs, to open code and dependencies, to installation/execution documentation, to public support/review channels, to user-facing publications. The score is not lower because many artifacts are publicly cross-referenced and versioned. It is not higher because the bundle does not provide an explicit, externally verifiable chain for any particular environmental output: no exact input dataset versions, parameter files, workflow run IDs, container/image digests, output hashes, issue/PR review records, and final publication/report are linked together for a concrete model result. The broad claim that InVEST outputs are intended to be credible and reproducible is therefore traceable at the tool/project level, but not fully at the individual-claim/run level.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "Project-level artifact linkage is visible, but exact run-level evidence chains are missing.",
+          "references": [
+            {
+              "label": "Official downloads page linking artifacts",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page gathers Workbench downloads, the InVEST GitHub repository, older/development versions, individual sample datasets, user guides, plugin developer guide, data sources, citation guidance, and usage-data notice.",
+              "relevance": "Shows project-level linkage among software, documentation, data resources, and communication artifacts."
+            },
+            {
+              "label": "User Guide DOI and model documentation",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide gives a suggested citation with DOI for “InVEST 3.20.0” and organizes model documentation by summaries, methods, limitations, data needs, interpreting results, data-source appendices, and references.",
+              "relevance": "Links a published documentation artifact to a specific software release and model evidence base."
+            },
+            {
+              "label": "GitHub release version and commit",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is tied to commit fca8bf5 and a verified GitHub signature, with changelog entries referencing specific issue numbers such as #2471, #2228, #2179, #2532, and #2555.",
+              "relevance": "Links released software versions to source-code state and public issue/PR identifiers."
+            },
+            {
+              "label": "Installation documentation linking environment and dependencies",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The install page documents conda-forge, PyPI, and git-source installation paths and lists package dependencies, including pygeoprocessing and taskgraph.",
+              "relevance": "Links the software artifact to reproducible computational-environment requirements."
+            },
+            {
+              "label": "Community forum",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "The public forum includes recent posts on model validation, parameter databases, model errors, and release announcements.",
+              "relevance": "Provides a public review/support layer linked to the software and methods, though not to exact run artifacts."
+            }
+          ]
+        }
+      ],
+      "total_score": 74,
+      "total_score_derivation": "Computed locally as round(mean([64, 86, 68, 78, 84, 62])) = 74.",
+      "single_paragraph_summary": "InVEST shows strong open traceability as an open-source ecosystem-services modeling toolset: the main software and major dependencies are public and apparently openly licensed, installation and dependency documentation is available, user-facing documentation is extensive, releases are versioned with changelogs and commit identifiers, and there are active public issue and community-support channels. The main weakness is not openness of the project itself but exact claim/run traceability: the evidence bundle does not demonstrate a complete externally verifiable chain from primary measurements and versioned input datasets through a specific model configuration and execution record to a concrete environmental output and its review/publication record. As a result, InVEST is highly inspectable at the software, methods, and communication layers, but individual environmental claims produced with it would still need their own archived inputs, parameters, execution environment, outputs, uncertainty documentation, and linked review trail.",
+      "limitations": [
+        "The evidence bundle does not expose detailed metadata, licenses, uncertainty estimates, or primary-measurement provenance for the sample datasets and data-source resources.",
+        "The Bitbucket sample-data evidence is mostly represented by a curator note; the captured page content itself does not show repository contents or version tags.",
+        "The captured GitHub workflow page does not include the actual build-and-test YAML contents, so CI details are inferred from the curator note and URL rather than directly inspected text.",
+        "No specific environmental analysis run is included with exact input versions, parameter files, workflow run IDs, output hashes, logs, or archived computational environment.",
+        "The assessment concerns the InVEST project/toolset, not the validity or traceability of any specific InVEST-derived environmental claim produced by a third party.",
+        "The evidence bundle does not show formal peer-review records, governance documents, systematic correction notices, or independent replication attempts for individual models.",
+        "The evidence bundle does not show an explicit Creative Commons or other open documentation license for the user guide/publication materials."
+      ],
+      "model_name": "gpt-5.5"
+    },
+    {
+      "run_number": 2,
+      "project_name": "InVEST (natcap/invest)",
+      "project_url": "https://github.com/natcap/invest",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 54,
+          "score_derivation": "There is moderate public evidence that InVEST provides identifiable example inputs and guidance about data sources: the official downloads page links to individual sample datasets for InVEST 3.20.0, a Natural Capital Alliance Data Hub, parameter and nutrient/sediment databases, and user guides; the curated manifest also identifies a versioned sample-data repository covering every InVEST model. The user guide table of contents shows model-specific sections for Data Needs, calibration/comparison, appendices on data sources, limitations, and references. This supports a score above fragmentary evidence. The score is not higher because the evidence bundle does not expose the actual contents, metadata, licenses, version tags, uncertainty estimates, quality controls, or primary-measurement provenance for the sample datasets and secondary databases. Since many InVEST analyses depend on user-supplied geospatial inputs, the bundle does not demonstrate that typical real-world input datasets are traceable back to primary measurement evidence with quantified errors and reusable licenses.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The evidence identifies official sample/data-source infrastructure, but the bundle includes little detail about the datasets themselves or their provenance and uncertainty metadata.",
+          "references": [
+            {
+              "label": "Official InVEST downloads and data sources page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page lists “Individual Sample Datasets for InVEST 3.20.0,” “Natural Capital Alliance Data Hub,” “Parameter Value Database,” “Nutrient Database,” and “Sediment Database.”",
+              "relevance": "Shows that input datasets and supporting data resources are publicly identified and linked from an official project page."
+            },
+            {
+              "label": "InVEST sample data repository",
+              "url": "https://bitbucket.org/natcap/invest-sample-data",
+              "quote_or_finding": "Curator note: “Versioned sample input datasets covering every InVEST model.” The captured page text itself is only “Bitbucket.”",
+              "relevance": "Supports the existence of versioned sample inputs, while the sparse capture limits verification of metadata, licensing, and provenance."
+            },
+            {
+              "label": "InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide includes model sections such as “Data Needs,” “Interpreting Results,” “Calibration/Comparison with observed data,” “Appendix: Data Sources,” “Limitations and Simplifications,” and “References.”",
+              "relevance": "Shows that input requirements and data-source guidance are documented at model level, even though underlying primary data traceability is not fully evidenced."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 86,
+          "score_derivation": "The project has strong public evidence for open-source models, methods, and software. The Natural Capital Alliance GitHub organization lists natcap/invest as public, Apache-2.0 licensed, with many forks/stars and active issues; the curated evidence identifies it as the main InVEST toolset source. Important supporting libraries are also public: PyGeoprocessing is documented as a Python/Cython open-source GIS processing library created to support InVEST, and TaskGraph is identified as the workflow engine used by InVEST models. Installation documentation lists distribution channels and dependencies, including pygeoprocessing and taskgraph. This merits a high score. The score is not higher because the captured main natcap/invest page does not show internal source files, model implementation details, or the license text directly, and the evidence bundle does not provide a complete dependency lockfile, full architecture documentation, or evidence that all user-facing infrastructure, including the Workbench and cloud/backend components, can operate independently of a single organization.",
+          "uncertainty": "low",
+          "uncertainty_reason": "Multiple public repositories, licensing indicators, dependency documentation, and supporting-library descriptions provide strong evidence for this stage.",
+          "references": [
+            {
+              "label": "natcap/invest GitHub repository",
+              "url": "https://github.com/natcap/invest",
+              "quote_or_finding": "The repository is public and described as “InVEST®: models that map and value the goods and services from nature that sustain and fulfill human life”; the curator note identifies it as the main InVEST toolset source and Apache-2.0 licensed.",
+              "relevance": "Primary evidence that the model software is publicly available in a version-controlled repository under an open-source license."
+            },
+            {
+              "label": "Natural Capital Alliance GitHub organization",
+              "url": "https://github.com/natcap",
+              "quote_or_finding": "The organization page lists the public pinned repository “invest” with language Python and license Apache-2.0, alongside related public repositories.",
+              "relevance": "Corroborates public repository status, open-source licensing, and organizational maintenance of the codebase."
+            },
+            {
+              "label": "PyGeoprocessing repository",
+              "url": "https://github.com/natcap/pygeoprocessing",
+              "quote_or_finding": "README states PyGeoprocessing is a Python/Cython library providing raster, vector, and hydrological GIS operations and was developed “to support the InVEST toolset”; repository includes LICENSE.txt, requirements.txt, tests, docs, and 4,189 commits in the captured listing.",
+              "relevance": "Shows that a key dependency and method library used by InVEST is open and documented."
+            },
+            {
+              "label": "TaskGraph repository",
+              "url": "https://github.com/natcap/taskgraph",
+              "quote_or_finding": "The curated note identifies TaskGraph as “the workflow engine all InVEST models use to organise execution”; the repository is public with issues and pull requests visible.",
+              "relevance": "Shows that an important execution/workflow dependency is publicly inspectable."
+            },
+            {
+              "label": "InVEST installation documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The page lists installation via conda-forge, PyPI, and source; dependencies include GDAL, pygeoprocessing >= 2.4.10, taskgraph >= 0.11.0, scipy, geopandas, and others.",
+              "relevance": "Documents dependencies and installation routes needed to inspect and run the software."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 70,
+          "score_derivation": "There is strong but incomplete evidence for open execution. The project provides documented installation paths through conda-forge, PyPI, and source, lists dependencies, includes a CLI/tutorial/navigation for batch processing, and indicates container-related documentation. The evidence bundle also includes a GitHub Actions build-and-test workflow URL, curated as building and testing InVEST on every change, and the release notes show versioned releases with commit identifiers and change histories. These features make external installation and model execution plausible and substantially inspectable. The score is not higher because the bundle does not show the actual CI workflow contents, test results, pinned computational environments, exact reproducible workflow runs, or a specific end-to-end run that connects named input datasets and parameters to reported outputs. For highest traceability, the project would need externally re-executable model-run artifacts, datastacks or workflow records with exact inputs, parameters, software commit, environment, and outputs.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "Execution infrastructure is clearly present, but the exact CI contents and end-to-end reproducibility artifacts are not visible in the captured evidence.",
+          "references": [
+            {
+              "label": "Build and test workflow",
+              "url": "https://github.com/natcap/invest/blob/main/.github/workflows/build-and-test.yml",
+              "quote_or_finding": "Curator note: “CI workflow that builds and tests InVEST on every change”; the captured GitHub page itself does not display the YAML contents.",
+              "relevance": "Supports continuous integration and automated testing, but the lack of captured workflow details limits verification."
+            },
+            {
+              "label": "Installing the InVEST Python Package",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "Documents installation through conda-forge, pip/PyPI, and source from GitHub; lists GDAL and other dependencies; notes source install command using git+https://github.com/natcap/invest.git@main.",
+              "relevance": "Provides reproducible environment setup information needed to run the software externally."
+            },
+            {
+              "label": "InVEST releases",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is shown with date, author, commit fca8bf5, verified signature, highlights, fixes, and model-specific changes.",
+              "relevance": "Versioned releases and changelogs help reproduce behavior for a given software version."
+            },
+            {
+              "label": "Official downloads page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "Provides downloads for InVEST 3.20.0 Workbench for Windows and Mac, older/development versions, individual sample datasets, and user guides.",
+              "relevance": "Shows accessible executables and sample data that support external execution, though not a full run record."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 78,
+          "score_derivation": "The project has strong evidence of public community and review channels. The GitHub repository exposes issues, pull requests, discussions, actions, projects, wiki, and security/quality tabs; the issue tracker is curated as a place where bugs are reported, discussed, and corrected. The Natural Capital Alliance Discourse forum is active, public, and includes software-support guidelines, announcements, science/research/data questions, and model-specific support threads with replies. This demonstrates visible mechanisms for critique, bug reporting, support, and interpretation questions. The score is not higher because the evidence bundle does not show examples of resolved issues linked to code changes, formal governance records, peer-review files, correction notices, replication attempts, or documented responses to scientific challenges. It is strong community evidence, but not a complete review and correction provenance chain.",
+          "uncertainty": "low",
+          "uncertainty_reason": "Public issue-tracking and forum evidence is clear, active, and directly relevant, though formal review evidence is limited.",
+          "references": [
+            {
+              "label": "natcap/invest issues",
+              "url": "https://github.com/natcap/invest/issues",
+              "quote_or_finding": "The repository interface shows public Issues, Pull requests, Discussions, Actions, Projects, Wiki, and Security/quality tabs; the repository listing shows 207 issues and 6 pull requests.",
+              "relevance": "Demonstrates public channels where problems, changes, and discussions can be tracked."
+            },
+            {
+              "label": "Natural Capital Alliance Online Community",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "Forum front page describes “A place for InVEST user support and collaboration” and shows active topics such as “InVEST 3.20.0 Released!”, “Seasonal Water Yield Stream Issues,” “Regarding validation of model,” and many model-specific support questions with replies.",
+              "relevance": "Shows open user-support and methodological discussion channels relevant to review and correction."
+            },
+            {
+              "label": "Forum support guidelines",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "A visible topic titled “Guidelines for posting software support questions” says the team welcomes users of the software and provides guidelines for effective posts and timely support.",
+              "relevance": "Indicates an explicit public process for raising software questions and reporting problems."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 83,
+          "score_derivation": "The project has excellent public-facing documentation and communication. The InVEST User Guide is openly accessible, gives a suggested citation with DOI for InVEST 3.20.0, lists contributors, states attribution guidelines, and organizes model documentation into summaries, introductions, model descriptions, limitations/simplifications, data needs, result interpretation, appendices, and references. The official downloads page links to downloads, user guides in multiple languages, plugins documentation, and data sources. GitHub releases provide versioned changelogs with model-specific changes, fixes, and references to issue numbers. This supports scrutiny of the toolset and its claims. The score is not higher because the evidence bundle does not show a standardized open content license such as Creative Commons for the guide, formal publication peer-review status, archived immutable documentation snapshots beyond the current/latest URL and DOI citation, or dashboard/update-cycle documentation for any dynamic outputs.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The user guide, downloads page, and releases provide direct and extensive evidence of open communication, with only licensing/review gaps remaining.",
+          "references": [
+            {
+              "label": "InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide provides suggested citation “Natural Capital Alliance, 2026. InVEST 3.20.0. https://doi.org/10.60793/natcap-invest-3.20.0,” attribution guidelines, contributor list, and detailed model sections including methods, data needs, limitations, interpretation, and references.",
+              "relevance": "Primary publication/communication artifact documenting claims, methods, data needs, and context."
+            },
+            {
+              "label": "Official downloads and user guides page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "Links to InVEST 3.20.0 Workbench downloads, older/development versions, individual sample datasets, user guides in English, Spanish, and Chinese, and a plugin developer guide.",
+              "relevance": "Shows accessible public communication and distribution channels for software, documentation, and supporting resources."
+            },
+            {
+              "label": "InVEST releases",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 includes version number, release date, verified commit, highlights, general changes, Workbench changes, and model-specific notes such as Annual Water Yield and Carbon Storage updates, with issue references like #2471, #2533, and #2555.",
+              "relevance": "Provides versioned communication of changes and fixes, supporting interpretation of outputs by software version."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 64,
+          "score_derivation": "The evidence chain is partially explicit across stages: official pages link software downloads, user guides, sample datasets, and data resources; the GitHub organization links the main codebase and related dependencies; installation documentation names dependencies and source install routes; releases link software versions to commits and issue-numbered changes; community and issue channels provide visible review venues. This creates a reasonably inspectable chain from general input resources to software, execution environment, review channels, and documentation. The score is not higher because the bundle does not demonstrate exact, claim-level provenance from a particular environmental output to named input datasets, dataset versions, measurement metadata, model configuration, parameter file, execution run, software commit, CI/test result, review record, and publication. The linkage is strong at the project-resource level but not at the individual environmental-claim or model-output level. The score is not lower because there are clear public cross-links among versioned releases, documentation, downloads, sample data, repositories, dependencies, and support/review venues.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "Project-level linkage is visible, but exact output-level evidence chains are not included in the bundle.",
+          "references": [
+            {
+              "label": "Official downloads, data, and user guide hub",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page combines links to InVEST Workbench downloads, the GitHub repository, older/development versions, individual sample datasets, user guides, plugin guide, and data-source resources.",
+              "relevance": "Acts as a project-level hub connecting software, documentation, input resources, and data-source guidance."
+            },
+            {
+              "label": "InVEST User Guide citation and structure",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide cites InVEST 3.20.0 with a DOI and includes model-specific sections for methods, limitations, data needs, results, data sources, and references.",
+              "relevance": "Links the public claim about model functionality to documented methods and evidence requirements, though not to exact run artifacts."
+            },
+            {
+              "label": "InVEST releases",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is tied to commit fca8bf5 and includes issue-numbered changes and model-specific release notes.",
+              "relevance": "Provides version linkage between published software behavior, code state, and change records."
+            },
+            {
+              "label": "Installation documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "Lists installation routes and dependencies, including pygeoprocessing and taskgraph, and provides a source-install command from the GitHub repository.",
+              "relevance": "Links software versions to execution environments and dependency requirements."
+            },
+            {
+              "label": "Community forum",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "Public forum shows active model-specific support and science/research/data discussions, including validation and output-interpretation questions.",
+              "relevance": "Connects model use and interpretation back to public review and support channels."
+            }
+          ]
+        }
+      ],
+      "total_score": 72,
+      "total_score_derivation": "Computed locally as round(mean([54, 86, 70, 78, 83, 64])) = 72.",
+      "single_paragraph_summary": "InVEST has a strong open-traceability foundation as a public, Apache-2.0-licensed ecosystem-service modeling toolset with open repositories, documented dependencies, install routes, versioned releases, public issue/community channels, and a detailed user guide that describes model methods, limitations, data needs, interpretation, and references. The strongest dimensions are open-source software and public communication; community review is also strong through GitHub and Discourse. The main traceability gaps are in input-data provenance and exact execution linkage: the bundle identifies sample datasets and data resources but does not expose complete metadata, licensing, primary measurement provenance, uncertainty, or quality-control information, and it does not provide a concrete end-to-end run tying specific inputs, parameters, code commit, workflow execution, outputs, review records, and publication for a particular environmental claim.",
+      "limitations": [
+        "The assessment uses only the supplied evidence bundle; no independent web retrieval or repository-file inspection was performed beyond the captured evidence text and curator notes.",
+        "The Bitbucket sample-data evidence is sparse in the capture, so dataset versioning, metadata, licenses, quality controls, and uncertainty information could not be verified directly.",
+        "The GitHub Actions workflow URL is included, but the captured evidence does not show the workflow YAML or CI results, limiting verification of automated build/test details.",
+        "The evidence describes the InVEST toolset generally, not a specific environmental analysis or output, so claim-level provenance from inputs to outputs cannot be fully assessed.",
+        "No complete dependency lockfile, container specification contents, datastack example, run manifest, or exact re-executable workflow artifact was provided.",
+        "The user guide appears openly accessible and citable, but the evidence bundle does not show a Creative Commons or comparable open documentation license.",
+        "Formal scientific peer review, governance records, correction notices, and replication attempts were not included in the bundle, although public issue/forum channels are visible."
+      ],
+      "model_name": "gpt-5.5"
+    },
+    {
+      "run_number": 3,
+      "project_name": "InVEST",
+      "project_url": "https://github.com/natcap/invest",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 58,
+          "score_derivation": "InVEST has moderate input-data traceability for a modelling toolset: the evidence identifies versioned sample input datasets for every model and an official downloads/data-sources page that points users to sample datasets, the Natural Capital Alliance Data Hub, parameter databases, nutrient and sediment databases, and model-specific data guidance. The User Guide also documents model data needs, appendices with data sources, calibration/comparison sections, limitations, and interpretation guidance for many models. This score is not lower because the input sources are public, identifiable, and connected to model documentation. It is not higher because the bundle does not expose the actual sample-data repository contents, dataset metadata, licences, provenance back to primary measurements, quantified measurement uncertainty, quality-control records, or immutable dataset versions/DOIs for all inputs; many real InVEST analyses depend on user-supplied local data that are not inherently open or externally verifiable through the core project.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "Some key input-data evidence is present only as a curated note or high-level download page rather than inspected dataset metadata and provenance records.",
+          "references": [
+            {
+              "label": "Versioned sample input datasets",
+              "url": "https://bitbucket.org/natcap/invest-sample-data",
+              "quote_or_finding": "Curator note states this is a repository of versioned sample input datasets covering every InVEST model.",
+              "relevance": "Supports public availability and versioning of example inputs used to run and learn the models."
+            },
+            {
+              "label": "Official downloads and data sources page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page lists “Individual Sample Datasets for InVEST 3.20.0” and data-source links including the Natural Capital Alliance Data Hub, Kc Calculator, Parameter Value Database, Nutrient Database, and Sediment Database.",
+              "relevance": "Shows official identification of input resources and data-source guidance for users."
+            },
+            {
+              "label": "InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide table of contents includes model sections such as “Data Needs,” “Limitations and Simplifications,” “Interpreting Results,” “Calibration/Comparison with observed data,” “Appendix: Data Sources,” and “References.”",
+              "relevance": "Shows that model input requirements and supporting data-source context are publicly documented."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 86,
+          "score_derivation": "The software and modelling methods are strongly open: the main InVEST repository is public and identified as Apache-2.0 licensed in the curated evidence; the Natural Capital Alliance GitHub organization lists InVEST as a public Python repository and also shows related public repositories. Key dependencies or infrastructure libraries are also public, including PyGeoprocessing, whose README describes its raster, vector, and hydrological operations and explicitly states it was developed as a programmable, open-source, free GIS processing library to support InVEST, and TaskGraph, identified as the workflow engine used by InVEST models. Installation documentation lists package dependencies and distribution channels. The score is not higher because the main repository evidence page in the bundle is truncated and does not itself show full source-tree contents, model formulas, licence file, dependency lockfiles, or complete infrastructure independence; still, the evidence base is strong for inspectable, version-controlled, reusable open-source software.",
+          "uncertainty": "low",
+          "uncertainty_reason": "Multiple public repositories and documentation pages provide consistent evidence of open-source code, dependencies, and licensing, though some GitHub pages are partially truncated in the bundle.",
+          "references": [
+            {
+              "label": "Main InVEST repository",
+              "url": "https://github.com/natcap/invest",
+              "quote_or_finding": "The repository is public, has Issues/Pull requests/Discussions/Actions enabled, and the curator note identifies it as the main InVEST toolset source licensed under Apache-2.0.",
+              "relevance": "Primary evidence that InVEST’s models and software are released in a public version-controlled repository under an open-source licence."
+            },
+            {
+              "label": "Natural Capital Alliance GitHub organization",
+              "url": "https://github.com/natcap",
+              "quote_or_finding": "The organization page lists “invest” as a public Python repository with description “models that map and value the goods and services from nature that sustain and fulfill human life,” and shows Apache-2.0 for several related InVEST repositories.",
+              "relevance": "Supports the public organizational context and related open repositories around the InVEST ecosystem."
+            },
+            {
+              "label": "PyGeoprocessing repository",
+              "url": "https://github.com/natcap/pygeoprocessing",
+              "quote_or_finding": "PyGeoprocessing is described as a Python/Cython library providing raster, vector, and hydrological GIS operations, developed to support InVEST; the repository shows source folders, tests, docs, requirements, setup files, and a licence file.",
+              "relevance": "Shows a major InVEST dependency is itself public, documented, and inspectable."
+            },
+            {
+              "label": "TaskGraph repository",
+              "url": "https://github.com/natcap/taskgraph",
+              "quote_or_finding": "The TaskGraph repository is public; the curator note identifies it as the workflow engine all InVEST models use to organise execution.",
+              "relevance": "Supports openness of workflow/execution software used by the model system."
+            },
+            {
+              "label": "Installation and dependency documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The page lists installation via conda-forge, PyPI, and source from GitHub, and includes dependencies such as GDAL, pandas, numpy, pygeoprocessing, taskgraph, scipy, shapely, geopandas, and others.",
+              "relevance": "Shows dependencies and software environment requirements are publicly documented."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 69,
+          "score_derivation": "InVEST has strong general execution reproducibility for a software tool: it provides public CI/build-test workflow evidence, documented installation via conda-forge, PyPI, or source, a CLI tutorial and container section in the documentation navigation, explicit dependency lists, versioned releases, and sample datasets. These elements make it plausible for external users to install the software, run models, and reproduce example executions. The score is not lower because the computational environment, dependencies, and release versions are clearly documented. It is not higher because the evidence does not show a specific archived workflow run connecting exact input datasets, parameter files, model configuration, software commit, execution logs, and outputs for a particular environmental claim; CI logs and build matrices are not visible in the bundle; and there is no evidence of fully pinned containers or reproducible workflow packages for all models and outputs.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "Execution infrastructure is documented, but the bundle does not include inspectable CI run details or an end-to-end archived model run from inputs to outputs.",
+          "references": [
+            {
+              "label": "Build and test workflow",
+              "url": "https://github.com/natcap/invest/blob/main/.github/workflows/build-and-test.yml",
+              "quote_or_finding": "Curator note identifies this as a CI workflow that builds and tests InVEST on every change.",
+              "relevance": "Supports automated testing and repeatability of software builds across code changes."
+            },
+            {
+              "label": "Installation documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The page documents installation through conda-forge, pip/PyPI, and direct source installation from GitHub, and lists the package dependencies needed for natcap.invest.",
+              "relevance": "Provides the environment setup information needed for external users to execute the software."
+            },
+            {
+              "label": "Source installation command",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The documentation gives a source install command: `pip install \"git+https://github.com/natcap/invest.git@main#egg=natcap.invest\"`, and notes GDAL and compiler requirements.",
+              "relevance": "Shows how users can install a specific source branch and understand system prerequisites."
+            },
+            {
+              "label": "Versioned releases",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is shown with commit `fca8bf5`, a verified GitHub signature, date, and detailed changelog entries.",
+              "relevance": "Supports reproducibility by tying software behavior to versioned releases and commits."
+            },
+            {
+              "label": "Sample datasets",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The official downloads page links to “Individual Sample Datasets for InVEST 3.20.0.”",
+              "relevance": "Provides public example inputs for executing and testing model workflows."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 78,
+          "score_derivation": "The project has strong public community and review traceability. The main repository has public Issues, Pull requests, Discussions, Actions, and a substantial issue count, while the online community forum contains active support, science, research, data, software-support, and announcement threads. The forum evidence shows users raising model-specific questions about water yield, SDR, NDR, habitat quality, recreation, coastal vulnerability, validation, unexpected outputs, and workbench bugs, with replies and dates. Release notes also link changes and fixes to issue numbers, showing some connection between critique and correction. The score is not higher because the bundle does not provide formal peer-review records, governance documents, decision logs, systematic correction notices, replication attempts, or detailed examples of maintainers resolving specific scientific challenges; review is visible mainly through GitHub and forum support channels rather than a fully documented open scientific review process.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The evidence clearly shows active public issue tracking and community support, although formal review processes are less documented.",
+          "references": [
+            {
+              "label": "GitHub issue tracker",
+              "url": "https://github.com/natcap/invest/issues",
+              "quote_or_finding": "The repository exposes a public Issues section; the repository header shows 207 issues and 6 pull requests in the evidence snapshot.",
+              "relevance": "Shows a public channel where bugs and improvements can be reported, discussed, and tracked."
+            },
+            {
+              "label": "Community forum",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "The forum lists active topics such as “Water Yield Models to support economic analysis,” “Seasonal Water Yield Stream Issues,” “Negative Values - SDR Output,” “Regarding validation of model,” and “Unexpected results in InVEST Coastal Vulnerability model,” with replies, views, and recent dates.",
+              "relevance": "Demonstrates open user support and methodological discussion around model use and interpretation."
+            },
+            {
+              "label": "Software support guidelines",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "A pinned forum topic is titled “Guidelines for posting software support questions” and says the team welcomes reports when software is not working as expected.",
+              "relevance": "Shows an open process for users to report errors and obtain support."
+            },
+            {
+              "label": "Release notes linked to issues",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 changelog entries cite issue or pull-request numbers such as #2471, #2228, #2179, #2532, #2555, #2442, and #2573.",
+              "relevance": "Shows that public issue/PR records are linked to corrections and improvements in released software."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 87,
+          "score_derivation": "InVEST has excellent public communication for a software/model platform. The User Guide is openly accessible, provides a suggested citation with DOI for InVEST 3.20.0, lists contributors, states attribution guidelines, and organizes model documentation into summaries, introductions, model descriptions, limitations, data needs, interpreting results, appendices, and references. The official downloads page centralizes software downloads, user guides in multiple languages, data sources, citation/attribution guidance, and a usage-data notice. The GitHub releases page provides versioned release notes and changelogs. The score is not higher because the evidence does not show a standardized open licence for the documentation, complete archived version history for every documentation page, or direct peer-review status for the User Guide itself; nevertheless, the public-facing documentation is clear, accessible, versioned, and highly usable for scrutiny.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The evidence includes substantial public documentation, citation, release, and download artifacts, with only licensing/review details incomplete.",
+          "references": [
+            {
+              "label": "InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide provides a suggested citation: “Natural Capital Alliance, 2026. InVEST 3.20.0. https://doi.org/10.60793/natcap-invest-3.20.0,” lists contributors, and includes attribution guidelines.",
+              "relevance": "Shows the main publication/documentation artifact is open, citable, and attributable."
+            },
+            {
+              "label": "Model documentation structure",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The table of contents lists model sections including “Summary,” “Introduction,” “The Model,” “Limitations and Simplifications,” “Data Needs,” “Interpreting Results,” “Appendix: Data Sources,” and “References.”",
+              "relevance": "Supports clear communication of claims, methods, inputs, limitations, and interpretation context."
+            },
+            {
+              "label": "Downloads and user guide page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page provides InVEST 3.20.0 Workbench downloads for Windows and Mac, links to the GitHub repository, older/development versions, sample datasets, user guides in English, Spanish, and Chinese, and data-source resources.",
+              "relevance": "Shows centralized, accessible communication of software, documentation, and supporting resources."
+            },
+            {
+              "label": "Versioned release notes",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 includes highlights, general changes, Workbench fixes, and model-specific changes such as Annual Water Yield and Carbon Storage updates.",
+              "relevance": "Shows publication of versioned changes and context needed to interpret outputs generated by specific software versions."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 63,
+          "score_derivation": "The evidence chain is partially explicit and externally inspectable: public input resources and sample datasets are linked from the official downloads page; the User Guide links model claims to method descriptions, limitations, data needs, references, and data-source appendices; open repositories expose the software and key dependencies; installation documentation links execution environments to packages and dependencies; release notes link software versions to commits and issue/PR numbers; and community channels provide review and support records. This score is above moderate because the chain across inputs, methods, software, execution guidance, review channels, and publications can be followed at a project level. It is not higher because the linkage is not complete or exact for a particular environmental claim or output: the bundle does not provide a manifest tying a specific model result to exact primary datasets, dataset versions/licences, parameter values, code commit, dependency lockfile/container digest, workflow run logs, generated outputs, review thread, and final publication. The project is traceable as a platform, but individual InVEST-derived environmental analyses would need their own explicit datastacks or provenance records to meet the highest standard.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "Project-level linkages are visible, but the bundle lacks an end-to-end, exact, versioned provenance record for a specific model output or environmental decision claim.",
+          "references": [
+            {
+              "label": "Official resource hub",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page links software downloads, the GitHub repository, older/development versions, sample datasets, user guides, plugin developer guide, and data sources from one place.",
+              "relevance": "Provides a central public linkage point connecting software, documentation, versions, and inputs."
+            },
+            {
+              "label": "User Guide citation and model sections",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The User Guide supplies a DOI for InVEST 3.20.0 and organizes models with method, limitation, data-need, interpretation, data-source, and reference sections.",
+              "relevance": "Links the published tool description to model assumptions, required evidence, and supporting references."
+            },
+            {
+              "label": "Release-to-code linkage",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is associated with commit `fca8bf5`, a verified signature, and issue-linked changelog entries.",
+              "relevance": "Links public software versions to code state and change records."
+            },
+            {
+              "label": "Install/dependency linkage",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The installation page documents package channels, source installation from the GitHub repository, GDAL requirements, and a dependency list including pygeoprocessing and taskgraph.",
+              "relevance": "Links the executable software to computational environment and dependency requirements."
+            },
+            {
+              "label": "Community-to-release linkage",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "The 3.20.0 release notes cite multiple issue/PR numbers for changes and fixes.",
+              "relevance": "Shows some linkage from public review/correction records to released changes."
+            }
+          ]
+        }
+      ],
+      "total_score": 74,
+      "total_score_derivation": "Computed locally as round(mean([58, 86, 69, 78, 87, 63])) = 74.",
+      "single_paragraph_summary": "InVEST is a highly open and well-documented ecosystem-services modelling platform with public source code, open dependencies, installation documentation, sample datasets, extensive user-guide documentation, active issue tracking, community support, and versioned releases. The strongest parts of its traceability chain are the open-source software stack, public documentation, release/version communication, and community review channels. The main gaps are in exact end-to-end provenance for specific environmental outputs: the evidence does not show fully inspectable primary-data provenance, quantified measurement uncertainties, dataset licences and immutable identifiers for all inputs, pinned execution environments or archived workflow runs, or explicit manifests linking a given result to exact data, parameters, code commits, logs, review records, and publications. Overall, InVEST is strongly traceable as an open modelling platform, while individual analyses produced with InVEST would require additional project-specific traceability records to reach the highest standard.",
+      "limitations": [
+        "The evidence bundle is incomplete and several GitHub pages are truncated or show only repository headers, so file-level details, workflow contents, and licence files could not always be directly inspected.",
+        "The Bitbucket sample-data evidence is represented mainly by a curator note; the actual datasets, metadata, provenance, uncertainty estimates, quality controls, and licences were not visible in the bundle.",
+        "This assessment evaluates the InVEST platform claim, not a specific InVEST-derived environmental analysis; traceability of any individual map, valuation, or policy claim may be higher or lower depending on the data and workflow records supplied by that analysis.",
+        "No evidence was provided of exact archived workflow runs tying specific inputs, parameters, software versions, dependency hashes, execution logs, and outputs together.",
+        "No formal peer-review package, governance record, correction registry, or replication study was included, beyond public GitHub/forum review and support channels.",
+        "Documentation appears open and citable, but the bundle does not clearly show a Creative Commons or equivalent licence for the User Guide or all communication artifacts."
+      ],
+      "model_name": "gpt-5.5"
+    },
+    {
+      "run_number": 4,
+      "project_name": "InVEST",
+      "project_url": "https://github.com/natcap/invest",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 57,
+          "score_derivation": "InVEST has moderate public evidence for input-data traceability: the official downloads page points users to individual sample datasets for InVEST 3.20.0, the Natural Capital Alliance Data Hub, parameter databases, nutrient and sediment databases, and related guidance, and the curated bundle identifies a versioned sample-data repository covering every model. The User Guide also documents model-by-model data needs, sources, calibration/comparison sections, appendices, and references. This is substantially better than little evidence because inputs are identifiable and supported by reusable examples and data-source guidance. The score is not higher because the evidence bundle does not show detailed metadata for the sample datasets, primary measurement provenance, quantified uncertainty/error, quality-control procedures, dataset licenses, or clear traceability from secondary data sources back to primary observations. Also, the Bitbucket page content itself was not available in the captured evidence beyond the curator note, so versioning and coverage cannot be independently inspected from the bundle text.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The official pages clearly identify data resources, but the bundle lacks detailed dataset-level metadata and the sample-data repository content was not captured.",
+          "references": [
+            {
+              "label": "Versioned sample input datasets",
+              "url": "https://bitbucket.org/natcap/invest-sample-data",
+              "quote_or_finding": "Curator note states this is a versioned sample input dataset repository covering every InVEST model; captured page content only shows 'Bitbucket'.",
+              "relevance": "Supports existence of reusable, versioned example inputs, but limited captured detail constrains verification."
+            },
+            {
+              "label": "Official downloads and data sources page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "Page lists 'Individual Sample Datasets for InVEST 3.20.0' and data sources including the Natural Capital Alliance Data Hub, Kc Calculator, Parameter Value Database, Nutrient Database, and Sediment Database.",
+              "relevance": "Shows public identification of input resources and model-supporting data sources."
+            },
+            {
+              "label": "InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide includes model sections such as 'Data Needs', 'Calibration/Comparison with observed data', 'Appendix: Data Sources', and 'References' for many models.",
+              "relevance": "Provides public documentation of input requirements and some source guidance for model users."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 87,
+          "score_derivation": "The software and method layer is strongly open. The main InVEST repository is public, identified as Apache-2.0 licensed in the curated evidence and organization listing, and is explicitly described as models that map and value goods and services from nature. Key dependencies and infrastructure libraries are also public: PyGeoprocessing is a version-controlled open-source GIS-processing library with code, docs, tests, requirements, and license files visible, and TaskGraph is public as the workflow engine dependency. Installation documentation lists distribution channels, source installation from GitHub, and dependencies. This warrants a high score because analytical logic, dependencies, licensing, and model software are externally inspectable in version-controlled repositories. The score is not higher because the captured main-repository page does not expose detailed file contents, method equations are more in the User Guide than directly linked from specific code modules in the bundle, and the evidence does not demonstrate fully pinned dependency lockfiles or all user-facing infrastructure components being independently deployable.",
+          "uncertainty": "low",
+          "uncertainty_reason": "Multiple public repositories, license evidence, dependency documentation, and installation paths make this stage well evidenced.",
+          "references": [
+            {
+              "label": "Main InVEST repository",
+              "url": "https://github.com/natcap/invest",
+              "quote_or_finding": "Public GitHub repository for 'InVEST®: models that map and value the goods and services from nature that sustain and fulfill human life'; curator note identifies Apache-2.0 license.",
+              "relevance": "Primary evidence that the core model/toolset source code is open and version-controlled."
+            },
+            {
+              "label": "PyGeoprocessing dependency",
+              "url": "https://github.com/natcap/pygeoprocessing",
+              "quote_or_finding": "Repository contains 4,189 commits and files including docs, tests, LICENSE.txt, requirements.txt, setup.py, and pyproject.toml; README describes raster, vector, and hydrological operations supporting InVEST.",
+              "relevance": "Shows an important geospatial-processing dependency is itself open, documented, tested, and version-controlled."
+            },
+            {
+              "label": "TaskGraph dependency",
+              "url": "https://github.com/natcap/taskgraph",
+              "quote_or_finding": "Public repository with issues, pull requests, actions, and security/quality tabs; curator note identifies it as the workflow engine all InVEST models use.",
+              "relevance": "Supports openness of workflow/execution software used by InVEST models."
+            },
+            {
+              "label": "Installation and dependency documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "Documentation lists conda-forge, PyPI, and source installation options and enumerates dependencies including GDAL, pygeoprocessing, taskgraph, pandas, numpy, scipy, geopandas, and others.",
+              "relevance": "Documents dependencies and configurations needed to understand and run the software."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 68,
+          "score_derivation": "InVEST has strong but incomplete execution traceability. The bundle identifies a GitHub Actions build-and-test workflow that builds and tests InVEST on changes, installation documentation provides conda, pip, and source-install commands plus dependency lists, and versioned releases make it possible to associate runs with software versions. The release notes also refer to datastacks, saved CSV handling, reports, CLI flags, and bug fixes, indicating attention to reproducible execution and output generation. The score is not lower because an external user can plausibly install the package, use sample data, run models, and inspect CI configuration. It is not higher because the captured CI workflow page contains no workflow content in the bundle, the evidence does not include public CI run logs/artifacts, exact model-run parameter files, workflow-run identifiers, container images, checksums, or archived outputs that connect particular input datasets to published example outputs. For the broad claim of credible and reproducible outputs, the evidence supports reproducible software operation more than exact run-level reproducibility.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "Execution support is clear from installation and release evidence, but exact workflow contents and run artifacts are mostly absent from the captured bundle.",
+          "references": [
+            {
+              "label": "Build and test workflow",
+              "url": "https://github.com/natcap/invest/blob/main/.github/workflows/build-and-test.yml",
+              "quote_or_finding": "Curator note describes this as a CI workflow that builds and tests InVEST on every change; captured GitHub page did not show the YAML contents.",
+              "relevance": "Supports automated testing and build reproducibility, though details are not visible in the bundle text."
+            },
+            {
+              "label": "Install documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "Documents installation via conda-forge, pip, and source from GitHub; lists dependency requirements and GDAL caveats.",
+              "relevance": "Provides external users with steps and environment requirements needed to reproduce execution."
+            },
+            {
+              "label": "Versioned releases and changelog",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is tagged to commit fca8bf5 and includes detailed change notes, including report generation, datastack behavior, CLI flags, and model-specific fixes.",
+              "relevance": "Allows users to tie execution behavior to a specific software version and inspect changes affecting reproducibility."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 76,
+          "score_derivation": "InVEST shows strong public community and review traceability through an active public GitHub issue tracker, pull requests, GitHub discussions, and an active Discourse community forum where users report errors, ask model questions, and receive support. The forum evidence includes recent posts on water yield, SDR, NDR, habitat quality, validation, parameter databases, Workbench crashes, and model-output interpretation, with reply counts visible. Release notes link many changes to issue numbers, showing that at least some corrections and improvements are publicly traceable to discussion or bug reports. The score is not higher because the bundle does not include formal peer-review records, governance processes, decision logs, correction notices outside release notes, or systematic evidence of how scientific challenges and validation critiques are resolved. It is also unclear how affected communities participate beyond user support and software discussion channels.",
+          "uncertainty": "low",
+          "uncertainty_reason": "Public issue and forum infrastructure is directly visible, although formal review/governance evidence is missing.",
+          "references": [
+            {
+              "label": "GitHub issue tracker",
+              "url": "https://github.com/natcap/invest/issues",
+              "quote_or_finding": "Public issue tracker for natcap/invest shows 207 issues, with repository tabs for issues, pull requests, discussions, actions, projects, and wiki.",
+              "relevance": "Provides a visible channel for bug reports, critique, corrections, and development discussion."
+            },
+            {
+              "label": "Natural Capital Alliance community forum",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "Forum lists active categories and recent topics such as 'Water Yield Models to support economic analysis', 'Seasonal Water Yield Stream Issues', 'Regarding validation of model', and 'Negative Values - SDR Output', with replies and views.",
+              "relevance": "Shows public user-support and scientific/model-question discussions around InVEST use and interpretation."
+            },
+            {
+              "label": "Release notes linked to issues",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 notes reference numerous issue numbers, for example #2471, #2228, #2179, #2555, #2533, and others.",
+              "relevance": "Demonstrates that at least some bug fixes, usability changes, and model updates are traceable to public issue records."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 88,
+          "score_derivation": "Publications and communication are excellent overall. The InVEST User Guide is openly accessible, provides a suggested citation with a DOI for InVEST 3.20.0, names contributors, explains attribution guidelines, and documents model summaries, methods, limitations, simplifications, data needs, interpreting results, appendices, and references. The official downloads page provides workbench downloads, user guides in multiple languages, data-source links, support resources, and usage-data disclosure. GitHub releases provide versioned communication of changes and bug fixes. The score is not higher because the captured evidence does not identify a Creative Commons or other open documentation license for the User Guide, the 'latest' user-guide URL may obscure historical versioning unless paired with releases/DOIs, and the bundle does not include external peer-reviewed publications validating every model. Still, for open communication of the toolset, methods, versions, and usage guidance, the evidence is very strong.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The documentation, downloads page, citation, DOI, multilingual guides, and release notes are directly evidenced.",
+          "references": [
+            {
+              "label": "Canonical InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "User Guide provides suggested citation 'Natural Capital Alliance, 2026. InVEST 3.20.0' with DOI, contributor list, attribution guidelines, and model sections including summaries, methods, limitations, data needs, interpreting results, data sources, and references.",
+              "relevance": "Primary public communication artifact documenting claims, methods, limitations, and supporting context."
+            },
+            {
+              "label": "Downloads, guides, and data page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "Page provides InVEST 3.20.0 Workbench downloads for Windows and Mac, links to GitHub, older/development versions, sample datasets, user guides in English, Spanish, and Chinese, plugin developer guide, data sources, attribution instructions, and usage-data notice.",
+              "relevance": "Shows accessible public communication for users, data sources, support, and attribution."
+            },
+            {
+              "label": "Versioned releases",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is marked latest, tied to commit fca8bf5, and includes detailed highlights and model-specific changes.",
+              "relevance": "Supports versioned public communication and changelog traceability."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 64,
+          "score_derivation": "The evidence chain is meaningfully linked but not fully explicit at run level. A user can trace the broad InVEST claim from public documentation and downloads to sample/data-source resources, from the User Guide to model methods and data needs, from installation docs to software dependencies, from the GitHub repository and related libraries to source code, from releases to specific versions and issue-linked changes, and from forums/issues to public review channels. This supports a moderate-to-strong open linkage score. The score is not higher because the bundle does not provide an explicit manifest connecting each environmental model claim to exact dataset versions, code commits, dependency versions, model configuration files, CI workflow runs, output artifacts, and review records. There is no single externally verifiable provenance record for a specific model output such as carbon storage, water yield, pollination, or coastal protection. Linkage across stages therefore exists through public URLs and version labels, but it remains distributed and partial rather than exact, versioned, and re-executable end-to-end.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "Many artifacts are linked at project level, but the bundle lacks exact claim-to-run provenance records.",
+          "references": [
+            {
+              "label": "Official downloads and data-source hub",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "Connects downloads, GitHub repository, older/development versions, sample datasets, user guides, plugin guide, data sources, attribution, and usage-data notice on one official page.",
+              "relevance": "Provides project-level linkage between software, documentation, input resources, and communication artifacts."
+            },
+            {
+              "label": "User Guide citation and model documentation",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "Provides a DOI and suggested citation for InVEST 3.20.0 and organizes model documentation with methods, data needs, limitations, and references.",
+              "relevance": "Links versioned publication/communication to model methods and required evidence inputs."
+            },
+            {
+              "label": "Installation documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "Links installable package routes to source installation from GitHub and lists dependencies such as pygeoprocessing and taskgraph.",
+              "relevance": "Connects the documented software environment to the source-code and dependency layer."
+            },
+            {
+              "label": "Versioned release with issue references",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is tied to commit fca8bf5 and includes changelog entries linked to issue numbers.",
+              "relevance": "Links software version, code changes, and public review/correction records."
+            },
+            {
+              "label": "Community forum",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "Public forum includes active model-specific support and interpretation discussions across InVEST models.",
+              "relevance": "Links users' execution and interpretation questions to public review and support channels, though not to exact model runs."
+            }
+          ]
+        }
+      ],
+      "total_score": 73,
+      "total_score_derivation": "Computed locally as round(mean([57, 87, 68, 76, 88, 64])) = 73.",
+      "single_paragraph_summary": "InVEST has a strong open-traceability profile for an environmental modeling toolset: the source code and major dependencies are public and open-source, installation paths and dependencies are documented, releases and user guides are versioned and publicly communicated, and active public issue/forum channels provide visible routes for critique and correction. The evidence chain is strongest from software to documentation, releases, and community review. It is weaker at the input-data and exact execution-provenance layers: sample datasets and data-source guidance exist, but the bundle does not expose detailed dataset metadata, primary measurement provenance, uncertainty, licensing, or complete dataset-to-output traceability, and it does not include exact run records, parameter files, workflow artifacts, or reproducible output bundles for specific environmental claims. Overall, InVEST is highly open as software and documentation, moderately open for data provenance and run-level reproducibility, and partially but not completely linked end-to-end.",
+      "limitations": [
+        "The assessment uses only the supplied evidence bundle; no additional live repository inspection was performed beyond the captured text and curator notes.",
+        "The Bitbucket sample-data repository evidence was not captured in detail, so claims about versioned sample datasets rely heavily on the curator note and official downloads page.",
+        "The bundle does not include dataset-level metadata, licenses, checksums, uncertainty estimates, primary measurement methods, or quality-control records for input datasets.",
+        "The CI workflow URL is supplied, but the captured evidence does not show the YAML contents, run history, logs, or artifacts.",
+        "No exact end-to-end model run is documented in the bundle with input versions, parameters, code commit, dependency environment, outputs, and review record.",
+        "The assessment evaluates traceability of the InVEST toolset and its documentation, not the scientific validity or accuracy of any particular InVEST model output.",
+        "Evidence for formal scientific peer review, governance, and correction policies is limited to public issue/forum/release infrastructure and does not include complete review records.",
+        "The User Guide evidence uses a 'latest' URL; although it cites InVEST 3.20.0 and a DOI, the bundle does not fully demonstrate historical documentation archiving or licensing."
+      ],
+      "model_name": "gpt-5.5"
+    },
+    {
+      "run_number": 5,
+      "project_name": "InVEST",
+      "project_url": "https://github.com/natcap/invest",
+      "stages": [
+        {
+          "stage": 1,
+          "stage_name": "Open Input Data and Measurement Evidence",
+          "score": 58,
+          "score_derivation": "InVEST has moderate public input-data traceability for a general-purpose ecosystem-services modeling tool: the evidence identifies official sample datasets for every model and an official downloads/data-sources page that links users to sample datasets, a Natural Capital Alliance Data Hub, parameter-value and nutrient/sediment databases, and user-guide data guidance. This is enough to show that expected inputs are identifiable and that example data are available for reuse in at least some form. The score is not higher because the supplied evidence does not expose the contents of the Bitbucket sample-data repository, dataset-level metadata, licenses, version tags, measurement methods, provenance back to primary observations, uncertainty/quality-control fields, or transformations for all model inputs. Since many InVEST runs use user-supplied spatial datasets, traceability of actual environmental outputs depends heavily on whether a given analysis preserves and documents its own input data. The score is not lower because there is clear official infrastructure for sample inputs and data-source guidance, rather than no public data pathway.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The bundle identifies important data resources but provides little detail on dataset-level metadata, licensing, provenance, and uncertainty.",
+          "references": [
+            {
+              "label": "Versioned sample data repository",
+              "url": "https://bitbucket.org/natcap/invest-sample-data",
+              "quote_or_finding": "Curator note identifies this as versioned sample input datasets covering every InVEST model.",
+              "relevance": "Supports the existence of reusable example inputs across the model suite, but the bundle does not show metadata, licenses, or measurement provenance."
+            },
+            {
+              "label": "Official InVEST downloads and data page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page lists 'Individual Sample Datasets for InVEST 3.20.0' and data-source resources including the Natural Capital Alliance Data Hub, Kc Calculator, Parameter Value Database, Nutrient Database, and Sediment Database.",
+              "relevance": "Shows official identification of input-data resources and guidance for users preparing model runs."
+            },
+            {
+              "label": "InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "Model sections include 'Data Needs' and appendices such as 'Data Sources' for multiple models, including Annual Water Yield, Carbon Storage and Sequestration, Coastal Blue Carbon, and others.",
+              "relevance": "Provides public documentation of required inputs and data-source guidance, though not full primary-data traceability for every possible analysis."
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "stage_name": "Open-Source Models, Methods, and Software",
+          "score": 88,
+          "score_derivation": "The software traceability is strong. The main InVEST repository is public on GitHub and identified as Apache-2.0 licensed; linked dependency repositories such as PyGeoprocessing and TaskGraph are also public, and PyGeoprocessing exposes substantial repository structure including source, tests, documentation, license, pyproject, requirements, setup files, and a README describing its raster, vector, and hydrological operations. Installation documentation lists major runtime dependencies and supported distribution channels. The score is not higher because the supplied evidence for the main InVEST repository page is mostly GitHub chrome and high-level repository metadata rather than direct inspection of all model source files, model equations, dependency lockfiles, build scripts, and infrastructure front-end code. It is not lower because the evidence clearly establishes open, version-controlled repositories, open-source licensing, public dependencies, and documented installation paths.",
+          "uncertainty": "low",
+          "uncertainty_reason": "Multiple public repositories and installation/dependency documentation provide direct evidence of open-source software infrastructure.",
+          "references": [
+            {
+              "label": "Main InVEST repository",
+              "url": "https://github.com/natcap/invest",
+              "quote_or_finding": "Public GitHub repository described as 'InVEST®: models that map and value the goods and services from nature that sustain and fulfill human life,' with repository metadata showing issues, pull requests, discussions, actions, stars and forks; curator note identifies Apache-2.0 licensing.",
+              "relevance": "Primary evidence that the core model toolset is openly hosted in version control under an open-source license."
+            },
+            {
+              "label": "PyGeoprocessing dependency",
+              "url": "https://github.com/natcap/pygeoprocessing",
+              "quote_or_finding": "README states PyGeoprocessing is a Python/Cython library providing raster, vector, and hydrological GIS operations and was developed to support InVEST; repository shows source, tests, docs, LICENSE.txt, requirements.txt, pyproject.toml, setup.py, and 4,189 commits.",
+              "relevance": "Shows that a major geospatial processing dependency is itself open, documented, version-controlled, and testable."
+            },
+            {
+              "label": "TaskGraph dependency",
+              "url": "https://github.com/natcap/taskgraph",
+              "quote_or_finding": "Public GitHub repository under natcap with issues, pull requests, actions, projects, and security/quality tabs; curator note identifies it as the workflow engine used by InVEST models.",
+              "relevance": "Supports openness of execution/workflow infrastructure used by the model suite."
+            },
+            {
+              "label": "Installation and dependencies documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "Documentation states InVEST can be installed from conda-forge, PyPI, or directly from the git source tree, and lists dependencies including GDAL, pandas, numpy, shapely, scipy, pygeoprocessing, taskgraph, geopandas, matplotlib, and others.",
+              "relevance": "Provides inspectable software environment and dependency information needed to understand and run the software."
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "stage_name": "Open Execution and Reproducibility",
+          "score": 68,
+          "score_derivation": "Execution traceability is strong for reproducing the software environment but weaker for reproducing a specific environmental claim or model output. The evidence includes a GitHub Actions build-and-test workflow, detailed installation instructions for conda-forge, PyPI, source installation, dependencies, CLI/tutorial/container topics, and release artifacts with versioned changes. These materials allow an external actor to install the package and inspect automated testing infrastructure. The score is not higher because the supplied bundle does not show the actual contents or run history of the CI workflow, a pinned computational environment such as a lockfile/container image digest for a particular release, executable notebooks or workflow scripts that run sample data end-to-end, preserved outputs, model parameters, or an exact run record linking specific inputs to specific reported outputs. It is not lower because installation, dependencies, CI, CLI, releases, and sample data create a credible partial path to re-execution.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "The evidence is good for installability and CI existence, but incomplete for exact run-level reproducibility from inputs to outputs.",
+          "references": [
+            {
+              "label": "Build and test workflow",
+              "url": "https://github.com/natcap/invest/blob/main/.github/workflows/build-and-test.yml",
+              "quote_or_finding": "Curator note identifies this as a CI workflow that builds and tests InVEST on every change.",
+              "relevance": "Shows public automated execution/testing infrastructure, although the bundle does not expose workflow contents or run results."
+            },
+            {
+              "label": "Installation documentation",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The page documents installation via conda-forge, pip/PyPI, and source from GitHub, explains GDAL requirements, lists dependencies, and includes navigation entries for CLI, batch processing, containers, model entry points, API reference, plugins, and changelog.",
+              "relevance": "Supports reproducibility by documenting how an external user can recreate the software environment and run models."
+            },
+            {
+              "label": "Versioned releases",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is dated 11 Jun, associated with commit fca8bf5, and contains a detailed changelog of model, Workbench, reporting, and bug-fix changes.",
+              "relevance": "Provides version anchors that users can use when attempting to reproduce analyses with a specific software release."
+            },
+            {
+              "label": "Sample datasets",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The official downloads page links to 'Individual Sample Datasets for InVEST 3.20.0'.",
+              "relevance": "Sample inputs support practical re-execution, though the evidence does not show full workflows or expected outputs."
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "stage_name": "Open Community and Review",
+          "score": 83,
+          "score_derivation": "InVEST has strong visible community and review infrastructure. The main repository has a public issue tracker, pull requests, discussions, actions, projects, and wiki tabs, with 207 issues shown in the evidence. The Natural Capital Alliance community forum is active and includes software-support guidelines, announcements, user questions, model validation questions, bug/error reports, and responses across many InVEST model topics. Releases cite issue numbers for fixes and enhancements, making some correction history visible. The score is not higher because the supplied evidence does not document formal peer-review records for the software or individual model methods, governance decision logs, systematic correction notices, response-time metrics, or how affected communities participate in methodological decisions. It is not lower because users clearly have public channels to report errors, ask scientific/methodological questions, and inspect at least some issue-linked maintenance history.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The public issue tracker and active Discourse forum provide direct, concrete evidence of open community scrutiny and support.",
+          "references": [
+            {
+              "label": "GitHub issue tracker",
+              "url": "https://github.com/natcap/invest/issues",
+              "quote_or_finding": "The repository page shows public Issues, Pull requests, Discussions, Actions, Projects, Wiki, and Security/quality tabs, with 207 issues visible in the repository metadata.",
+              "relevance": "Provides an inspectable public channel for bug reports, feature requests, and corrections."
+            },
+            {
+              "label": "Natural Capital Alliance community forum",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "Forum homepage describes itself as 'A place for InVEST user support and collaboration' and shows active topics such as software support, model validation, InVEST release announcements, negative SDR outputs, and Workbench crashes, with replies and recent dates.",
+              "relevance": "Shows active public user-support and methodological discussion channels beyond GitHub."
+            },
+            {
+              "label": "Forum support guidelines",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "A pinned topic titled 'Guidelines for posting software support questions' says the team welcomes software support posts and provides guidance for effective error reporting.",
+              "relevance": "Indicates an open process for users to raise issues and seek support."
+            },
+            {
+              "label": "Release issue references",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "The 3.20.0 release notes link changes and fixes to issue or pull-request numbers such as #2471, #2228, #2179, #2532, #2555, #2442, and #2573.",
+              "relevance": "Connects public maintenance history to specific tracked changes and corrections."
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "stage_name": "Open Publications and Communication",
+          "score": 90,
+          "score_derivation": "Publication and communication traceability is excellent for a software/model suite. The InVEST User Guide is openly accessible and functions as canonical documentation, with suggested citation and DOI for version 3.20.0, contributor attribution, model sections covering summaries, introductions, model descriptions, limitations/simplifications, data needs, interpretation, appendices, and references. The official downloads page links to Workbench downloads, GitHub, older/development versions, sample datasets, multilingual user guides, plugin developer guidance, and data sources. GitHub releases provide versioned changelogs and commit anchors. The score is not higher because the bundle does not show a standardized open license for the documentation, formal publication peer-review status for each model, complete version history of the user guide beyond current/latest, or permanently archived copies for every release except the cited DOI/release information. It is not lower because the public documentation is comprehensive, accessible, attributable, version-aware, and directly tied to model use.",
+          "uncertainty": "low",
+          "uncertainty_reason": "The evidence includes a detailed public user guide, official download/data pages, citation information, and versioned release notes.",
+          "references": [
+            {
+              "label": "InVEST User Guide",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide lists a suggested citation, 'Natural Capital Alliance, 2026. InVEST 3.20.0. https://doi.org/10.60793/natcap-invest-3.20.0,' names contributors, and organizes model documentation into sections including summaries, model descriptions, limitations, data needs, interpretation, appendices, and references.",
+              "relevance": "Primary open publication documenting claims, methods, inputs, limitations, and citation context for the toolset."
+            },
+            {
+              "label": "Official downloads, user guides, and data page",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page provides Workbench downloads for InVEST 3.20.0, GitHub repository link, older/development versions, sample datasets, English/Spanish/Chinese user guides, plugin developer guide, data sources, attribution guidance, and usage-data notice.",
+              "relevance": "Central communication hub connecting users to documentation, software, data, attribution, and support resources."
+            },
+            {
+              "label": "Versioned releases and changelog",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "The 3.20.0 release notes provide release date, commit identifier fca8bf5, verification status, highlights, and detailed model-specific and Workbench changes.",
+              "relevance": "Supports version-aware communication and allows users to understand differences between software versions."
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "stage_name": "Open Linkage",
+          "score": 65,
+          "score_derivation": "The overall evidence chain is visible but not fully explicit at run level. A plausible chain can be inspected from official sample data and data-source guidance, to the open InVEST repository and open dependencies, to installation/CI/release information, to public issues/forums, and finally to the user guide and release communications. There are also useful version anchors: InVEST 3.20.0 downloads, sample datasets for 3.20.0, a suggested citation/DOI for 3.20.0, and a release linked to commit fca8bf5. However, Open Linkage requires explicit, specific, versioned, externally verifiable connections between claims and exact datasets, code versions, model configurations, workflow runs, review records, and publications. The supplied evidence does not show a single machine-readable provenance record or manifest in the project repository that binds a specific environmental output to exact input files, parameters, code commit, dependency versions, CI/workflow run, expected outputs, and review discussion. The score is not lower because the official pages and repositories cross-reference enough artifacts to reconstruct a high-level traceability chain; it is not higher because the most important exact claim-to-evidence links remain implicit or analysis-dependent.",
+          "uncertainty": "medium",
+          "uncertainty_reason": "High-level artifact linkage is clear, but exact run-level provenance and machine-verifiable links are not demonstrated in the supplied evidence.",
+          "references": [
+            {
+              "label": "Official downloads page links software, data, guides, and attribution",
+              "url": "https://naturalcapitalalliance.stanford.edu/software/invest/invest-downloads-data",
+              "quote_or_finding": "The page combines downloads for InVEST 3.20.0, GitHub repository, older/development versions, sample datasets, user guides, plugin developer guide, data sources, attribution guidance, and usage-data notice.",
+              "relevance": "Provides the strongest central linkage across data, software, documentation, and communication artifacts."
+            },
+            {
+              "label": "User Guide version citation",
+              "url": "https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/index.html",
+              "quote_or_finding": "The guide gives a suggested citation for 'InVEST 3.20.0' with DOI https://doi.org/10.60793/natcap-invest-3.20.0 and documents models, limitations, data needs, interpretation, and references.",
+              "relevance": "Links published documentation and citation to a named software version."
+            },
+            {
+              "label": "Release-to-commit anchor",
+              "url": "https://github.com/natcap/invest/releases",
+              "quote_or_finding": "Release 3.20.0 is linked to commit fca8bf5 and includes detailed change notes with issue references.",
+              "relevance": "Links a public software version to a specific code state and maintenance/review artifacts."
+            },
+            {
+              "label": "Installation page dependency and source links",
+              "url": "https://invest.readthedocs.io/en/latest/installing.html",
+              "quote_or_finding": "The page describes installing from conda-forge, PyPI, or directly from GitHub main and lists dependencies including pygeoprocessing and taskgraph.",
+              "relevance": "Connects software execution to dependency and environment information, but not to an exact completed analysis run."
+            },
+            {
+              "label": "Community forum and issue tracker",
+              "url": "https://community.naturalcapitalalliance.org/",
+              "quote_or_finding": "The forum contains active model-specific support and science/data discussions, while the linked GitHub project has public issues and pull requests.",
+              "relevance": "Supplies review/community artifacts in the chain, though not always linked to specific claims or released outputs."
+            }
+          ]
+        }
+      ],
+      "total_score": 75,
+      "total_score_derivation": "Computed locally as round(mean([58, 88, 68, 83, 90, 65])) = 75.",
+      "single_paragraph_summary": "InVEST shows a strong open-traceability profile as an open-source ecosystem-services modeling platform: official pages link users from downloads and sample datasets to public GitHub repositories, open dependencies, installation instructions, release notes, user-guide documentation, issue tracking, and a community forum. The strongest dimensions are open software, publications, and community review: the toolset and dependencies are public and version-controlled, the user guide documents models, data needs, limitations, interpretation, references, and citation/DOI information, and users can inspect active support and issue channels. The weaker dimensions are input-data provenance, exact execution reproducibility, and cross-artifact linkage: the evidence does not demonstrate dataset-level metadata, uncertainty, measurement provenance, licenses, or an exact reproducible run that binds particular input files, parameters, code commit, environment, outputs, and review records. Overall, the evidence supports a high-level open evidence chain for the InVEST toolset, but not a fully machine-verifiable provenance chain for each environmental output produced with it.",
+      "limitations": [
+        "The assessment uses only the supplied evidence bundle; no live repository inspection or independent download of files was performed.",
+        "The Bitbucket sample-data repository evidence is represented mainly by a curator note, with no visible dataset contents, metadata, version tags, licenses, or uncertainty information in the bundle.",
+        "The evidence concerns the InVEST platform/toolset rather than one specific environmental analysis; run-level traceability will vary by user project and input-data documentation.",
+        "The CI workflow is identified by URL and curator note, but the supplied page extract does not show the workflow YAML contents or successful run history.",
+        "No complete provenance artifact was supplied that links exact input datasets, parameters, code commit, dependency versions, workflow run, outputs, review discussion, and publication for a specific model result.",
+        "The bundle does not provide formal peer-review records or governance documentation for individual model methods, though public issue/forum review channels are evident.",
+        "Documentation licensing and archival/versioning details are not fully visible in the supplied evidence."
+      ],
+      "model_name": "gpt-5.5"
+    }
+  ]
+}
