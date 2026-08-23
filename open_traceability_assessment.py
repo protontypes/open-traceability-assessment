@@ -58,6 +58,18 @@ DEFAULT_PROJECT_URL = "https://github.com/natcap/invest"
 # Structured output schema
 # -----------------------------
 
+# Canonical stage names, owned by the runner. The model never outputs stage names
+# (or any other runner-owned metadata); finalize_run() fills them in locally so
+# every stored run carries identical labels without spending output tokens on them.
+STAGE_NAMES: dict[int, str] = {
+    1: "Open Input Data and Measurement Evidence",
+    2: "Open-Source Models, Methods, and Software",
+    3: "Open Execution and Reproducibility",
+    4: "Open Community and Review",
+    5: "Open Publications and Communication",
+    6: "Open Linkage",
+}
+
 
 class EvidenceReference(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -74,11 +86,17 @@ class EvidenceReference(BaseModel):
     relevance: str = Field(description="Why this reference supports the score.")
 
 
-class StageAssessment(BaseModel):
+# --- Model-facing schemas ---------------------------------------------------
+# These contain only the fields the model must actually produce. Runner-owned
+# metadata (run number, project URL, model attribution, totals, stage names)
+# lives on the storage models below and is applied locally by finalize_run();
+# making the model generate it was pure output-token waste.
+
+
+class StageAssessmentOutput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     stage: int = Field(ge=1, le=6)
-    stage_name: str
     score: int = Field(ge=0, le=100)
     score_derivation: str = Field(
         description=(
@@ -92,6 +110,75 @@ class StageAssessment(BaseModel):
     uncertainty_reason: str = Field(
         description="One sentence explaining the uncertainty level."
     )
+    references: list[EvidenceReference] = Field(
+        description="The strongest supporting references for this score, at most 3."
+    )
+
+
+class AssessmentOutput(BaseModel):
+    """Full narrative schema, used for the first --full-runs runs per provider."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    project_name: str
+    stages: list[StageAssessmentOutput]
+    single_paragraph_summary: str
+    limitations: list[str]
+
+
+class SlimStageOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    stage: int = Field(ge=1, le=6)
+    score: int = Field(ge=0, le=100)
+    uncertainty: Literal["low", "medium", "high"] = Field(
+        description="Overall confidence in this stage's score given the available evidence."
+    )
+    reference_urls: list[str] = Field(
+        description="URLs from the evidence bundle that most support the score, at most 3."
+    )
+
+
+class SlimAssessmentOutput(BaseModel):
+    """Scores-only schema for repeat runs beyond --full-runs.
+
+    Repeat runs exist to measure score variance, which only needs the numbers —
+    regenerating the narrative every run multiplied the (expensive) output tokens
+    for no analytical gain. Uncertainty and bare reference URLs are kept so the
+    report's consensus counting and uncertainty distribution still work.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    stages: list[SlimStageOutput]
+
+
+def output_schema_for(slim: bool) -> type[BaseModel]:
+    return SlimAssessmentOutput if slim else AssessmentOutput
+
+
+# --- Storage models ----------------------------------------------------------
+# What lands in the .runs.json file: a model output merged with runner-owned
+# metadata and the token usage reported by the provider.
+
+
+class TokenUsage(BaseModel):
+    input_tokens: int = 0
+    cached_input_tokens: int = 0  # served from the prompt cache (heavily discounted)
+    cache_creation_input_tokens: int = 0  # written to the cache (Anthropic only)
+    output_tokens: int = 0
+    reasoning_output_tokens: int = 0  # OpenAI reports reasoning separately; Anthropic includes it in output_tokens
+
+
+class StageAssessment(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    stage: int
+    stage_name: str
+    score: int
+    score_derivation: str
+    uncertainty: Literal["low", "medium", "high"]
+    uncertainty_reason: str
     references: list[EvidenceReference]
 
 
@@ -102,22 +189,13 @@ class AssessmentRun(BaseModel):
     project_name: str
     project_url: str
     stages: list[StageAssessment]
-    total_score: Optional[int] = Field(
-        default=None,
-        ge=0,
-        le=100,
-        description="Leave null. Computed locally by the runner as the rounded mean of the stage scores.",
-    )
-    total_score_derivation: Optional[str] = Field(
-        default=None,
-        description="Leave null. Filled in locally by the runner.",
-    )
+    total_score: Optional[int] = None
+    total_score_derivation: Optional[str] = None
     single_paragraph_summary: str
     limitations: list[str]
-    model_name: Optional[str] = Field(
-        default=None,
-        description="Leave null. Set locally by the runner to the model that produced this run.",
-    )
+    model_name: Optional[str] = None
+    schema_variant: Literal["full", "slim"] = "full"
+    usage: Optional[TokenUsage] = None
 
 
 # Schema for the optional manifest-expansion step (--suggest-references). The model is
@@ -630,6 +708,25 @@ Create a full evidence chain from input data (1) to (5), then use this chain of 
 """
 
 
+FULL_OUTPUT_RULES = """
+Output requirements:
+- Score stages 1-6 independently from 0 to 100.
+- Treat this as an independent run; do not try to match imagined prior runs.
+- For each stage cite at most the 3 strongest references from the evidence bundle.
+- Provide a single-paragraph summary.
+- Include limitations, especially where the evidence bundle is incomplete.
+""".strip()
+
+SLIM_OUTPUT_RULES = """
+Output requirements:
+- Score stages 1-6 independently from 0 to 100.
+- Treat this as an independent run; do not try to match imagined prior runs.
+- This is a scores-only run: for each stage return only the score, the uncertainty
+  level, and the URLs from the evidence bundle (at most 3) that most support the
+  score. Do not write any derivation prose.
+""".strip()
+
+
 def build_user_prompt(
     *,
     run_number: int,
@@ -638,18 +735,25 @@ def build_user_prompt(
     definition_url: str,
     definition_text: str,
     evidence_bundle: str,
-) -> tuple[str, str]:
-    """Return ``(static_prefix, dynamic_suffix)`` for one assessment run.
+    slim: bool = False,
+) -> tuple[str, str, str]:
+    """Return ``(shared_core, variant_rules, dynamic_suffix)`` for one assessment run.
 
-    The static prefix (definition + evidence bundle + output requirements) is
-    byte-identical across every run of a given assessment, so it forms a stable,
-    cacheable prompt prefix: OpenAI caches it automatically, and the Anthropic path
-    marks it with ``cache_control`` (see ``run_assessment_*``). Only the dynamic
-    suffix — the run number — changes per run, and it is placed last so it never
-    invalidates the cached prefix. Caching is a prefix match, so the run number must
-    not appear before the evidence bundle.
+    The parts are ordered from most to least stable because prompt caching is a
+    prefix match:
+
+    - ``shared_core`` (definition + evidence bundle) is byte-identical across every
+      run of an assessment, full or slim, so all runs share one big cached prefix.
+    - ``variant_rules`` (the output requirements) differ between the full and slim
+      schemas, so they sit after the core on their own cache breakpoint: slim runs
+      still reuse the shared-core prefix written by the first full run.
+    - ``dynamic_suffix`` (just the run number) changes every run and is placed
+      last, after all cache breakpoints.
+
+    Never move per-run varying text ahead of the evidence bundle: caching is a
+    prefix match, so that would break the cache for everything after it.
     """
-    static_prefix = f"""
+    shared_core = f"""
 Perform an Open Traceability Assessment of the project/report below.
 
 Definition source URL:
@@ -663,18 +767,12 @@ Project/report URL:
 
 Evidence bundle:
 {evidence_bundle}
-
-Output requirements:
-- Score stages 1-6 independently from 0 to 100.
-- Treat this as an independent run; do not try to match imagined prior runs.
-- Leave total_score and total_score_derivation null; the runner computes the total locally.
-- Provide a single-paragraph summary.
-- Include limitations, especially where the evidence bundle is incomplete.
 """.strip()
 
+    variant_rules = SLIM_OUTPUT_RULES if slim else FULL_OUTPUT_RULES
     dynamic_suffix = f"This is assessment run {run_number} of {runs}."
 
-    return static_prefix, dynamic_suffix
+    return shared_core, variant_rules, dynamic_suffix
 
 
 # -----------------------------
@@ -682,35 +780,161 @@ Output requirements:
 # -----------------------------
 
 
+def openai_input(shared_core: str, variant_rules: str, dynamic_suffix: str) -> list[dict]:
+    """OpenAI message list; automatic prefix caching reuses the stable leading parts."""
+    return [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": f"{shared_core}\n\n{variant_rules}\n\n{dynamic_suffix}"},
+    ]
+
+
+def anthropic_message_content(
+    shared_core: str, variant_rules: str, dynamic_suffix: str
+) -> list[dict]:
+    """Anthropic user content with two cache breakpoints.
+
+    Caching is a prefix match in render order tools -> system -> messages. The first
+    breakpoint caches the system prompt plus the (large) shared core, so full and
+    slim runs share it; the second caches the variant rules, so repeat runs of the
+    same variant are fully cached. Cache reads bill at ~0.1x. The per-run suffix
+    stays after every breakpoint so it never invalidates them.
+    """
+    return [
+        {
+            "type": "text",
+            "text": shared_core,
+            "cache_control": {"type": "ephemeral"},
+        },
+        {
+            "type": "text",
+            "text": variant_rules,
+            "cache_control": {"type": "ephemeral"},
+        },
+        {"type": "text", "text": dynamic_suffix},
+    ]
+
+
+def _usage_field(container: object, key: str) -> int:
+    """Read one numeric usage field from an SDK object or a plain dict, default 0."""
+    if container is None:
+        value = None
+    elif isinstance(container, dict):
+        value = container.get(key)
+    else:
+        value = getattr(container, key, None)
+    return int(value or 0)
+
+
+def usage_from_openai(usage: object) -> Optional[TokenUsage]:
+    if usage is None:
+        return None
+    if isinstance(usage, dict):
+        input_details = usage.get("input_tokens_details")
+        output_details = usage.get("output_tokens_details")
+    else:
+        input_details = getattr(usage, "input_tokens_details", None)
+        output_details = getattr(usage, "output_tokens_details", None)
+    return TokenUsage(
+        input_tokens=_usage_field(usage, "input_tokens"),
+        cached_input_tokens=_usage_field(input_details, "cached_tokens"),
+        output_tokens=_usage_field(usage, "output_tokens"),
+        reasoning_output_tokens=_usage_field(output_details, "reasoning_tokens"),
+    )
+
+
+def usage_from_anthropic(usage: object) -> Optional[TokenUsage]:
+    if usage is None:
+        return None
+    return TokenUsage(
+        input_tokens=_usage_field(usage, "input_tokens"),
+        cached_input_tokens=_usage_field(usage, "cache_read_input_tokens"),
+        cache_creation_input_tokens=_usage_field(usage, "cache_creation_input_tokens"),
+        output_tokens=_usage_field(usage, "output_tokens"),
+    )
+
+
+def format_usage(usage: Optional[TokenUsage]) -> str:
+    if usage is None:
+        return "usage unavailable"
+    return (
+        f"input {usage.input_tokens} (cache read {usage.cached_input_tokens}, "
+        f"cache write {usage.cache_creation_input_tokens}), "
+        f"output {usage.output_tokens} (reasoning {usage.reasoning_output_tokens})"
+    )
+
+
 def finalize_run(
-    parsed: AssessmentRun,
+    parsed: AssessmentOutput | SlimAssessmentOutput,
     *,
     run_number: int,
     project_url: str,
     model: str,
     include_total: bool,
+    usage: Optional[TokenUsage] = None,
 ) -> AssessmentRun:
-    """Apply run metadata, model attribution, and total-score behavior locally.
+    """Build the stored run from a model output plus runner-owned metadata.
 
-    Shared across providers so the score/total semantics are identical no matter
-    which model produced the assessment.
+    Run number, project URL, stage names, model attribution, totals, and token
+    usage never round-trip through the model. Shared across providers so the
+    score/total semantics are identical no matter which model produced the run.
     """
-    parsed.run_number = run_number
-    parsed.project_url = project_url
-    parsed.model_name = model
+    slim = isinstance(parsed, SlimAssessmentOutput)
+
+    if slim:
+        stages = [
+            StageAssessment(
+                stage=s.stage,
+                stage_name=STAGE_NAMES.get(s.stage, f"Stage {s.stage}"),
+                score=s.score,
+                score_derivation="",
+                uncertainty=s.uncertainty,
+                uncertainty_reason="",
+                references=[
+                    EvidenceReference(label=url, url=url, quote_or_finding="", relevance="")
+                    for url in s.reference_urls
+                ],
+            )
+            for s in parsed.stages
+        ]
+        project_name, summary, limitations = "", "", []
+    else:
+        stages = [
+            StageAssessment(
+                stage=s.stage,
+                stage_name=STAGE_NAMES.get(s.stage, f"Stage {s.stage}"),
+                score=s.score,
+                score_derivation=s.score_derivation,
+                uncertainty=s.uncertainty,
+                uncertainty_reason=s.uncertainty_reason,
+                references=s.references,
+            )
+            for s in parsed.stages
+        ]
+        project_name = parsed.project_name
+        summary = parsed.single_paragraph_summary
+        limitations = parsed.limitations
+
+    run = AssessmentRun(
+        run_number=run_number,
+        project_name=project_name,
+        project_url=project_url,
+        stages=stages,
+        single_paragraph_summary=summary,
+        limitations=limitations,
+        model_name=model,
+        schema_variant="slim" if slim else "full",
+        usage=usage,
+    )
 
     if include_total:
-        stage_scores = [stage.score for stage in parsed.stages]
+        stage_scores = [stage.score for stage in run.stages]
         computed_total = round(statistics.mean(stage_scores))
-        parsed.total_score = computed_total
-        parsed.total_score_derivation = (
+        run.total_score = computed_total
+        run.total_score_derivation = (
             f"Computed locally as round(mean({stage_scores})) = {computed_total}."
         )
-    else:
-        parsed.total_score = None
-        parsed.total_score_derivation = None
 
-    return parsed
+    return run
 
 
 def run_assessment_openai(
@@ -718,25 +942,24 @@ def run_assessment_openai(
     *,
     model: str,
     reasoning_effort: str,
-    static_prefix: str,
+    output_schema: type[BaseModel],
+    shared_core: str,
+    variant_rules: str,
     dynamic_suffix: str,
-) -> AssessmentRun:
-    # The system prompt and static prefix are identical across every run, so OpenAI's
-    # automatic prefix caching reuses them; the per-run suffix is kept last so it
-    # never invalidates that cached prefix.
+) -> tuple[BaseModel, Optional[TokenUsage]]:
+    # The system prompt and shared core are identical across every run, so OpenAI's
+    # automatic prefix caching reuses them; the variant rules and per-run suffix are
+    # kept last so they never invalidate that cached prefix.
     kwargs = {
         "model": model,
-        "input": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f"{static_prefix}\n\n{dynamic_suffix}"},
-        ],
-        "text_format": AssessmentRun,
+        "input": openai_input(shared_core, variant_rules, dynamic_suffix),
+        "text_format": output_schema,
     }
     if reasoning_effort != "none":
         kwargs["reasoning"] = {"effort": reasoning_effort}
 
     response = client.responses.parse(**kwargs)
-    return response.output_parsed
+    return response.output_parsed, usage_from_openai(getattr(response, "usage", None))
 
 
 def run_assessment_anthropic(
@@ -744,15 +967,13 @@ def run_assessment_anthropic(
     *,
     model: str,
     reasoning_effort: str,
-    static_prefix: str,
+    output_schema: type[BaseModel],
+    shared_core: str,
+    variant_rules: str,
     dynamic_suffix: str,
-) -> AssessmentRun:
-    # Caching is a prefix match in render order tools -> system -> messages, so the
-    # cache_control breakpoint on the static prefix block caches the system prompt and
-    # the (large) evidence bundle together. Cache reads bill at ~0.1x, so every run
-    # after the first reuses that prefix for ~90% less input cost. The per-run suffix
-    # is a separate, uncached block placed after the breakpoint. The evidence bundle is
-    # well above Opus's 4096-token minimum cacheable prefix.
+) -> tuple[BaseModel, Optional[TokenUsage]]:
+    # Cache breakpoints are set inside anthropic_message_content(); the evidence
+    # bundle is well above Opus's minimum cacheable prefix.
     kwargs = {
         "model": model,
         "max_tokens": 16000,
@@ -760,17 +981,12 @@ def run_assessment_anthropic(
         "messages": [
             {
                 "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": static_prefix,
-                        "cache_control": {"type": "ephemeral"},
-                    },
-                    {"type": "text", "text": dynamic_suffix},
-                ],
+                "content": anthropic_message_content(
+                    shared_core, variant_rules, dynamic_suffix
+                ),
             }
         ],
-        "output_format": AssessmentRun,
+        "output_format": output_schema,
     }
     # The Anthropic equivalent of OpenAI's reasoning effort is adaptive thinking
     # combined with the effort parameter.
@@ -779,7 +995,7 @@ def run_assessment_anthropic(
         kwargs["output_config"] = {"effort": reasoning_effort}
 
     response = client.messages.parse(**kwargs)
-    return response.parsed_output
+    return response.parsed_output, usage_from_anthropic(getattr(response, "usage", None))
 
 
 def run_assessment(
@@ -796,30 +1012,37 @@ def run_assessment(
     definition_text: str,
     evidence_bundle: str,
     include_total: bool,
+    slim: bool = False,
 ) -> AssessmentRun:
-    static_prefix, dynamic_suffix = build_user_prompt(
+    shared_core, variant_rules, dynamic_suffix = build_user_prompt(
         run_number=run_number,
         runs=runs,
         project_url=project_url,
         definition_url=definition_url,
         definition_text=definition_text,
         evidence_bundle=evidence_bundle,
+        slim=slim,
     )
+    output_schema = output_schema_for(slim)
 
     if provider == "anthropic":
-        parsed = run_assessment_anthropic(
+        parsed, usage = run_assessment_anthropic(
             anthropic_client,
             model=model,
             reasoning_effort=reasoning_effort,
-            static_prefix=static_prefix,
+            output_schema=output_schema,
+            shared_core=shared_core,
+            variant_rules=variant_rules,
             dynamic_suffix=dynamic_suffix,
         )
     else:
-        parsed = run_assessment_openai(
+        parsed, usage = run_assessment_openai(
             openai_client,
             model=model,
             reasoning_effort=reasoning_effort,
-            static_prefix=static_prefix,
+            output_schema=output_schema,
+            shared_core=shared_core,
+            variant_rules=variant_rules,
             dynamic_suffix=dynamic_suffix,
         )
 
@@ -829,7 +1052,237 @@ def run_assessment(
         project_url=project_url,
         model=model,
         include_total=include_total,
+        usage=usage,
     )
+
+
+# -----------------------------
+# Batch mode (--batch)
+# -----------------------------
+# Both providers' Batch APIs bill all tokens at 50% of the synchronous price. The
+# N runs of an assessment are fully independent, so they submit as one batch per
+# provider. Trade-offs: results arrive together (no incremental per-run saving)
+# and batches can take minutes to hours (up to 24h in the worst case).
+
+
+@dataclass
+class RunSpec:
+    run_number: int
+    provider: str
+    model: str
+    slim: bool
+
+
+def openai_text_format(schema_cls: type[BaseModel]) -> dict:
+    """Raw ``text.format`` param for a Pydantic schema.
+
+    Batch request bodies bypass ``responses.parse``, so the strict-schema
+    conversion the SDK normally performs is invoked here directly (with a plain
+    Pydantic-schema fallback if the private helper moves).
+    """
+    try:
+        from openai.lib._pydantic import to_strict_json_schema
+
+        schema = to_strict_json_schema(schema_cls)
+    except Exception:
+        schema = schema_cls.model_json_schema()
+    return {
+        "type": "json_schema",
+        "name": schema_cls.__name__,
+        "strict": True,
+        "schema": schema,
+    }
+
+
+def anthropic_output_format(schema_cls: type[BaseModel]) -> dict:
+    """Raw ``output_config.format`` for a Pydantic schema (batches bypass parse())."""
+    try:
+        from anthropic import transform_schema
+
+        schema = transform_schema(schema_cls)
+    except Exception:
+        schema = schema_cls.model_json_schema()
+    return {"type": "json_schema", "schema": schema}
+
+
+def _run_number_of(custom_id: str) -> int:
+    return int(custom_id.rsplit("-", 1)[1])
+
+
+def run_batch_openai(
+    client,
+    specs: list[RunSpec],
+    *,
+    model: str,
+    reasoning_effort: str,
+    prompt_parts_for,
+    poll_seconds: float,
+) -> tuple[dict[int, tuple[BaseModel, Optional[TokenUsage]]], dict[int, str]]:
+    """Submit one provider's runs as an OpenAI batch and collect the results."""
+    lines = []
+    for spec in specs:
+        shared_core, variant_rules, dynamic_suffix = prompt_parts_for(spec)
+        body = {
+            "model": model,
+            "input": openai_input(shared_core, variant_rules, dynamic_suffix),
+            "text": {"format": openai_text_format(output_schema_for(spec.slim))},
+        }
+        if reasoning_effort != "none":
+            body["reasoning"] = {"effort": reasoning_effort}
+        lines.append(
+            json.dumps(
+                {
+                    "custom_id": f"run-{spec.run_number}",
+                    "method": "POST",
+                    "url": "/v1/responses",
+                    "body": body,
+                },
+                ensure_ascii=False,
+            )
+        )
+
+    batch_file = client.files.create(
+        file=("assessment_batch.jsonl", "\n".join(lines).encode("utf-8")),
+        purpose="batch",
+    )
+    batch = client.batches.create(
+        input_file_id=batch_file.id,
+        endpoint="/v1/responses",
+        completion_window="24h",
+    )
+    print(f"  OpenAI batch {batch.id} submitted ({len(specs)} run(s)).")
+
+    terminal = {"completed", "failed", "expired", "cancelled"}
+    while batch.status not in terminal:
+        time.sleep(poll_seconds)
+        batch = client.batches.retrieve(batch.id)
+        counts = getattr(batch, "request_counts", None)
+        completed = getattr(counts, "completed", "?") if counts else "?"
+        print(f"  OpenAI batch status: {batch.status} ({completed}/{len(specs)} completed)")
+
+    outputs: dict[int, tuple[BaseModel, Optional[TokenUsage]]] = {}
+    errors: dict[int, str] = {}
+    spec_by_run = {spec.run_number: spec for spec in specs}
+
+    result_file_ids = [
+        file_id
+        for file_id in (batch.output_file_id, getattr(batch, "error_file_id", None))
+        if file_id
+    ]
+    if not result_file_ids:
+        raise RuntimeError(f"OpenAI batch {batch.id} ended with status {batch.status} and no result files")
+
+    for file_id in result_file_ids:
+        for raw_line in client.files.content(file_id).text.splitlines():
+            if not raw_line.strip():
+                continue
+            record = json.loads(raw_line)
+            run_number = _run_number_of(record["custom_id"])
+            response = record.get("response") or {}
+            body = response.get("body") or {}
+            if record.get("error") or response.get("status_code") != 200:
+                errors[run_number] = json.dumps(
+                    record.get("error") or body.get("error") or {"status_code": response.get("status_code")}
+                )
+                continue
+            text = "".join(
+                content.get("text", "")
+                for item in body.get("output", [])
+                if item.get("type") == "message"
+                for content in item.get("content", [])
+                if content.get("type") == "output_text"
+            )
+            try:
+                parsed = output_schema_for(spec_by_run[run_number].slim).model_validate_json(text)
+            except Exception as exc:
+                errors[run_number] = f"Could not parse structured output: {exc}"
+                continue
+            outputs[run_number] = (parsed, usage_from_openai(body.get("usage")))
+
+    for spec in specs:
+        if spec.run_number not in outputs and spec.run_number not in errors:
+            errors[spec.run_number] = f"No result returned (batch status {batch.status})"
+
+    return outputs, errors
+
+
+def run_batch_anthropic(
+    client,
+    specs: list[RunSpec],
+    *,
+    model: str,
+    reasoning_effort: str,
+    prompt_parts_for,
+    poll_seconds: float,
+) -> tuple[dict[int, tuple[BaseModel, Optional[TokenUsage]]], dict[int, str]]:
+    """Submit one provider's runs as an Anthropic Message Batch and collect the results."""
+    requests_payload = []
+    for spec in specs:
+        shared_core, variant_rules, dynamic_suffix = prompt_parts_for(spec)
+        # Prompt caching also applies inside batches (best effort), so the same
+        # cache breakpoints used in the synchronous path are kept here.
+        params = {
+            "model": model,
+            "max_tokens": 16000,
+            "system": SYSTEM_PROMPT,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": anthropic_message_content(
+                        shared_core, variant_rules, dynamic_suffix
+                    ),
+                }
+            ],
+            "output_config": {
+                "format": anthropic_output_format(output_schema_for(spec.slim))
+            },
+        }
+        if reasoning_effort != "none":
+            params["thinking"] = {"type": "adaptive"}
+            params["output_config"]["effort"] = reasoning_effort
+        requests_payload.append(
+            {"custom_id": f"run-{spec.run_number}", "params": params}
+        )
+
+    batch = client.messages.batches.create(requests=requests_payload)
+    print(f"  Anthropic batch {batch.id} submitted ({len(specs)} run(s)).")
+
+    while batch.processing_status != "ended":
+        time.sleep(poll_seconds)
+        batch = client.messages.batches.retrieve(batch.id)
+        counts = batch.request_counts
+        print(
+            f"  Anthropic batch status: {batch.processing_status} "
+            f"(succeeded {counts.succeeded}, errored {counts.errored}, "
+            f"processing {counts.processing})"
+        )
+
+    outputs: dict[int, tuple[BaseModel, Optional[TokenUsage]]] = {}
+    errors: dict[int, str] = {}
+    spec_by_run = {spec.run_number: spec for spec in specs}
+
+    for result in client.messages.batches.results(batch.id):
+        run_number = _run_number_of(result.custom_id)
+        if result.result.type != "succeeded":
+            detail = getattr(getattr(result.result, "error", None), "type", "")
+            errors[run_number] = f"Batch item {result.result.type}" + (
+                f": {detail}" if detail else ""
+            )
+            continue
+        message = result.result.message
+        text = next((b.text for b in message.content if b.type == "text"), "")
+        try:
+            parsed = output_schema_for(spec_by_run[run_number].slim).model_validate_json(text)
+        except Exception as exc:
+            errors[run_number] = f"Could not parse structured output: {exc}"
+            continue
+        outputs[run_number] = (parsed, usage_from_anthropic(message.usage))
+
+    for spec in specs:
+        if spec.run_number not in outputs and spec.run_number not in errors:
+            errors[spec.run_number] = "No result returned for this run"
+
+    return outputs, errors
 
 
 # -----------------------------
@@ -1053,10 +1506,26 @@ HUMAN_REVIEW_INSTRUCTIONS = (
 
 
 def build_runs_payload(runs: list[AssessmentRun]) -> dict:
+    totals = TokenUsage()
+    runs_counted = 0
+    for run in runs:
+        if run.usage is None:
+            continue
+        runs_counted += 1
+        totals.input_tokens += run.usage.input_tokens
+        totals.cached_input_tokens += run.usage.cached_input_tokens
+        totals.cache_creation_input_tokens += run.usage.cache_creation_input_tokens
+        totals.output_tokens += run.usage.output_tokens
+        totals.reasoning_output_tokens += run.usage.reasoning_output_tokens
+
     return {
         "human_review": {
             "approved": False,
             "instructions": HUMAN_REVIEW_INSTRUCTIONS,
+        },
+        "token_usage": {
+            "runs_counted": runs_counted,
+            "totals": totals.model_dump(),
         },
         "runs": [model_to_dict(r) for r in runs],
     }
@@ -1390,8 +1859,10 @@ def write_markdown_report(
             finding = md_escape(ref["finding"])
             cited = ", ".join(str(n) for n in sorted(ref["runs"]))
             marker = "" if ref["verified"] else " ⚠️"
+            # Slim (scores-only) runs cite bare URLs, so a reference may have no finding.
+            finding_part = f": {finding}" if finding else ""
             lines.append(
-                f"- [{label}]({url}){marker}: {finding} "
+                f"- [{label}]({url}){marker}{finding_part} "
                 f"_(cited in {len(ref['runs'])}/{run_count} runs: {cited})_"
             )
         lines.append("")
@@ -1463,6 +1934,35 @@ def parse_args() -> argparse.Namespace:
         "--runs", type=int, default=3, help="Number of runs per selected provider."
     )
     parser.add_argument(
+        "--full-runs",
+        type=int,
+        default=1,
+        help=(
+            "Per provider, how many runs use the full narrative schema (derivations, "
+            "summary, limitations). The remaining runs use a slim scores-only schema "
+            "(score, uncertainty, reference URLs) that costs a fraction of the output "
+            "tokens — repeat runs exist to measure variance, which only needs the "
+            "numbers. Set >= --runs to make every run full (the old behavior)."
+        ),
+    )
+    parser.add_argument(
+        "--batch",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help=(
+            "Submit all runs per provider through the provider's Batch API: every "
+            "token bills at 50%% of the synchronous price, but results arrive "
+            "together after the batch ends (minutes to hours; incremental per-run "
+            "saving is not possible)."
+        ),
+    )
+    parser.add_argument(
+        "--batch-poll-seconds",
+        type=float,
+        default=30.0,
+        help="How often to poll batch status when --batch is set.",
+    )
+    parser.add_argument(
         "--provider",
         choices=["openai", "anthropic", "both"],
         default="openai",
@@ -1527,6 +2027,9 @@ def main() -> None:
     if args.runs < 1:
         raise ValueError("--runs must be at least 1")
 
+    if args.full_runs < 0:
+        raise ValueError("--full-runs must be >= 0")
+
     if args.suggest_references and not args.manifest:
         raise ValueError(
             "--suggest-references expands a curated manifest, so it requires --manifest."
@@ -1579,57 +2082,137 @@ def main() -> None:
 
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
 
-    total_runs = args.runs * len(provider_models)
+    # Build the per-run plan up front: the first --full-runs runs per provider use
+    # the full narrative schema, the rest the slim scores-only schema.
+    run_specs: list[RunSpec] = []
+    run_number = 0
+    for provider, model in provider_models:
+        for index in range(args.runs):
+            run_number += 1
+            run_specs.append(
+                RunSpec(
+                    run_number=run_number,
+                    provider=provider,
+                    model=model,
+                    slim=index >= args.full_runs,
+                )
+            )
+
+    total_runs = len(run_specs)
     runs: list[AssessmentRun] = []
     failures: list[tuple[int, str]] = []
     run_dir: Optional[Path] = None
     json_path: Optional[Path] = None
     md_path: Optional[Path] = None
 
-    run_number = 0
-    for provider, model in provider_models:
-        for _ in range(args.runs):
-            run_number += 1
+    def ensure_run_dir(project_name: str) -> None:
+        nonlocal run_dir, json_path, md_path
+        if run_dir is not None:
+            return
+        name_prefix = f"{slugify(project_name)}_{args.out_prefix}"
+        run_dir = Path(args.output_dir) / f"{timestamp}_{name_prefix}"
+        run_dir.mkdir(parents=True, exist_ok=True)
+        json_path = run_dir / f"{name_prefix}.runs.json"
+        md_path = run_dir / f"{name_prefix}.report.md"
+
+    def save_runs() -> None:
+        # Slim runs carry no project name, so take it from the first run that has one.
+        ensure_run_dir(next((r.project_name for r in runs if r.project_name), "project"))
+        json_path.write_text(
+            json.dumps(build_runs_payload(runs), indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+    def prompt_parts_for(spec: RunSpec) -> tuple[str, str, str]:
+        return build_user_prompt(
+            run_number=spec.run_number,
+            runs=total_runs,
+            project_url=project_url,
+            definition_url=args.definition_url,
+            definition_text=definition_text,
+            evidence_bundle=evidence_bundle,
+            slim=spec.slim,
+        )
+
+    if args.batch:
+        batch_runners = {"openai": run_batch_openai, "anthropic": run_batch_anthropic}
+        clients = {"openai": openai_client, "anthropic": anthropic_client}
+        for provider, model in provider_models:
+            specs = [s for s in run_specs if s.provider == provider and s.model == model]
+            print(f"Submitting {len(specs)} run(s) as one {provider} batch ({model})...")
+            try:
+                outputs, errors = batch_runners[provider](
+                    clients[provider],
+                    specs,
+                    model=model,
+                    reasoning_effort=args.reasoning_effort,
+                    prompt_parts_for=prompt_parts_for,
+                    poll_seconds=args.batch_poll_seconds,
+                )
+            except Exception as exc:  # noqa: BLE001 - one provider's batch must not lose the other's
+                print(f"  {provider} batch failed: {exc}")
+                failures.extend((spec.run_number, str(exc)) for spec in specs)
+                continue
+
+            for spec in specs:
+                if spec.run_number in outputs:
+                    parsed, usage = outputs[spec.run_number]
+                    run = finalize_run(
+                        parsed,
+                        run_number=spec.run_number,
+                        project_url=project_url,
+                        model=model,
+                        include_total=args.include_total,
+                        usage=usage,
+                    )
+                    runs.append(run)
+                    print(f"  Run {spec.run_number} succeeded; tokens: {format_usage(usage)}")
+                else:
+                    message = errors.get(spec.run_number, "unknown batch error")
+                    print(f"  Run {spec.run_number} failed: {message}")
+                    failures.append((spec.run_number, message))
+
+        runs.sort(key=lambda run: run.run_number)
+        failures.sort(key=lambda failure: failure[0])
+        if runs:
+            save_runs()
+            print(f"Saved {len(runs)} run(s) to {json_path}")
+    else:
+        for spec in run_specs:
+            variant = "slim" if spec.slim else "full"
             print(
-                f"Running assessment {run_number}/{total_runs} ({provider}: {model})..."
+                f"Running assessment {spec.run_number}/{total_runs} "
+                f"({spec.provider}: {spec.model}, {variant} schema)..."
             )
             try:
                 run = run_assessment(
-                    provider=provider,
+                    provider=spec.provider,
                     openai_client=openai_client,
                     anthropic_client=anthropic_client,
-                    model=model,
+                    model=spec.model,
                     reasoning_effort=args.reasoning_effort,
-                    run_number=run_number,
+                    run_number=spec.run_number,
                     runs=total_runs,
                     project_url=project_url,
                     definition_url=args.definition_url,
                     definition_text=definition_text,
                     evidence_bundle=evidence_bundle,
                     include_total=args.include_total,
+                    slim=spec.slim,
                 )
             except Exception as exc:  # noqa: BLE001 - one failed run must not lose the others
-                print(f"  Run {run_number} failed: {exc}")
-                failures.append((run_number, str(exc)))
+                print(f"  Run {spec.run_number} failed: {exc}")
+                failures.append((spec.run_number, str(exc)))
                 continue
 
             runs.append(run)
+            print(f"  Tokens: {format_usage(run.usage)}")
 
             # Persist after every successful run so a later failure cannot discard prior work.
-            if run_dir is None:
-                name_prefix = f"{slugify(run.project_name)}_{args.out_prefix}"
-                run_dir = Path(args.output_dir) / f"{timestamp}_{name_prefix}"
-                run_dir.mkdir(parents=True, exist_ok=True)
-                json_path = run_dir / f"{name_prefix}.runs.json"
-                md_path = run_dir / f"{name_prefix}.report.md"
-
-            json_path.write_text(
-                json.dumps(build_runs_payload(runs), indent=2, ensure_ascii=False),
-                encoding="utf-8",
-            )
+            save_runs()
             print(f"  Saved {len(runs)} run(s) so far to {json_path}")
 
-            if run_number < total_runs and args.sleep_seconds > 0:
+            if spec.run_number < total_runs and args.sleep_seconds > 0:
                 time.sleep(args.sleep_seconds)
 
     # Optional manifest expansion: ask one model for additional evidence URLs and write
@@ -1654,10 +2237,7 @@ def main() -> None:
             suggestions = None
 
         if suggestions is not None and suggestions.suggestions:
-            if run_dir is None:
-                name_prefix = f"{slugify(manifest.claim or 'project')}_{args.out_prefix}"
-                run_dir = Path(args.output_dir) / f"{timestamp}_{name_prefix}"
-                run_dir.mkdir(parents=True, exist_ok=True)
+            ensure_run_dir(manifest.claim or "project")
             expanded_path = write_expanded_manifest(
                 manifest=manifest,
                 suggestions=suggestions,

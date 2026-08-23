@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A single-file CLI (`ota.py`) that runs an **Open Traceability Assessment**: it fetches a project's evidence (GitHub repo, web page, or PDF), bundles it, and asks an LLM (OpenAI and/or Anthropic) to score six traceability dimensions 0–100, repeated over multiple runs to expose model variance. Output is a structured JSON file plus a Markdown report, written into a timestamped per-run folder under `reports/`.
+A single-file CLI (`open_traceability_assessment.py`) that runs an **Open Traceability Assessment**: it fetches a project's evidence (GitHub repo, web page, or PDF), bundles it, and asks an LLM (OpenAI and/or Anthropic) to score six traceability dimensions 0–100, repeated over multiple runs to expose model variance. Output is a structured JSON file plus a Markdown report, written into a timestamped per-run folder under `reports/`.
 
-The whole program lives in `ota.py`; there is no package structure, test suite, or build step.
+The whole program lives in `open_traceability_assessment.py`; there is no package structure, test suite, or build step.
 
 ## Commands
 
@@ -16,10 +16,14 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt        # NOTE: also `pip install anthropic>=0.69.0` for --provider anthropic/both
 
 # Run (requires OPENAI_API_KEY and/or ANTHROPIC_API_KEY in the environment)
-python ota.py --project-url https://github.com/natcap/invest --runs 5 --include-total --out-prefix invest
+python open_traceability_assessment.py --project-url https://github.com/natcap/invest --runs 5 --include-total --out-prefix invest
 
 # Compare both providers in one report (--runs applies per provider)
-python ota.py --project-url <url> --provider both --model gpt-5.5 --anthropic-model claude-opus-4-8
+python open_traceability_assessment.py --project-url <url> --provider both --openai-model gpt-5.5 --anthropic-model claude-opus-4-8
+
+# Token-efficiency knobs: --full-runs N (full narrative schema for the first N runs
+# per provider, slim scores-only schema for the rest; default 1) and --batch
+# (submit runs through the providers' Batch APIs at 50% token price, results async)
 ```
 
 There are no tests or linters configured. To smoke-test a change, run against a small repo with `--runs 1`. Each real run sends a large evidence bundle and can cost up to ~$1.
@@ -34,11 +38,11 @@ The program is a linear pipeline in `main()`; understanding these stages is the 
      - Everything else → `collect_generic_evidence` → `fetch_url_text`, which handles HTML (BeautifulSoup text extraction), PDF (pypdf), and a HackMD `/download` special case (`candidate_text_urls`).
    - **Curated** (`--manifest`, `load_manifest` + `collect_manifest_evidence`): reads a YAML Open Traceability manifest (local path or URL) that pins the exact evidence URLs per dimension, then fetches each and builds a bundle grouped/labelled by stage. This makes runs reproducible (same bundle every time) and lets evidence include artifacts a crawl can't reach. Manifest keys map to stages 1–5 via `MANIFEST_DIMENSIONS` (+ aliases in `MANIFEST_KEY_ALIASES`, e.g. `open_access`→`open_publications`); there is intentionally no stage-6 key because the manifest file *is* the Open Linkage artifact. An optional top-level `namespace` (org/project home, single URL or list) is fetched once as cross-dimension context. When a manifest is used, `main()` sets the report's `project_url` to the manifest's `claim_url`. `pyyaml` is imported lazily here. Sample: `examples/open-traceability.yml`.
 
-2. **Prompt construction** (`build_user_prompt`) deliberately splits each prompt into a `static_prefix` (definition + evidence bundle + output rules — byte-identical across all runs) and a tiny `dynamic_suffix` (just the run number). This ordering is load-bearing for **prompt caching**: OpenAI caches the prefix automatically; the Anthropic path marks it with `cache_control` ephemeral. Never move per-run varying text ahead of the evidence bundle or you break the cache.
+2. **Prompt construction** (`build_user_prompt`) deliberately splits each prompt into three parts ordered from most to least stable: a `shared_core` (definition + evidence bundle — byte-identical across every run, full or slim), `variant_rules` (the output requirements, differing between the full and slim schemas), and a tiny `dynamic_suffix` (just the run number). This ordering is load-bearing for **prompt caching**: OpenAI caches the stable prefix automatically; the Anthropic path puts `cache_control` breakpoints after the core *and* after the variant rules, so slim runs still reuse the big core prefix written by the first full run. Never move per-run varying text ahead of the evidence bundle or you break the cache.
 
-3. **Model call** dispatches by provider (`run_assessment` → `run_assessment_openai` / `run_assessment_anthropic`). Both use the SDK's native structured-output parsing against the `AssessmentRun` Pydantic schema, so the model's output is validated, not hand-parsed. `reasoning_effort` maps to OpenAI's `reasoning` param vs. Anthropic's adaptive thinking + effort.
+3. **Model call** dispatches by provider (`run_assessment` → `run_assessment_openai` / `run_assessment_anthropic`). Both use the SDK's native structured-output parsing against a **model-facing** Pydantic schema, so the model's output is validated, not hand-parsed, and both return the provider-reported token usage alongside the parsed output. Two schemas exist: `AssessmentOutput` (full narrative) for the first `--full-runs` runs per provider, and `SlimAssessmentOutput` (scores, uncertainty, bare reference URLs) for the remaining runs — repeat runs measure variance, which only needs the numbers, so they skip the expensive prose. `reasoning_effort` maps to OpenAI's `reasoning` param vs. Anthropic's adaptive thinking + effort. With `--batch`, `run_batch_openai` / `run_batch_anthropic` instead submit all of a provider's runs as one Batch API job (50% token price, async results, no incremental saving); the batch bodies build the raw structured-output params (`text.format` / `output_config.format`) that `parse()` would otherwise derive.
 
-4. **`finalize_run`** applies provider-independent semantics locally: sets run metadata/`model_name` and computes `total_score` as the rounded mean of stage scores. The schema tells the model to leave `total_score` null — the runner owns it.
+4. **`finalize_run`** builds the stored `AssessmentRun` from a model output plus everything runner-owned: run metadata, `model_name`, canonical `stage_name`s (`STAGE_NAMES`), token `usage`, the `schema_variant` marker, and `total_score` as the rounded mean of stage scores. The model-facing schemas contain none of these fields — making the model generate them was output-token waste.
 
 5. **Reporting** (`write_markdown_report` + helpers) aggregates across runs: per-dimension average/std-dev, optional per-model comparison table, and `consolidate_references`, which dedupes cited references by URL and marks any whose URL was **not** in the collected evidence bundle with ⚠️ (a hallucinated-reference guard — this is why `evidence_items` is threaded all the way through).
 
@@ -47,6 +51,7 @@ The program is a linear pipeline in `main()`; understanding these stages is the 
 ## Conventions that matter
 
 - **Provider SDKs are imported lazily** in `build_clients` so users only install the provider they use. `requirements.txt` intentionally omits `anthropic`.
-- **Results are written incrementally**: the JSON is re-saved after every successful run, and one failed run is caught and skipped rather than aborting the batch (see the try/except in `main`).
+- **Results are written incrementally** (synchronous mode): the JSON is re-saved after every successful run, and one failed run is caught and skipped rather than aborting the batch (see the try/except in `main`). In `--batch` mode results arrive together, so the JSON is written once per completed provider batch.
+- **Token usage is recorded**: each stored run carries a `usage` block (input / cached / cache-write / output / reasoning tokens) and `runs.json` has a `token_usage` totals section — check `cached_input_tokens` there to confirm prompt caching is actually hitting.
 - **Pydantic models use `extra="forbid"`** — adding a field to the model output means adding it to the schema; the providers enforce the schema strictly.
 - Output goes to `reports/<timestamp>_<project-slug>_<out-prefix>/` with `.runs.json` and `.report.md`. Both carry a human-review approval gate (`human_review.approved` / a Markdown checkbox) that starts unapproved by design — this tool assists, it does not certify.
